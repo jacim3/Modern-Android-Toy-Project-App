@@ -3,7 +3,9 @@ package com.example.walkingpark.dto
 import com.google.gson.annotations.SerializedName
 
 // https://www.json2kotlin.com/results.php
-
+/**
+*   deprecated - api 서버가 불안정하여, 사용하지 않음.
+*/
 data class ParkDTO (
 
     @SerializedName("response") val response : Response

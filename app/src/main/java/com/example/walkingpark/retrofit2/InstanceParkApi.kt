@@ -6,6 +6,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object InstanceParkApi {
 
+    /**
+     deprecated - 공공데이터 api 서버가 불안정하여 json 파일데이터로 대체
+    * */
     private const val BASE_URL = "http://api.data.go.kr/openapi/"
 
     private val retrofit: Retrofit by lazy {
