@@ -1,24 +1,40 @@
 package com.example.walkingpark
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
-import androidx.viewpager2.widget.ViewPager2
 import com.example.walkingpark.databinding.ActivityMainBinding
 import com.example.walkingpark.factory.PublicApiViewModelFactory
+import com.example.walkingpark.fragment_tab_1.HomeFragment
+import com.example.walkingpark.fragment_tab_2.ParkMapsFragment
+import com.example.walkingpark.fragment_tab_3.SettingsFragment
 import com.example.walkingpark.repository.PublicDataApiRepository
-import com.example.walkingpark.components_ui.ViewPager2Adapter
-import com.example.walkingpark.database.singleton.ParkDataSet
-import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayoutMediator
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.tasks.CancellationToken
+import com.google.android.gms.tasks.CancellationTokenSource
+import kr.hyosang.coordinate.CoordPoint
+import kr.hyosang.coordinate.TransCoord
+
 
 class MainActivity : AppCompatActivity() {
 
 
     private var binding: ActivityMainBinding? = null
     private lateinit var viewModel: MainViewModel
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+
+
+    // TODO 측정소 정보를 가져오려면, 현재 위경도 좌표를 tm 좌표로 변환해야 하며, jar 과 같은 외부 라이브러리는 부정확함.
+    // TODO 다른 API 연동이 필요하여 이를 보류.
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,9 +46,56 @@ class MainActivity : AppCompatActivity() {
             PublicApiViewModelFactory(PublicDataApiRepository(this))
         )[MainViewModel::class.java]
 
-        setViewPagerWithTabLayout()
 
-        Log.e("getDataset", ParkDataSet.globalParkDataSet.records.size.toString())
+        // TODO 백그라운드 설정하여 위치정보 얻어오기
+        // 1. 퍼미션
+        // 2.
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        viewModel.serviceStart(this)
+
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return
+        }
+
+        val src = CancellationTokenSource()
+        val ct: CancellationToken = src.token
+        fusedLocationClient.getCurrentLocation(
+            PRIORITY_HIGH_ACCURACY,
+            ct
+        ).addOnSuccessListener {
+            Log.e("fusedLocationProvider", "${it.latitude} ${it.longitude}")
+            val point = CoordPoint(it.latitude, it.longitude)
+        }
+
+        binding!!.buttonHome.setOnClickListener {
+            val transaction1 = supportFragmentManager.beginTransaction()
+            transaction1.replace(R.id.fragmentContainer, HomeFragment()).commit()
+        }
+
+        binding!!.buttonMaps.setOnClickListener {
+            val transaction2 = supportFragmentManager.beginTransaction()
+            transaction2.replace(R.id.fragmentContainer, ParkMapsFragment()).commit()
+        }
+
+        binding!!.buttonSettings.setOnClickListener {
+            val transaction3 = supportFragmentManager.beginTransaction()
+            transaction3.replace(R.id.fragmentContainer, SettingsFragment()).commit()
+        }
     }
 
     override fun onStart() {
@@ -56,49 +119,7 @@ class MainActivity : AppCompatActivity() {
         binding = null
     }
 
-    private fun setViewPagerWithTabLayout() {
-        val pagerAdapter = ViewPager2Adapter(supportFragmentManager, lifecycle)
-
-        this.binding!!.circleIndicator.run {
-            setViewPager(binding!!.viewPager2)
-            createIndicators(MAIN_PAGER_TAB_NUMBER, 0)
-        }
-
-        binding!!.viewPager2.apply {
-            adapter = pagerAdapter
-            orientation = ViewPager2.ORIENTATION_HORIZONTAL
-            binding!!.viewPager2.registerOnPageChangeCallback(object :
-                ViewPager2.OnPageChangeCallback() {
-
-                override fun onPageScrolled(
-                    position: Int,
-                    positionOffset: Float,
-                    positionOffsetPixels: Int
-                ) {
-                    super.onPageScrolled(position, positionOffset, positionOffsetPixels)
-                }
-
-                override fun onPageSelected(position: Int) {
-                    super.onPageSelected(position)
-                    binding!!.circleIndicator.animatePageSelected(position % MAIN_PAGER_TAB_NUMBER)
-                }
-
-                override fun onPageScrollStateChanged(state: Int) {
-                    super.onPageScrollStateChanged(state)
-                }
-            })
-        }
-
-        binding!!.viewPager2.isUserInputEnabled = false
-
-        TabLayoutMediator(
-            binding!!.tabLayout,
-            binding!!.viewPager2
-        ) { tab: TabLayout.Tab?, position: Int ->
-        }.attach()
-    }
-
     companion object {
-        const val MAIN_PAGER_TAB_NUMBER = 3
+
     }
 }

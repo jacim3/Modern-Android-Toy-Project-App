@@ -1,5 +1,6 @@
 package com.example.walkingpark.dto
 
+import android.util.Log
 import com.google.gson.annotations.SerializedName
 
 data class ParkDAO(
@@ -12,7 +13,6 @@ data class ParkDAO(
     )
 
     data class Records(
-
         @SerializedName("관리번호") val manageNumber: String,
         @SerializedName("공원명") val parkName: String,
         @SerializedName("공원구분") val parkCategory: String,
@@ -32,6 +32,9 @@ data class ParkDAO(
         @SerializedName("데이터기준일자") val dateReference: String,
         @SerializedName("제공기관코드") val institutionCode: String,
         @SerializedName("제공기관명") val institutionName2: String
-    )
-
+    ):Comparable<Records> {
+        override fun compareTo(other: Records):Int {
+            return compareValuesBy(this, other, { it.latitude.toDouble() }, { it.longitude.toDouble() })
+        }
+    }
 }

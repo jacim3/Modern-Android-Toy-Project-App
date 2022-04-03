@@ -3,6 +3,7 @@ package com.example.walkingpark.fragment_tab_2
 import android.content.Context
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -32,8 +33,8 @@ class ParkMapsFragment : Fragment(), OnMapReadyCallback{
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
+        Log.e("ParkMapsFragment()", "onAttach()")
     }
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -42,43 +43,52 @@ class ParkMapsFragment : Fragment(), OnMapReadyCallback{
         binding = FragmentParkmapsBinding.inflate(layoutInflater, container, false)
         binding!!.mapFragment.onCreate(savedInstanceState)
         binding!!.mapFragment.getMapAsync(this)
+        Log.e("ParkMapsFragment()", "onCreateView()")
         return binding!!.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this)[ParkMapsViewModel::class.java]
+        Log.e("ParkMapsFragment()", "onViewCreated()")
     }
 
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
         super.onViewStateRestored(savedInstanceState)
+        Log.e("ParkMapsFragment()", "onViewStateRestored()")
 
     }
 
 
     override fun onStart() {
         super.onStart()
+        Log.e("ParkMapsFragment()", "onStart()")
         binding!!.mapFragment.onStart()
     }
 
     override fun onResume() {
         super.onResume()
+        Log.e("ParkMapsFragment()", "onResume()")
+
         binding!!.mapFragment.onResume()
     }
 
     override fun onPause() {
         super.onPause()
+        Log.e("ParkMapsFragment()", "onPause()")
         binding!!.mapFragment.onPause()
     }
 
     override fun onStop() {
         super.onStop()
+        Log.e("ParkMapsFragment()", "onStop()")
         binding!!.mapFragment.onStop()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        Log.e("ParkMapsFragment()", "onDestroyView()")
     }
 
     companion object {
@@ -96,5 +106,9 @@ class ParkMapsFragment : Fragment(), OnMapReadyCallback{
         googleMap.addMarker(markerOptions);
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(seoul))
         googleMap.animateCamera(CameraUpdateFactory.zoomTo(12f))
+    }
+
+    private fun getCurrentPosition(){
+
     }
 }

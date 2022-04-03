@@ -17,6 +17,7 @@ class PublicDataApiRepository(private val activity: MainActivity) {
     private val apiKey = checkApiKey(activity)
 
     // 공원 데이터 가져오기
+/*
     suspend fun getParkData(): Response<ParkDTO>? {
 
         if (apiKey == null) {
@@ -24,7 +25,7 @@ class PublicDataApiRepository(private val activity: MainActivity) {
             return null
         }
         return InstanceParkApi.api.getParkData(apiKey, "1", "json")
-    }
+    }*/
 
     // 측정소 이름으로 데이터 가져오기
     suspend fun getStationDataByName(stationName: String): Response<StationNameDTO>? {
@@ -45,7 +46,7 @@ class PublicDataApiRepository(private val activity: MainActivity) {
     }
 
     // 공기 데이터 측정소 이름으로 가져오기
-    suspend fun getAirDataByStationName(stationName: String): Response<AirDTO>?{
+    suspend fun getAirDataByStationName(stationName: String): Response<AirDTO>? {
         if (apiKey == null) {
             Toast.makeText(activity.applicationContext, "키 없음", Toast.LENGTH_SHORT).show()
             return null

@@ -8,37 +8,41 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/viewPager2"
+        <FrameLayout
+            android:id="@+id/fragmentContainer"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@+id/circleIndicator"
+            app:layout_constraintBottom_toTopOf="@+id/linearLayoutTabs"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <me.relex.circleindicator.CircleIndicator3
-            android:id="@+id/circleIndicator"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            app:ci_drawable="@drawable/circleindicator_dot"
-            app:layout_constraintBottom_toTopOf="@+id/appBarLayout" />
-
-        <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/appBarLayout"
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/linearLayoutTabs"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:background="#E1E1E1"
-            android:elevation="5dp"
+            android:background="#E8E8E8"
             app:layout_constraintBottom_toBottomOf="parent">
 
-            <com.google.android.material.tabs.TabLayout
-                android:id="@+id/tabLayout"
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/buttonHome"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:elevation="5dp"
-                app:tabIndicatorColor="#000000">
+                android:layout_weight="1"/>
 
-            </com.google.android.material.tabs.TabLayout>
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/buttonMaps"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"/>
 
-        </com.google.android.material.appbar.AppBarLayout>
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/buttonSettings"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"/>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
