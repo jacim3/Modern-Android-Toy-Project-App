@@ -1,4 +1,4 @@
-package com.example.walkingpark.components.background.service
+package com.example.walkingpark.components.foreground.service
 
 import android.Manifest
 import android.app.*
@@ -14,13 +14,14 @@ import androidx.core.app.NotificationCompat
 import com.example.walkingpark.MainActivity
 import com.example.walkingpark.R
 import com.example.walkingpark.database.singleton.Common
+import com.example.walkingpark.database.singleton.Settings
+import com.example.walkingpark.database.singleton.UserData
 import com.google.android.gms.location.*
 import com.google.android.gms.tasks.CancellationToken
 import com.google.android.gms.tasks.CancellationTokenSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kr.hyosang.coordinate.CoordPoint
 
 class ParkMapsService : Service() {
 
@@ -35,8 +36,8 @@ class ParkMapsService : Service() {
         get() = field + 1
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationTrackNotification: NotificationCompat.Builder
-    private lateinit var locationRequest:LocationRequest
-    private lateinit var locationCallback:LocationCallback
+    private lateinit var locationRequest: LocationRequest
+    private lateinit var locationCallback: LocationCallback
 
     val thisService: ParkMapsService = this
 
@@ -99,12 +100,11 @@ class ParkMapsService : Service() {
             )
         }
         startForeground(2, locationTrackNotification.build())
-
-
         return mBinder
     }
 
-    private fun searchLastLocation(){
+    // fusedLocationClient 객체를 초기화 하며, 사용자 위치정보 찾기 수행
+    private fun searchLocation() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this@ParkMapsService)
 
         if (ActivityCompat.checkSelfPermission(
@@ -127,35 +127,51 @@ class ParkMapsService : Service() {
             Log.e("fusedLocationProvider", "fail")
         }.addOnSuccessListener {
             Log.e("fusedLocationProvider", "${it.latitude} ${it.longitude}")
-            val point = CoordPoint(it.latitude, it.longitude)
+
+            // BroadCastReceiver 콜백이 호출되었음을 알리기
+            val requestIntent = Intent()
+            requestIntent.action = Common.REQUEST_ACTION_UPDATE
+            sendBroadcast(requestIntent)
+
+            UserData.currentLatitude = it.latitude
+            UserData.currentLongitude = it.longitude
         }
     }
 
     // Location 설정 변경
-    private fun setLocationRequest(){
+    private fun setLocationRequest() {
         locationRequest = LocationRequest.create().apply {
-            interval = Common.LOCATION_UPDATE_INTERVAL
-            fastestInterval = Common.LOCATION_UPDATE_INTERVAL_FASTEST
+            interval = Settings.LOCATION_UPDATE_INTERVAL
+            fastestInterval = Settings.LOCATION_UPDATE_INTERVAL_FASTEST
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         }
     }
 
     // 로케이션 콜백 등록
-    private fun setLocationCallback(){
-        locationCallback = object: LocationCallback() {
-            override fun onLocationResult(p0: LocationResult) {
-                super.onLocationResult(p0)
+    private fun setLocationCallback() {
+        locationCallback = object : LocationCallback() {
+            override fun onLocationResult(result: LocationResult) {
+                super.onLocationResult(result)
                 Log.e("LocationCallback", "OnLocationResult")
+                Log.e(
+                    "LocationCallback",
+                    "${result.lastLocation.latitude} ${result.lastLocation.longitude}"
+
+                )
+                UserData.currentLatitude = result.lastLocation.latitude
+                UserData.currentLongitude = result.lastLocation.longitude
             }
 
-            override fun onLocationAvailability(p0: LocationAvailability) {
-                super.onLocationAvailability(p0)
+            override fun onLocationAvailability(response: LocationAvailability) {
+                super.onLocationAvailability(response)
                 Log.e("LocationCallback", "onLocationAvailability")
+                Log.e("LocationCallback", "${response.isLocationAvailable}")
+
             }
         }
     }
 
-    private fun registerLocationUpdate(){
+    private fun updateLocation() {
 
         if (ActivityCompat.checkSelfPermission(
                 this,
@@ -165,19 +181,20 @@ class ParkMapsService : Service() {
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
+            Log.e("ParkMapsService", "퍼미션 허용 안됨")
             return
         }
-        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
+
+        CoroutineScope(Dispatchers.Default).launch {
+            fusedLocationClient.requestLocationUpdates(
+                locationRequest,
+                locationCallback,
+                Looper.getMainLooper()
+            ).addOnCompleteListener { Log.e("Completed", "Completed") }
+        }
     }
 
-    fun stopLocationUpdates(){
+    fun stopUpdateLocation() {
         fusedLocationClient.removeLocationUpdates(locationCallback)
     }
 
@@ -196,17 +213,20 @@ class ParkMapsService : Service() {
 
         if (requestCode != -1) {
 
-           when(requestCode) {
-               Common.PERMISSION -> {
-                   searchLastLocation()
-               }
-               Common.LOCATION_UPDATE -> {
+            when (requestCode) {
+                Common.PERMISSION -> {
+                    searchLocation()
+                }
+                Common.LOCATION_UPDATE -> {
+                    updateLocation()
+                }
+                Common.LOCATION_UPDATE_CANCEL -> {
+                    stopUpdateLocation()
+                }
+                Common.LOCATION_SETTINGS -> {
 
-               }
-               Common.LOCATION_SETTINGS -> {
-
-               }
-           }
+                }
+            }
         }
         /*
             1. START_STICKY = Service 가 재시작될 때 null intent 전달

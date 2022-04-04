@@ -1,21 +1,12 @@
 package com.example.walkingpark
 
-import android.Manifest
-import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
-import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.Handler
-import android.os.IBinder
 import android.os.Looper
-import android.util.Log
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import com.example.walkingpark.components.background.service.ParkMapsService
 import com.example.walkingpark.database.room.AppDatabase
-import com.example.walkingpark.database.singleton.ParkDataSet
 import com.example.walkingpark.repository.ParkRoomRepository
 import kotlinx.coroutines.*
 

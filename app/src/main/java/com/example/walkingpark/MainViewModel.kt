@@ -1,15 +1,12 @@
 package com.example.walkingpark
 
-import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
-import android.util.Log
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.walkingpark.components.background.service.ParkMapsService
+import com.example.walkingpark.components.foreground.service.ParkMapsService
 import com.example.walkingpark.dto.AirDTO
 import com.example.walkingpark.dto.StationTmDTO
 import com.example.walkingpark.repository.PublicDataApiRepository
@@ -19,23 +16,6 @@ class MainViewModel(private val repository: PublicDataApiRepository) : ViewModel
 
     val responseStationTmDataSet = MutableLiveData<Response<StationTmDTO>>()
     val responseAirDataSet = MutableLiveData<Response<AirDTO>>()
-
-    fun serviceStart(context: Context) {
-
-        // 보안을 위해서, 서비스는 반드시 명시적 인텐트를 사용해야 한다.
-        val intent = Intent(context,ParkMapsService::class.java)
-        // 포그라운드 서비스 버전 처리
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
-            context
-            .startForegroundService(intent)
-        else
-            context.startService(intent)
-    }
-
-    fun serviceStop(context: Context) {
-        val intent = Intent(context, ParkMapsService::class.java)
-        context.stopService(intent)
-    }
 
     fun getParkMapsService(service:IBinder): ParkMapsService {
 

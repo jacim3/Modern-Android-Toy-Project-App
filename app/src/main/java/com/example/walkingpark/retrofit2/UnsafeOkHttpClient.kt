@@ -6,6 +6,11 @@ import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
 
+/**
+* 안드로이드에서 rest-api 공공데이터 포털 api 통신을 막음
+* 이를 우회하기 위한, 안전하지 않은 방법.
+* */
+
 object UnsafeOkHttpClient {
 
     fun unsafeOkHttpClient(): OkHttpClient.Builder {
