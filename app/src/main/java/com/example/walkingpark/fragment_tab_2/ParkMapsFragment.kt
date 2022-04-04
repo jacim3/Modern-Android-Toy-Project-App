@@ -51,6 +51,8 @@ class ParkMapsFragment : Fragment(), OnMapReadyCallback{
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this)[ParkMapsViewModel::class.java]
         Log.e("ParkMapsFragment()", "onViewCreated()")
+
+        Log.e("ParkMapsService()", (activity as MainActivity).parkMapsService.number.toString())
     }
 
 

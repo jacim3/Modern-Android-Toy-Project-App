@@ -1,13 +1,18 @@
 package com.example.walkingpark.fragment_tab_1
 
+import android.content.ComponentName
 import android.content.Context
+import android.content.ServiceConnection
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
+import android.os.IBinder
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import com.example.walkingpark.MainActivity
 import com.example.walkingpark.R
 import com.example.walkingpark.databinding.FragmentHomeBinding
 import com.example.walkingpark.fragment_tab_2.ParkMapsViewModel
@@ -40,6 +45,7 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Log.e("HomeFragment()", "onViewCreated()")
+
 
     }
 

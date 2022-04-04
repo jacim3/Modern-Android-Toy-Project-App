@@ -40,10 +40,10 @@
         </activity> <!-- 공공데이터 포털 Api 키 -->
         <meta-data
             android:name="public.data.api.key"
-            android:value=/> <!-- Google Maps Api 키 -->
+            android:value="" /> <!-- Google Maps Api 키 -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value=/>
+            android:value="" />
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" /> <!-- google.maps 16.0.0 이하를 사용하고, targetApi Level 28 이상인 경우 다음 선언 추가 -->
