@@ -3,7 +3,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -13,36 +12,42 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             app:layout_constraintBottom_toTopOf="@+id/linearLayoutTabs"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/linearLayoutTabs"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:background="#E8E8E8"
-            app:layout_constraintBottom_toBottomOf="parent">
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:layout_editor_absoluteX="0dp">
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/buttonHome"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1"/>
+                android:layout_weight="1"
+                android:text="@string/tab_button_1" />
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/buttonMaps"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1"/>
+                android:layout_weight="1"
+                android:text="@string/tab_button_2" />
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/buttonSettings"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1"/>
+                android:layout_weight="1"
+                android:text="@string/tab_button_3" />
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 
-
-
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </layout>

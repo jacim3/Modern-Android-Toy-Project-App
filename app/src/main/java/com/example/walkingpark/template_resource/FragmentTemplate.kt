@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
-import com.example.walkingpark.fragment_tab_2.ParkMapsViewModel
+import com.example.walkingpark.tabs.tab_2.ParkMapsViewModel
 
 /*
 * 프래그먼트 생성을 위한 복붙용 템플릿.

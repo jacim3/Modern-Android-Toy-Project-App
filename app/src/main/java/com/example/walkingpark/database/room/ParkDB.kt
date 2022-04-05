@@ -2,10 +2,7 @@ package com.example.walkingpark.database.room
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.example.walkingpark.dto.ParkDAO
-import com.google.gson.annotations.SerializedName
 
 /**
 *   assets 의 db 파일과 제약조건을 동일학 맞춰줄 것!

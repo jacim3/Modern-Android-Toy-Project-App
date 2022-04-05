@@ -4,11 +4,14 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.walkingpark.database.room.AppDatabase
 import com.example.walkingpark.repository.ParkRoomRepository
 import kotlinx.coroutines.*
+import okhttp3.OkHttpClient
+import java.lang.Exception
 
 class Splash : AppCompatActivity() {
     private var handler = Handler(Looper.getMainLooper())
@@ -67,5 +70,14 @@ class Splash : AppCompatActivity() {
 
     }
 
+
+    fun sendOtherApi() {
+        try {
+            val client = OkHttpClient()
+
+        }catch (e: Exception) {
+            Log.e("Error", e.printStackTrace().toString())
+        }
+    }
 
 }

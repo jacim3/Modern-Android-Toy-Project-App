@@ -4,7 +4,6 @@ import android.content.pm.PackageManager
 import android.widget.Toast
 import com.example.walkingpark.MainActivity
 import com.example.walkingpark.dto.AirDTO
-import com.example.walkingpark.dto.ParkDTO
 import com.example.walkingpark.dto.StationNameDTO
 import com.example.walkingpark.dto.StationTmDTO
 import com.example.walkingpark.retrofit2.InstanceAirApi
@@ -12,7 +11,7 @@ import com.example.walkingpark.retrofit2.InstanceParkApi
 import com.example.walkingpark.retrofit2.InstanceStationApi
 import retrofit2.Response
 
-class PublicDataApiRepository(private val activity: MainActivity) {
+class RestApiRepository(private val activity: MainActivity) {
 
     private val apiKey = checkApiKey(activity)
 

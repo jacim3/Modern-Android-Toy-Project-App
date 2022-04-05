@@ -1,4 +1,4 @@
-package com.example.walkingpark.fragment_tab_3
+package com.example.walkingpark.tabs.tab_3
 
 import androidx.lifecycle.ViewModel
 

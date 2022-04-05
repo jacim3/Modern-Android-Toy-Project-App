@@ -1,4 +1,4 @@
-package com.example.walkingpark.fragment_tab_2
+package com.example.walkingpark.tabs.tab_2
 
 import android.content.Context
 import androidx.lifecycle.ViewModelProvider
@@ -9,18 +9,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.example.walkingpark.MainActivity
-import com.example.walkingpark.R
 import com.example.walkingpark.databinding.FragmentParkmapsBinding
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 /*
 *  뷰바인딩 사용 안함
@@ -55,13 +50,10 @@ class ParkMapsFragment : Fragment(), OnMapReadyCallback{
         Log.e("ParkMapsService()", (activity as MainActivity).parkMapsService.number.toString())
     }
 
-
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
         super.onViewStateRestored(savedInstanceState)
         Log.e("ParkMapsFragment()", "onViewStateRestored()")
-
     }
-
 
     override fun onStart() {
         super.onStart()
@@ -72,7 +64,6 @@ class ParkMapsFragment : Fragment(), OnMapReadyCallback{
     override fun onResume() {
         super.onResume()
         Log.e("ParkMapsFragment()", "onResume()")
-
         binding!!.mapFragment.onResume()
     }
 
@@ -101,6 +92,7 @@ class ParkMapsFragment : Fragment(), OnMapReadyCallback{
         this.googleMap = googleMap
         val seoul = LatLng(37.56, 126.97);
         val markerOptions= MarkerOptions()
+
         markerOptions.position(seoul);
         markerOptions.title("서울");
         markerOptions.snippet("수도");

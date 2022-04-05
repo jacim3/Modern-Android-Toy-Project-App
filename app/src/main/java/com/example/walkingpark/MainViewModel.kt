@@ -1,7 +1,5 @@
 package com.example.walkingpark
 
-import android.content.Context
-import android.content.Intent
 import android.os.Build
 import android.os.IBinder
 import androidx.lifecycle.MutableLiveData
@@ -9,10 +7,10 @@ import androidx.lifecycle.ViewModel
 import com.example.walkingpark.components.foreground.service.ParkMapsService
 import com.example.walkingpark.dto.AirDTO
 import com.example.walkingpark.dto.StationTmDTO
-import com.example.walkingpark.repository.PublicDataApiRepository
+import com.example.walkingpark.repository.RestApiRepository
 import retrofit2.Response
 
-class MainViewModel(private val repository: PublicDataApiRepository) : ViewModel() {
+class MainViewModel(private val repository: RestApiRepository) : ViewModel() {
 
     val responseStationTmDataSet = MutableLiveData<Response<StationTmDTO>>()
     val responseAirDataSet = MutableLiveData<Response<AirDTO>>()

@@ -23,6 +23,23 @@ object Common {
 object UserData{
     var currentLatitude: Double = 0.0       // 사용자 위도 실시간 저장
     var currentLongitude: Double = 0.0      // 사용자 경도 실시간 저장
+    lateinit var userLocation:Array<String> // 사용자 위치정보 저장
+}
+
+object Locations{
+    // 공공데이터 TM 좌표가 제대로 먹지 않음. -> Geocoder 에서 받아온 주소데이터로 처리.
+    const val MAX_LENGTH = 10 // 저장 최대 길이
+    const val COUNTRY = 0
+    const val SI = 1        // 사
+    const val GUN = 2       // 군
+    const val GU = 3        // 구
+    const val EUP = 4       // ...
+    const val DO = 5
+    const val MUN = 6
+    const val DONG = 7
+    const val EX1 = 8       // 여분 주소 넣기
+    const val EX2 = 9
+    const val EX3 = 10
 }
 
 object Settings{

@@ -1,21 +1,17 @@
-package com.example.walkingpark.fragment_tab_1
+package com.example.walkingpark.tabs.tab_1
 
-import android.content.ComponentName
 import android.content.Context
-import android.content.ServiceConnection
-import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
-import android.os.IBinder
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import com.example.walkingpark.MainActivity
-import com.example.walkingpark.R
 import com.example.walkingpark.databinding.FragmentHomeBinding
-import com.example.walkingpark.fragment_tab_2.ParkMapsViewModel
+import com.example.walkingpark.tabs.tab_2.ParkMapsViewModel
+
+// TODO 1. 동네예보 Api 연동 -> x,y 구하는 방법에 대한 고민 필요.
+// TODO 미세먼지 정보를 가져오는 가장 쉬운 방법
 
 class HomeFragment : Fragment() {
 

@@ -3,7 +3,9 @@ package com.example.walkingpark.dto
 import com.google.gson.annotations.SerializedName
 import retrofit2.Response
 
-
+/**
+*   공공데이터 - 대기정보를 받아 직렬화를 수행할 DTO 객체
+*/
 data class AirDTO(
 
     @SerializedName("response") val response: Response
