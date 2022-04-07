@@ -9,14 +9,14 @@
 Broadcast Receiver
 Foreground Service
 
-사용 라이브러리
+# 사용 라이브러리
 ViewModel 
 Room  (앱 내 로컬 DB 구축)
 Retrofit 2 (공공데이터 Rest Api 연동)
 Coroutine (네트워크 비동기 처리)
 Google Maps Api (사용자 좌표 추적)
 
-추후 적용 예정 라이브러리
+# 적용 예정 라이브러리
 Dagger-hilt
 Databinding
 Firebase Auth
