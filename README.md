@@ -7,7 +7,7 @@
 - ViewModel은 현재 적용중. 추후 DataBinding 도입으로 뷰화 뷰모델을 완전히 분리하는 것으로 MVVM 패턴 완성 예정 
 - Google Maps Api 와 공공데이터 포털을 이용하므로, Manifest의 meta-data에 키 등록 필요.
 
-## Start App Development
+## App Development 
 - 2022.04.02 공공데이터 포털 + 레트로핏2 연동 및 MVVM을 위한 간단한 아키텍쳐 설정
 - 2022.04.03 기획 수정 + 로컬 DB 연동 및 초기화 관련 로직 작성
 - 2022.04.04 기획 수정 + 포그라운드 서비스 로직 작정
