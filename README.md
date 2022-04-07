@@ -14,7 +14,7 @@
 
 # 현재 적용중인 컴포넌트
 - Foreground Service (사용자 위치 추적 수행 및 이러한 상황을 노티피케이션으로 알림)
-- Broadcast Receiver (동적 리시버. 서버스로부터 얻어온 결과를 추기적으로 액티비티에 전달. 액티비티는 이러한 요청을 따라 알맞은 요청을 다시 RequestCode와 함께 onStartCommand()로 서비스에 전달)
+- Broadcast Receiver (동적 리시버. 서비스로부터 얻어온 결과를 추기적으로 리턴. 알맞은 요청을 다시 RequestCode와 함께 onStartCommand()로 서비스에 전달)
 
 # 현재 적용중인 AAC 컴포넌트
 - Room (스플래시에서 미리 준비된 db 파일을 Room 으로 초기화하는데 따른 별도 시간 소요. (최초 앱 실행시에만))
@@ -28,7 +28,7 @@
 # 현재 적용중인 라이브러리
 - Retrofit 2 (공공데이터 Rest Api 연동)
 - Coroutine (네트워크 비동기 처리)
-- Google Maps Api (포그라운드 서비스에서 작동하여, 사용자 좌표 추적 후 액티비티에 전달)
+- Google Maps Api (포그라운드 서비스에서 작동하여, 사용자 좌표 추적 후 리턴)
 
 # 적용 예정 라이브러리 (현재 미적용)
 - Dagger-hilt (DI)
