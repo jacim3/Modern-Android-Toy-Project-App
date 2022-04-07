@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.example.walkingpark.components.foreground.service.ParkMapsService
-import com.example.walkingpark.database.singleton.Common
+import com.example.walkingpark.database.etc.Common
 import com.example.walkingpark.databinding.ActivityMainBinding
 import com.example.walkingpark.factory.PublicApiViewModelFactory
 import com.example.walkingpark.tabs.tab_1.HomeFragment
@@ -30,6 +30,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var parkMapsService: ParkMapsService       // 서비스 객체
     private var isParkMapsServiceRunning = false
     lateinit var parkMapsReceiver: BroadcastReceiver
+    lateinit var updateReceiver:BroadcastReceiver
 
     // TODO 측정소 정보를 가져오려면, 현재 위경도 좌표를 tm 좌표로 변환해야 하며, jar 과 같은 외부 라이브러리는 부정확함.
     // TODO 다른 API 연동이 필요하여 이를 보류.
@@ -67,6 +68,10 @@ class MainActivity : AppCompatActivity() {
                 Manifest.permission.ACCESS_COARSE_LOCATION
             )
         )
+
+        viewModel.userAddressMap.observe(this){
+            Log.e("LocationUpdated!!!!", it.toString())
+        }
     }
 
     // 백그라운드 위치정보 서비스 활성 및 콜백 등록.
@@ -83,9 +88,15 @@ class MainActivity : AppCompatActivity() {
                 parkMapsService = viewModel.getParkMapsService(service)
                 isParkMapsServiceRunning = true
 
-                // 서비스에서 맵 요청 콜백이 완료됨에 따라 이를 액티비티에 알려주기 위한 리시버 초기화 및 등록
-                parkMapsReceiver = ParkMapsReceiver(applicationContext)
-                registerReceiver(parkMapsReceiver, IntentFilter(Common.REQUEST_ACTION_UPDATE))
+                // 서비스에서 작업이 완료됨에 따라, 서비스로부터 결과를 수신받을 리시버 등록
+                parkMapsReceiver = ParkMapsReceiver(applicationContext, viewModel)
+                val filter = IntentFilter().apply {
+                    addAction(Common.REQUEST_ACTION_UPDATE)
+                    addAction(Common.REQUEST_ACTION_PAUSE)
+                    addAction(Common.ACCEPT_ACTION_UPDATE)
+                }
+
+                registerReceiver(parkMapsReceiver, filter)
             }
 
             override fun onServiceDisconnected(name: ComponentName) {
@@ -146,14 +157,21 @@ class MainActivity : AppCompatActivity() {
         startParkMapsService(intent)
     }
 
-    class ParkMapsReceiver(val context: Context) : BroadcastReceiver() {
+    // 동적리시버를 통하여, ParkMapsService 에서 액티비티로 전달되는 로직 정의
+    // 서비스에서 최초 위치정보를 성공적으로 받아왔음을 알게되어, 이를 통하여 다시 서비스에 위치업데이트를 요청
+    class ParkMapsReceiver(val context: Context, val viewModel: MainViewModel) : BroadcastReceiver() {
         override fun onReceive(p0: Context?, result: Intent?) {
             Log.e("ParkMapsReceiver", "ParkMapsReceiver")
             when (result!!.action) {
+                // 서비스에
                 Common.REQUEST_ACTION_UPDATE -> {
                     val intent = Intent(context, ParkMapsService::class.java)
                     intent.putExtra("requestCode", Common.LOCATION_UPDATE)
                     context.startService(intent)
+                }
+                Common.ACCEPT_ACTION_UPDATE -> {
+                    val addressMap: HashMap<Char,String> = result.getSerializableExtra("addressMap") as HashMap<Char, String>
+                    viewModel.userAddressMap.value = addressMap
                 }
             }
         }

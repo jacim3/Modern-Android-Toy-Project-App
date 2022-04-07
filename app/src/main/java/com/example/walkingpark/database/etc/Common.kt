@@ -1,7 +1,7 @@
-package com.example.walkingpark.database.singleton
+package com.example.walkingpark.database.etc
 /**
-*   상수값 보관 클래스
-* */
+*   상수값 및 enum 보관 클래스
+**/
 object Common {
     const val DATABASE_NAME = "ParkDB"      // 데이터베이스 이름
     const val DATABASE_DIR = "parkdb.db"    // 데이터베이스 경로
@@ -12,6 +12,7 @@ object Common {
 
     const val REQUEST_ACTION_UPDATE = "REQUEST_ACTION_UPDATE"
     const val REQUEST_ACTION_PAUSE = "REQUEST_ACTION_PAUSE"
+    const val ACCEPT_ACTION_UPDATE = "ACCEPT_ACTION_UPDATE"
 
     // Service RequestCode 관련
     const val PERMISSION = 0
@@ -26,25 +27,21 @@ object UserData{
     lateinit var userLocation:Array<String> // 사용자 위치정보 저장
 }
 
-object Locations{
-    // 공공데이터 TM 좌표가 제대로 먹지 않음. -> Geocoder 에서 받아온 주소데이터로 처리.
-    const val MAX_LENGTH = 10 // 저장 최대 길이
-    const val COUNTRY = 0
-    const val SI = 1        // 사
-    const val GUN = 2       // 군
-    const val GU = 3        // 구
-    const val EUP = 4       // ...
-    const val DO = 5
-    const val MUN = 6
-    const val DONG = 7
-    const val EX1 = 8       // 여분 주소 넣기
-    const val EX2 = 9
-    const val EX3 = 10
+enum class ADDRESS(val x:Char
+) {
+    DO('도'),
+    SI('시'),
+    GUN('군'),
+    GU('구'),
+    EUP('읍'),
+    MUN('면'),
+    DONG('동')
 }
 
 object Settings{
-    const val LOCATION_UPDATE_INTERVAL: Long = 10            // 위치 업데이트 간격
-    const val LOCATION_UPDATE_INTERVAL_FASTEST: Long = 5     // 위치 업데이트 간격(빠른)
+    const val LOCATION_UPDATE_INTERVAL: Long = 10000            // 위치 업데이트 간격
+    const val LOCATION_UPDATE_INTERVAL_FASTEST: Long = 5000     // 위치 업데이트 간격(빠른)
+    const val LOCATION_ADDRESS_SEARCH_COUNT = 5                 // 현재 위치 LatLng 에 대한 주소 검색 개수
 }
 
 object Logic {

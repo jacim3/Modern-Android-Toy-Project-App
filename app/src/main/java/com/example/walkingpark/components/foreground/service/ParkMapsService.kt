@@ -10,25 +10,22 @@ import android.os.Build
 import android.os.IBinder
 import android.os.Looper
 import android.util.Log
-import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
+import androidx.lifecycle.MutableLiveData
 import com.example.walkingpark.MainActivity
 import com.example.walkingpark.R
-import com.example.walkingpark.database.singleton.Common
-import com.example.walkingpark.database.singleton.Locations
-import com.example.walkingpark.database.singleton.Settings
-import com.example.walkingpark.database.singleton.UserData
+import com.example.walkingpark.database.etc.*
 import com.google.android.gms.location.*
 import com.google.android.gms.tasks.CancellationToken
 import com.google.android.gms.tasks.CancellationTokenSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kr.hyosang.coordinate.CoordPoint
-import kr.hyosang.coordinate.TransCoord
 import java.lang.Exception
+import java.lang.IndexOutOfBoundsException
 import java.util.*
+import kotlin.collections.HashMap
 
 /**
  *   위치정보 요청 및 업데이트 관련 포그라운드 서비스
@@ -37,6 +34,7 @@ import java.util.*
 class ParkMapsService : Service() {
 
     private val mBinder: IBinder = LocalBinder()
+    private val addressMap = HashMap<Char, String?>()
     var number: Int = 0
         get() = field + 1
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -115,10 +113,10 @@ class ParkMapsService : Service() {
 
             when (requestCode) {
                 Common.PERMISSION -> {
-                    searchLocation()
+                    searchUserLocation()
                 }
                 Common.LOCATION_UPDATE -> {
-                    updateLocation()
+                    updateUserLocation()
                 }
                 Common.LOCATION_UPDATE_CANCEL -> {
                     stopUpdateLocation()
@@ -141,7 +139,7 @@ class ParkMapsService : Service() {
     }
 
     // fusedLocationClient 객체를 초기화 하며, 사용자 위치정보 찾기 수행
-    private fun searchLocation() {
+    private fun searchUserLocation() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this@ParkMapsService)
 
         if (ActivityCompat.checkSelfPermission(
@@ -165,77 +163,65 @@ class ParkMapsService : Service() {
         }.addOnSuccessListener {
             Log.e("fusedLocationProvider", "${it.latitude} ${it.longitude}")
 
+            UserData.currentLatitude = it.latitude
+            UserData.currentLongitude = it.longitude
 
-            // BroadCastReceiver 콜백이 호출되었음을 알리기
+            getDetailedUserLocation(it.latitude, it.longitude)
+
+            // 서비스의 위치정보 획득이 완료되었음을 알리고, 위치정보 서비스가 초기화가 완료되었음에 따라
+            // 엑티비티에서 다시 서비스에 위치업데이트를 요청하도록 리시버 전송
             val requestIntent = Intent()
             requestIntent.action = Common.REQUEST_ACTION_UPDATE
             sendBroadcast(requestIntent)
 
-            UserData.currentLatitude = it.latitude
-            UserData.currentLongitude = it.longitude
+            // 위치정보 획득이 완료됨에 따라 ViewModel 의 LiveData 업데이트를 위한 요청 수행
+            val acceptIntent = Intent()
+            acceptIntent.action = Common.ACCEPT_ACTION_UPDATE
+            acceptIntent.putExtra("addressMap", addressMap)
+            sendBroadcast(acceptIntent)
         }
     }
 
     // TODO 지도가 업데이트 됨에 딸, 데이터를 너무 자주 가져오게 되면, 이 데이터를 처리하는데 리소스 낭비 발생
-    // TODO 이 앱은 반드시 '한국' 에서만 작동
+    // TODO 이 앱은 반드시 '한국' 에서만 작동. 도 시 군 구 읍 면 동만 추출.
     // 주소정보를 굳이 가져오는 이유는 공공데이터 api 에서 TM 좌표 조회 기능이 올바르게 작동하지 않음
     // 추가로 동네 예보 정보를 가져오기 위한 주소데이터 필요.
-    private fun getDetailedUserLocation(latitude:Double, longitude:Double){
+    private fun getDetailedUserLocation(latitude: Double, longitude: Double) {
 
         // 사용자 위치정보 업데이트!! TM 좌표는 오류가 있움.
-        UserData.userLocation = Array(Locations.MAX_LENGTH){"없음"}
+
+        val addressLiveData =
+            MutableLiveData<MutableMap<Char, String?>>()  // 사용자 위치에 대한 주소데이터 저장
         try {
             val coder = Geocoder(this, Locale.getDefault())
-            val location = coder.getFromLocation(latitude, longitude, 10)
 
-            for (i in location.indices) {
-                val tmp = location[i].getAddressLine(0).split(" ")
-                for (j in tmp.indices) {
 
-                    if (!tmp.equals("없음")) {
-                        continue
+            // TODO Stream 의 ForEach 와 ForLoop 는 다르며, ForEach 의 리소스 낭비가 심하다.
+            // TODO MutableLiveData 에서는 Null 이 발생할 경우 예외처리가 발생 -> NullCheck 가 엄격한것 같음.
+            // -> Filter 를 통하여 제한한다 하여도 루프를 모두 수행.
+            val location =
+                coder.getFromLocation(latitude, longitude, Settings.LOCATION_ADDRESS_SEARCH_COUNT)
+
+
+            location.map {
+                it.getAddressLine(0).toString().split(" ")
+            }.flatten().distinct().forEach {
+                for (enum in ADDRESS.values()) {
+                    if (it[it.lastIndex] == enum.x && addressMap[enum.x] == null) {
+                        addressMap[enum.x] = it
                     }
-                    val case = tmp[j]
-                    when(case[case.length-1]){
-                        '국' -> {
-                            UserData.userLocation[Locations.COUNTRY] = case
-                        }
-                        '시' -> {
-                            UserData.userLocation[Locations.SI] = case
-                        }
-                        '군' -> {
-                            UserData.userLocation[Locations.SI] = case
-                        }
-                        '구' -> {
-                            UserData.userLocation[Locations.SI] = case
-                        }
-                        '읍' -> {
-                            UserData.userLocation[Locations.SI] = case
-                        }
-                        '면' -> {
-                            UserData.userLocation[Locations.SI] = case
-                        }
-                        '동' -> {
-                            UserData.userLocation[Locations.SI] = case
-                        }
-                        else -> {
-                            UserData.userLocation[Locations.EX1] = case
-                        }
-
-                    }
-
                 }
             }
 
+            addressLiveData.value = addressMap
+            Log.e("addressMap", addressMap.toString())
+            Log.e("addressLivaData", addressLiveData.value.toString())
 
+        } catch (e: IndexOutOfBoundsException) {
+            Log.e("IndexOutOfBounn", e.printStackTrace().toString())
         } catch (e: Exception) {
-
+            Log.e("Exception", "")
         }
-
-            for (i in    UserData.userLocation.indices) {
-                Log.e("sadfasdfasdfdsa",    UserData.userLocation[i])
-            }
-
     }
 
     // 위치 업데이트 요청의 param 으로 사용될 LocationRequest 의 설정객체 초기화
@@ -271,7 +257,7 @@ class ParkMapsService : Service() {
     }
 
     // 주기적인 위치 업데이트 수행
-    private fun updateLocation() {
+    private fun updateUserLocation() {
 
         if (ActivityCompat.checkSelfPermission(
                 this,

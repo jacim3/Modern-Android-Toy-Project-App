@@ -2,9 +2,8 @@ package com.example.walkingpark.repository
 
 import android.content.Context
 import androidx.room.Room
-import androidx.room.withTransaction
 import com.example.walkingpark.database.room.AppDatabase
-import com.example.walkingpark.database.singleton.Common
+import com.example.walkingpark.database.etc.Common
 
 class ParkRoomRepository {
 

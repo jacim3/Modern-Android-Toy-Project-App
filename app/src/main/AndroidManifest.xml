@@ -42,7 +42,7 @@
         <!-- 공공데이터 포털 키 -->
         <meta-data
             android:name="public.data.api.key"
-            android:value="fff" />
+            android:value="" />
         <!-- Google Maps Api 키 -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"

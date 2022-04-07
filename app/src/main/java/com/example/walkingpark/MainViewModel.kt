@@ -14,13 +14,13 @@ class MainViewModel(private val repository: RestApiRepository) : ViewModel() {
 
     val responseStationTmDataSet = MutableLiveData<Response<StationTmDTO>>()
     val responseAirDataSet = MutableLiveData<Response<AirDTO>>()
+    val userAddressMap = MutableLiveData<MutableMap<Char, String>>()  // 사용자 위치에 대한 주소데이터 저장
 
     fun getParkMapsService(service:IBinder): ParkMapsService {
 
         val mb: ParkMapsService.LocalBinder = service as ParkMapsService.LocalBinder
         return mb.getService() // 서비스가 제공하는 메소드 호출하여 서비스쪽 객체를 전달받을수 있슴
     }
-
 
     // 위치정보 퍼미션 관련
     // ACCESS_FINE_LOCATION,ACCESS_COARSE_LOCATION 처리

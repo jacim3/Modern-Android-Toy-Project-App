@@ -14,3 +14,8 @@ interface ParkDao {
     @Query("SELECT * FROM ParkDB ORDER BY field6, field7")
     suspend fun sortDataOnlyOneTime(): List<ParkDB>
 }
+
+@Dao
+interface WeatherDao {
+
+}
