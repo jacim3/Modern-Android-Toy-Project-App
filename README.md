@@ -6,8 +6,8 @@
 
 
 # 사용 컴포넌트
-## Foreground Service (사용자 위치 추적 및 이를 노티피케이션으로 알림)
-## Broadcast Receiver (동적 리시버. 서버스로부터 얻어온 결과를 추기적으로 액티비티에 전달)
+- Foreground Service (사용자 위치 추적 및 이를 노티피케이션으로 알림)
+- Broadcast Receiver (동적 리시버. 서버스로부터 얻어온 결과를 추기적으로 액티비티에 전달)
 
 # 사용 라이브러리
 ## ViewModel 
