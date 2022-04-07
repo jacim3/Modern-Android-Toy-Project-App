@@ -28,7 +28,7 @@
 # 현재 적용중인 라이브러리
 - Retrofit 2 (공공데이터 Rest Api 연동)
 - Coroutine (네트워크 비동기 처리)
-- Google Maps Api (사용자 좌표 추적)
+- Google Maps Api (포그라운드 서비스에서 작동하여, 사용자 좌표 추적 후 액티비티에 전달)
 
 # 적용 예정 라이브러리 (현재 미적용)
 - Dagger-hilt (DI)
