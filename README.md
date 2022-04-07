@@ -3,7 +3,7 @@
 
 ## * Start App Development
 #### 2022.04.02 공공데이터 포털 + 레트로핏2 연동 및 MVVM을 위한 간단한 아키텍쳐 설정
-
+#### 2022.04.03 공공데이터 Rest-Api 의 
 # Manifest - meta-data 에 Google Maps Api 키 및 공공데이터 포털 키 필요.
 
 # 주요 컴포넌트
@@ -11,7 +11,7 @@
 - Broadcast Receiver (동적 리시버. 서버스로부터 얻어온 결과를 추기적으로 액티비티에 전달. 액티비티는 이러한 요청을 따라 알맞은 요청을 다시 onStartCommand()로 서비스에 전달)
 
 # AAC 컴포넌트
-- Room (최초 앱 실행시에 스플래시에서 미리 준비된 db 파일을 Room 으로 구축하는데 따른 추가 시간 소요 )
+- Room (최초 앱 실행시에 스플래시에서 미리 준비된 db 파일을 Room 으로 구축하는데 따른 추가 시간 소요.)
 - ViewModel
 - LiveData 
 
