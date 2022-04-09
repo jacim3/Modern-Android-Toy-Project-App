@@ -7,15 +7,19 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
+import com.example.walkingpark.MainViewModel
 import com.example.walkingpark.databinding.FragmentHomeBinding
 import com.example.walkingpark.tabs.tab_2.ParkMapsViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
 // TODO 1. 동네예보 Api 연동 -> x,y 구하는 방법에 대한 고민 필요.
 // TODO 미세먼지 정보를 가져오는 가장 쉬운 방법
 
+@AndroidEntryPoint
 class HomeFragment : Fragment() {
 
-    private lateinit var viewModel: ParkMapsViewModel
+    private val mainViewModel by viewModels<MainViewModel>()
     private var binding: FragmentHomeBinding? = null
 
     override fun onAttach(context: Context) {

@@ -11,11 +11,10 @@ interface ParkDao {
     @Query("SELECT * FROM ParkDB WHERE pk = 1")
     suspend fun checkQuery(): List<ParkDB>
 
-    @Query("SELECT * FROM ParkDB ORDER BY field6, field7")
-    suspend fun sortDataOnlyOneTime(): List<ParkDB>
 }
 
 @Dao
-interface WeatherDao {
-
+interface GridDao {
+    @Query("SELECT * FROM GridDB")
+    suspend fun getAll(): List<GridDB>
 }

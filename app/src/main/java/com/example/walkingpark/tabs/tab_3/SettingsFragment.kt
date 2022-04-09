@@ -6,11 +6,16 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
+import com.example.walkingpark.MainViewModel
 import com.example.walkingpark.databinding.FragmentSettingsBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+
+@AndroidEntryPoint
 class SettingsFragment : Fragment() {
 
-    private lateinit var viewModel: SettingsViewModel
+    private val mainViewModel by viewModels<MainViewModel>()
     private var binding: FragmentSettingsBinding? = null
     override fun onAttach(context: Context) {
         super.onAttach(context)

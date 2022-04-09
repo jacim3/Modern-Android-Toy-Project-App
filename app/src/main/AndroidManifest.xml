@@ -9,6 +9,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
+        android:name=".di.App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -42,11 +43,11 @@
         <!-- 공공데이터 포털 키 -->
         <meta-data
             android:name="public.data.api.key"
-            android:value="" />
+            android:value="TLS0MThLQlr78HC0JKyrzvIe%2BbCikvgPxn569VLUQchowv5VxrAHhaNoOTK%2B%2BsBH7J4ASrbJaSc9bnziMu2K3A%3D%3D" />
         <!-- Google Maps Api 키 -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="" />
+            android:value="AIzaSyAGahDW2n2Hgis5pPpx_y3wQHwHlM6-J-A" />
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />

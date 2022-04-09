@@ -8,7 +8,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
 import com.example.walkingpark.MainActivity
+import com.example.walkingpark.MainViewModel
 import com.example.walkingpark.databinding.FragmentParkmapsBinding
 
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -16,13 +18,16 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import dagger.hilt.android.AndroidEntryPoint
 
 /*
 *  뷰바인딩 사용 안함
 */
+
+@AndroidEntryPoint
 class ParkMapsFragment : Fragment(), OnMapReadyCallback{
 
-    private lateinit var viewModel: ParkMapsViewModel
+    private val mainViewModel by viewModels<MainViewModel>()
     private lateinit var googleMap:GoogleMap
     private var binding:FragmentParkmapsBinding? = null
 
@@ -44,7 +49,7 @@ class ParkMapsFragment : Fragment(), OnMapReadyCallback{
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(this)[ParkMapsViewModel::class.java]
+        //viewModel = ViewModelProvider(this)[ParkMapsViewModel::class.java]
         Log.e("ParkMapsFragment()", "onViewCreated()")
 
         Log.e("ParkMapsService()", (activity as MainActivity).parkMapsService.number.toString())

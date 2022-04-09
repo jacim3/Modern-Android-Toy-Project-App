@@ -2,56 +2,65 @@ package com.example.walkingpark
 
 import android.Manifest
 import android.content.*
+import android.content.pm.PackageManager
 import android.os.*
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProvider
 import com.example.walkingpark.components.foreground.service.ParkMapsService
-import com.example.walkingpark.database.etc.Common
+import com.example.walkingpark.enum.Common
 import com.example.walkingpark.databinding.ActivityMainBinding
-import com.example.walkingpark.factory.PublicApiViewModelFactory
+import com.example.walkingpark.di.repository.RoomRepository
 import com.example.walkingpark.tabs.tab_1.HomeFragment
 import com.example.walkingpark.tabs.tab_2.ParkMapsFragment
 import com.example.walkingpark.tabs.tab_3.SettingsFragment
-import com.example.walkingpark.repository.RestApiRepository
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 // TODO 데이터 바인딩 대체?? -> 자세히 알아볼 것 !!!!
 // TODO DAGGER 공부 -> 의존주입에 관해 이해
 // TODO Coroutine 공부 -> 더욱 확실히 학습!!!!!
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private var binding: ActivityMainBinding? = null
-    private lateinit var viewModel: MainViewModel
+    private val viewModel by viewModels<MainViewModel>()            // 뷰모델 주입
 
-    lateinit var parkMapsService: ParkMapsService       // 서비스 객체
+    @Inject
+    lateinit var roomRepository: RoomRepository
+
+    lateinit var parkMapsService: ParkMapsService                   // 서비스 객체
     private var isParkMapsServiceRunning = false
     lateinit var parkMapsReceiver: BroadcastReceiver
-    lateinit var updateReceiver:BroadcastReceiver
+    lateinit var updateReceiver: BroadcastReceiver
 
-    // TODO 측정소 정보를 가져오려면, 현재 위경도 좌표를 tm 좌표로 변환해야 하며, jar 과 같은 외부 라이브러리는 부정확함.
-    // TODO 다른 API 연동이 필요하여 이를 보류.
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         binding!!.lifecycleOwner = this
-        viewModel = ViewModelProvider(
-            this,
-            PublicApiViewModelFactory(RestApiRepository(this))
-        )[MainViewModel::class.java]
 
         setBottomButtonsAsTab()         // 하단 버튼 설정
         startParkMapsService()          // 위치데이터 서비스 실행
+
+
+        CoroutineScope(Dispatchers.IO).launch {
+            roomRepository.allCheck()
+        }
 
         // 퍼미션 요청 핸들링. (onActivityResult 대체)
         val locationPermissionRequest = registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
         ) { permissions ->
-            Log.e("퍼미션 요청", "퍼미션 요청")
+/*            Log.e("퍼미션 요청", "퍼미션 요청")
             val permissionCheck = viewModel.handleLocationPermissions(permissions)
             if (permissionCheck) {
                 val intent = Intent(this, ParkMapsService::class.java)
@@ -59,7 +68,9 @@ class MainActivity : AppCompatActivity() {
                 startParkMapsService(intent)
             } else {
 
-            }
+            }*/
+            startLocationAfterPermissionCheck()
+
         }
         // 퍼미션 요청 수행!!
         locationPermissionRequest.launch(
@@ -69,9 +80,29 @@ class MainActivity : AppCompatActivity() {
             )
         )
 
-        viewModel.userAddressMap.observe(this){
+        viewModel.userAddressMap.observe(this) {
             Log.e("LocationUpdated!!!!", it.toString())
         }
+    }
+
+    private fun startLocationAfterPermissionCheck() {
+
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) // 퍼미션이 허용되지 않음 -> 종료
+        {
+            Toast.makeText(this, "퍼미션을 허용해야 앱 이용이 가능합니다.", Toast.LENGTH_SHORT).show()
+            finish()
+        }
+        // 퍼미션이 허용되었으므로 서비스 실행
+        val intent = Intent(this, ParkMapsService::class.java)
+        intent.putExtra("requestCode", Common.PERMISSION)
+        startParkMapsService(intent)
     }
 
     // 백그라운드 위치정보 서비스 활성 및 콜백 등록.
@@ -87,6 +118,7 @@ class MainActivity : AppCompatActivity() {
                 // 서비스 객체를 전역변수로 저장
                 parkMapsService = viewModel.getParkMapsService(service)
                 isParkMapsServiceRunning = true
+
 
                 // 서비스에서 작업이 완료됨에 따라, 서비스로부터 결과를 수신받을 리시버 등록
                 parkMapsReceiver = ParkMapsReceiver(applicationContext, viewModel)
@@ -159,7 +191,9 @@ class MainActivity : AppCompatActivity() {
 
     // 동적리시버를 통하여, ParkMapsService 에서 액티비티로 전달되는 로직 정의
     // 서비스에서 최초 위치정보를 성공적으로 받아왔음을 알게되어, 이를 통하여 다시 서비스에 위치업데이트를 요청
-    class ParkMapsReceiver(val context: Context, val viewModel: MainViewModel) : BroadcastReceiver() {
+    @AndroidEntryPoint
+    class ParkMapsReceiver(val context: Context, val viewModel: MainViewModel) :
+        BroadcastReceiver() {
         override fun onReceive(p0: Context?, result: Intent?) {
             Log.e("ParkMapsReceiver", "ParkMapsReceiver")
             when (result!!.action) {
@@ -170,7 +204,8 @@ class MainActivity : AppCompatActivity() {
                     context.startService(intent)
                 }
                 Common.ACCEPT_ACTION_UPDATE -> {
-                    val addressMap: HashMap<Char,String> = result.getSerializableExtra("addressMap") as HashMap<Char, String>
+                    val addressMap: HashMap<Char, String> =
+                        result.getSerializableExtra("addressMap") as HashMap<Char, String>
                     viewModel.userAddressMap.value = addressMap
                 }
             }
