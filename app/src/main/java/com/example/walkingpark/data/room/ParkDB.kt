@@ -1,4 +1,4 @@
-package com.example.walkingpark.database.room
+package com.example.walkingpark.data.room
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

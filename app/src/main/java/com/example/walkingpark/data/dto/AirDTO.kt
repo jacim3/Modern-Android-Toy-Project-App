@@ -1,11 +1,12 @@
-package com.example.walkingpark.dto
+package com.example.walkingpark.data.dto
 
 import com.google.gson.annotations.SerializedName
-import retrofit2.Response
 
 /**
 *   공공데이터 - 대기정보를 받아 직렬화를 수행할 DTO 객체
 */
+
+
 data class AirDTO(
 
     @SerializedName("response") val response: Response
@@ -23,28 +24,28 @@ data class AirDTO(
             @SerializedName("numOfRows") val numOfRows: Int
         ) {
             data class Items(
-
-                @SerializedName("so2Grade") val so2Grade: Int,
+                //TODO 받아오는 데이터가 누락되는 경우도 있으므로, 자료형을 String 으로 선언할것!!
+                @SerializedName("so2Grade") val so2Grade: String,
                 @SerializedName("coFlag") val coFlag: String,
-                @SerializedName("khaiValue") val khaiValue: Int,
-                @SerializedName("so2Value") val so2Value: Double,
-                @SerializedName("coValue") val coValue: Double,
+                @SerializedName("khaiValue") val khaiValue: String,
+                @SerializedName("so2Value") val so2Value: String,
+                @SerializedName("coValue") val coValue: String,
                 @SerializedName("pm25Flag") val pm25Flag: String,
                 @SerializedName("pm10Flag") val pm10Flag: String,
-                @SerializedName("pm10Value") val pm10Value: Int,
-                @SerializedName("o3Grade") val o3Grade: Int,
-                @SerializedName("khaiGrade") val khaiGrade: Int,
-                @SerializedName("pm25Value") val pm25Value: Int,
+                @SerializedName("pm10Value") val pm10Value: String,
+                @SerializedName("o3Grade") val o3Grade: String,
+                @SerializedName("khaiGrade") val khaiGrade: String,
+                @SerializedName("pm25Value") val pm25Value: String,
                 @SerializedName("no2Flag") val no2Flag: String,
-                @SerializedName("no2Grade") val no2Grade: Int,
+                @SerializedName("no2Grade") val no2Grade: String,
                 @SerializedName("o3Flag") val o3Flag: String,
-                @SerializedName("pm25Grade") val pm25Grade: Int,
+                @SerializedName("pm25Grade") val pm25Grade: String,
                 @SerializedName("so2Flag") val so2Flag: String,
                 @SerializedName("dataTime") val dataTime: String,
-                @SerializedName("coGrade") val coGrade: Int,
-                @SerializedName("no2Value") val no2Value: Double,
-                @SerializedName("pm10Grade") val pm10Grade: Int,
-                @SerializedName("o3Value") val o3Value: Double
+                @SerializedName("coGrade") val coGrade: String,
+                @SerializedName("no2Value") val no2Value: String,
+                @SerializedName("pm10Grade") val pm10Grade: String,
+                @SerializedName("o3Value") val o3Value: String
             )
         }
 

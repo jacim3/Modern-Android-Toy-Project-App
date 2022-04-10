@@ -1,23 +1,13 @@
-package com.example.walkingpark.enum
+package com.example.walkingpark.data.enum
 /**
 *   상수값 및 enum 보관 클래스
 **/
 
-enum class ADDRESS(val x:Char
-) {
-    DO('도'),
-    SI('시'),
-    GUN('군'),
-    GU('구'),
-    EUP('읍'),
-    MUN('면'),
-    DONG('동')
-}
+
 
 object Common {
     const val LOCAL_DATABASE_NAME = "ParkDB"      // 데이터베이스 이름
     const val DATABASE_DIR_PARK_DB = "parkdb.db"    // 데이터베이스 경로
-
 
     // 위치검색 ForeGround Service Notification
     const val DESC_TITLE_LOCATION_NOTIFICATION = "위치 추적"
@@ -35,6 +25,7 @@ object Common {
 
     const val BASE_URL_API_AIR = "https://apis.data.go.kr/B552584/ArpltnInforInqireSvc/"
     const val BASE_URL_API_STATION = "https://apis.data.go.kr/B552584/MsrstnInfoInqireSvc/"
+    const val BASE_URL_API_WEATHER = "https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/"
 }
 
 object UserData{

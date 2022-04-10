@@ -3,13 +3,10 @@ package com.example.walkingpark.di.repository
 import android.content.Context
 import android.util.Log
 import androidx.room.Room
-import com.example.walkingpark.database.room.AppDatabase
-import com.example.walkingpark.enum.Common
+import com.example.walkingpark.data.enum.ADDRESS
+import com.example.walkingpark.data.enum.Common
+import com.example.walkingpark.data.room.AppDatabase
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -33,15 +30,23 @@ class RoomRepository @Inject constructor() {
                     .build()
             }
 
-
-
         return null
     }
 
-    suspend fun allCheck() {
+    suspend fun getDataFromGridDB(addressMap: HashMap<Char, String>){
 
-            Log.e("aaaaaaaaaaaaa", appDatabase.parkDao().getAll().size.toString())
-            Log.e("bbbbbbbbbbbbbbbbbbb", appDatabase.gridDao().getAll().size.toString())
+        val doName = addressMap[ADDRESS.DO.x]
+        val siName = addressMap[ADDRESS.SI.x]
+        val gunName = addressMap[ADDRESS.GUN.x]
+        val guName = addressMap[ADDRESS.GU.x]
+        val dongName = addressMap[ADDRESS.DONG.x]
+        val munName = addressMap[ADDRESS.MUN.x]
+        val eupName = addressMap[ADDRESS.EUP.x]
+
+
+    }
+
+    suspend fun allCheck() {
 
     }
 }

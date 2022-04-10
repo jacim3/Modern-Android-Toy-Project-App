@@ -11,10 +11,11 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModelProvider
 import com.example.walkingpark.components.foreground.service.ParkMapsService
-import com.example.walkingpark.enum.Common
+import com.example.walkingpark.data.enum.Common
 import com.example.walkingpark.databinding.ActivityMainBinding
-import com.example.walkingpark.di.repository.RoomRepository
+import com.example.walkingpark.di.repository.LocationRepository
 import com.example.walkingpark.tabs.tab_1.HomeFragment
 import com.example.walkingpark.tabs.tab_2.ParkMapsFragment
 import com.example.walkingpark.tabs.tab_3.SettingsFragment
@@ -32,21 +33,24 @@ import javax.inject.Inject
 class MainActivity : AppCompatActivity() {
 
     private var binding: ActivityMainBinding? = null
-    private val viewModel by viewModels<MainViewModel>()            // 뷰모델 주입
+    //private val viewModel by viewModels<MainViewModel>()            // 뷰모델 주입
 
+    val viewModel by viewModels<MainViewModel>()
     lateinit var parkMapsService: ParkMapsService                   // 서비스 객체
     private var isParkMapsServiceRunning = false
     lateinit var parkMapsReceiver: BroadcastReceiver
+
+    @Inject
+    lateinit var locationRepository: LocationRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-        binding!!.lifecycleOwner = this
 
+        locationRepository.locationCallback = viewModel.locationCallback
         setBottomButtonsAsTab()         // 하단 버튼 설정
         startParkMapsService()          // 위치데이터 서비스 실행
-
 
         // 퍼미션 요청 핸들링. (onActivityResult 대체)
         val locationPermissionRequest = registerForActivityResult(
@@ -62,8 +66,19 @@ class MainActivity : AppCompatActivity() {
             )
         )
 
-        viewModel.userAddressMap.observe(this) {
-            Log.e("LocationUpdated!!!!", it.toString())
+        viewModel.userLocationHolder.observe(this) {
+            Log.e("received1", it.toString())
+        }
+
+        viewModel.userAddressHolder.observe(this){
+            Log.e("received2", it.toString())
+        }
+
+        viewModel.userStationHolder.observe(this) {
+            CoroutineScope(Dispatchers.IO).launch {
+                Log.e("received3",it.stationName)
+                viewModel.getAirDataFromApi(it.stationName)
+            }
         }
     }
 
@@ -188,7 +203,7 @@ class MainActivity : AppCompatActivity() {
                 Common.ACCEPT_ACTION_UPDATE -> {
                     val addressMap: HashMap<Char, String> =
                         result.getSerializableExtra("addressMap") as HashMap<Char, String>
-                    viewModel.userAddressMap.value = addressMap
+                    //viewModel.userAddressMap.value = addressMap
                 }
             }
         }

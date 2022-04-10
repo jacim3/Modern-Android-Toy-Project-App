@@ -14,7 +14,7 @@ import javax.inject.Qualifier
 object ApiKeyModule {
 
 
-    @MapsApiKey
+    @PublicApiKey
     @Provides
     fun getMapsApiKey(@ApplicationContext context:Context): String {
         try {
@@ -35,7 +35,7 @@ object ApiKeyModule {
         return ""
     }
 
-    @PublicApiKey
+    @MapsApiKey
     @Provides
     fun getPublicDataApiKey(@ApplicationContext context: Context): String {
         try {

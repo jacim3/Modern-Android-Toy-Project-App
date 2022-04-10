@@ -9,17 +9,15 @@ import android.location.Geocoder
 import android.os.Build
 import android.os.Looper
 import android.util.Log
-import androidx.activity.viewModels
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.MutableLiveData
 import com.example.walkingpark.MainActivity
-import com.example.walkingpark.MainViewModel
-import com.example.walkingpark.enum.ADDRESS
-import com.example.walkingpark.enum.Common
-import com.example.walkingpark.enum.Settings
-import com.example.walkingpark.enum.UserData
+import com.example.walkingpark.data.dto.AirDTO
+import com.example.walkingpark.data.dto.StationDTO
+import com.example.walkingpark.data.enum.ADDRESS
+import com.example.walkingpark.data.enum.Settings
+import com.example.walkingpark.data.enum.UserData
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -34,6 +32,7 @@ import java.lang.IndexOutOfBoundsException
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.collections.HashMap
 
 @Singleton
 class LocationRepository @Inject constructor() {
@@ -47,10 +46,10 @@ class LocationRepository @Inject constructor() {
     @Inject
     lateinit var locationRequest: LocationRequest
 
-    @Inject
     lateinit var locationCallback: LocationCallback
 
     val addressMap = HashMap<Char, String?>()
+    val latLngMap = HashMap<String, Double>()
 
     fun setLocationTrackNotification(@ApplicationContext context: Context): Notification {
         // 위치추적 관련 Notification 생성
@@ -106,20 +105,17 @@ class LocationRepository @Inject constructor() {
             UserData.currentLatitude = it.latitude
             UserData.currentLongitude = it.longitude
 
-            getDetailedUserLocation(context, it.latitude, it.longitude)
+            parsingAddressMap(context, it.latitude, it.longitude)
 
         }
     }
 
-    fun cancelUpdateLocation(){
-        fusedLocationClient.removeLocationUpdates(locationCallback)
-    }
 
     // TODO 지도가 업데이트 됨에 딸, 데이터를 너무 자주 가져오게 되면, 이 데이터를 처리하는데 리소스 낭비 발생
     // TODO 이 앱은 반드시 '한국' 에서만 작동. 도 시 군 구 읍 면 동만 추출.
     // 주소정보를 굳이 가져오는 이유는 공공데이터 api 에서 TM 좌표 조회 기능이 올바르게 작동하지 않음
     // 추가로 동네 예보 정보를 가져오기 위한 주소데이터 필요.
-    private fun getDetailedUserLocation(context: Context, latitude: Double, longitude: Double) {
+    fun parsingAddressMap(context: Context, latitude: Double, longitude: Double): HashMap<Char, String?>? {
 
         // 사용자 위치정보 업데이트!! TM 좌표는 오류가 있움.
 
@@ -135,7 +131,8 @@ class LocationRepository @Inject constructor() {
             val location =
                 coder.getFromLocation(latitude, longitude, Settings.LOCATION_ADDRESS_SEARCH_COUNT)
 
-
+            latLngMap["위도"] = latitude
+            latLngMap["경도"] = longitude
             location.map {
                 it.getAddressLine(0).toString().split(" ")
             }.flatten().distinct().forEach {
@@ -146,19 +143,18 @@ class LocationRepository @Inject constructor() {
                 }
             }
 
-            addressLiveData.value = addressMap
-            Log.e("addressMap", addressMap.toString())
-            Log.e("addressLivaData", addressLiveData.value.toString())
+            return addressMap
 
         } catch (e: IndexOutOfBoundsException) {
             Log.e("IndexOutOfBounn", e.printStackTrace().toString())
         } catch (e: Exception) {
             Log.e("Exception", "")
         }
+        return null
     }
 
     // 주기적인 위치 업데이트 수행
-    fun setUpdateUserLocation(@ApplicationContext context: Context) {
+    fun setUpdateUserLocation(@ApplicationContext context: Context, locationCallback:LocationCallback) {
 
         if (ActivityCompat.checkSelfPermission(
                 context,
@@ -179,5 +175,9 @@ class LocationRepository @Inject constructor() {
                 Looper.getMainLooper()
             ).addOnCompleteListener { Log.e("Completed", "Completed") }
         }
+    }
+
+    fun cancelUpdateLocation(locationCallback: LocationCallback) {
+        fusedLocationClient.removeLocationUpdates(locationCallback)
     }
 }

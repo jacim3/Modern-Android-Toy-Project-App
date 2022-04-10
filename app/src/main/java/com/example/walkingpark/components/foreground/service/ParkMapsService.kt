@@ -1,34 +1,14 @@
 package com.example.walkingpark.components.foreground.service
 
-import android.Manifest
 import android.app.*
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.location.Geocoder
 import android.os.Binder
-import android.os.Build
 import android.os.IBinder
-import android.os.Looper
 import android.util.Log
-import androidx.core.app.ActivityCompat
-import androidx.core.app.NotificationCompat
-import androidx.lifecycle.MutableLiveData
-import com.example.walkingpark.MainActivity
-import com.example.walkingpark.R
 import com.example.walkingpark.di.repository.LocationRepository
-import com.example.walkingpark.enum.*
-import com.google.android.gms.location.*
-import com.google.android.gms.tasks.CancellationToken
-import com.google.android.gms.tasks.CancellationTokenSource
+import com.example.walkingpark.data.enum.*
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import java.lang.Exception
-import java.lang.IndexOutOfBoundsException
-import java.util.*
 import javax.inject.Inject
-import kotlin.collections.HashMap
 
 /**
  *   위치정보 요청 및 업데이트 관련 포그라운드 서비스
@@ -92,10 +72,10 @@ class ParkMapsService : Service() {
 
                 }
                 Common.LOCATION_UPDATE -> {
-                    locationRepository.setUpdateUserLocation(applicationContext)
+                    locationRepository.setUpdateUserLocation(applicationContext, locationRepository.locationCallback)
                 }
                 Common.LOCATION_UPDATE_CANCEL -> {
-                    locationRepository.cancelUpdateLocation()
+                    locationRepository.cancelUpdateLocation(locationRepository.locationCallback)
                 }
                 Common.LOCATION_SETTINGS -> {
 

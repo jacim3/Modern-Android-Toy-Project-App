@@ -2,8 +2,8 @@ package com.example.walkingpark.di.module
 
 import android.content.Context
 import androidx.room.Room
-import com.example.walkingpark.enum.Common
-import com.example.walkingpark.database.room.AppDatabase
+import com.example.walkingpark.data.enum.Common
+import com.example.walkingpark.data.room.AppDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
