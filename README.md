@@ -8,7 +8,7 @@
 - Google Maps Api 와 공공데이터 포털을 이용하므로, Manifest의 meta-data에 키 등록 필요.
 
 ## App Development 
-- 2022.04.02 공공데이터 포털 + 레트로핏2 연동 및 MVVM을 위한 간단한 아키텍쳐 설정
+- 2022.04.02 공공데이터 포털 + 레트로핏2 연동 
 - 2022.04.03 기획 수정 + 로컬 DB 연동 및 초기화 관련 로직 작성
 - 2022.04.04 기획 수정 + 포그라운드 서비스 로직 작정
 
@@ -29,9 +29,9 @@
 - Retrofit 2 (공공데이터 Rest Api 연동)
 - Coroutine (네트워크 비동기 처리)
 - Google Maps Api (포그라운드 서비스에서 작동하여, 사용자 좌표 추적 후 리턴)
+- Dagger-hilt (DI)
 
 # 적용 예정 라이브러리 (현재 미적용)
-- Dagger-hilt (DI)
-- Databinding (MVVM 완성을 위해 필요)
+- Databinding ( 관심사 분리 및 MVVM 적용을 위해 필요)
 - Firebase Auth (회원 로그인 관련-> 추후 소셜 기능이 추가될 경우.)
 - Firebase FireStore (회원 데이터 저장-> 추후 소셜 기능이 추가될 경우)
