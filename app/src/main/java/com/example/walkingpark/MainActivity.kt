@@ -34,13 +34,9 @@ class MainActivity : AppCompatActivity() {
     private var binding: ActivityMainBinding? = null
     private val viewModel by viewModels<MainViewModel>()            // 뷰모델 주입
 
-    @Inject
-    lateinit var roomRepository: RoomRepository
-
     lateinit var parkMapsService: ParkMapsService                   // 서비스 객체
     private var isParkMapsServiceRunning = false
     lateinit var parkMapsReceiver: BroadcastReceiver
-    lateinit var updateReceiver: BroadcastReceiver
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,25 +48,11 @@ class MainActivity : AppCompatActivity() {
         startParkMapsService()          // 위치데이터 서비스 실행
 
 
-        CoroutineScope(Dispatchers.IO).launch {
-            roomRepository.allCheck()
-        }
-
         // 퍼미션 요청 핸들링. (onActivityResult 대체)
         val locationPermissionRequest = registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
         ) { permissions ->
-/*            Log.e("퍼미션 요청", "퍼미션 요청")
-            val permissionCheck = viewModel.handleLocationPermissions(permissions)
-            if (permissionCheck) {
-                val intent = Intent(this, ParkMapsService::class.java)
-                intent.putExtra("requestCode", Common.PERMISSION)
-                startParkMapsService(intent)
-            } else {
-
-            }*/
             startLocationAfterPermissionCheck()
-
         }
         // 퍼미션 요청 수행!!
         locationPermissionRequest.launch(
@@ -85,6 +67,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // 위치 퍼미션 체크 이후, 위치정보 서비스 실행 메서드
     private fun startLocationAfterPermissionCheck() {
 
         if (ActivityCompat.checkSelfPermission(
@@ -119,7 +102,6 @@ class MainActivity : AppCompatActivity() {
                 parkMapsService = viewModel.getParkMapsService(service)
                 isParkMapsServiceRunning = true
 
-
                 // 서비스에서 작업이 완료됨에 따라, 서비스로부터 결과를 수신받을 리시버 등록
                 parkMapsReceiver = ParkMapsReceiver(applicationContext, viewModel)
                 val filter = IntentFilter().apply {
@@ -127,7 +109,6 @@ class MainActivity : AppCompatActivity() {
                     addAction(Common.REQUEST_ACTION_PAUSE)
                     addAction(Common.ACCEPT_ACTION_UPDATE)
                 }
-
                 registerReceiver(parkMapsReceiver, filter)
             }
 
@@ -194,6 +175,7 @@ class MainActivity : AppCompatActivity() {
     @AndroidEntryPoint
     class ParkMapsReceiver(val context: Context, val viewModel: MainViewModel) :
         BroadcastReceiver() {
+
         override fun onReceive(p0: Context?, result: Intent?) {
             Log.e("ParkMapsReceiver", "ParkMapsReceiver")
             when (result!!.action) {

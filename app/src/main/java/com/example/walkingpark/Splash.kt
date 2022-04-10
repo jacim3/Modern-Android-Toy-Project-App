@@ -38,7 +38,6 @@ class Splash : AppCompatActivity() {
         CoroutineScope(Dispatchers.IO).launch {
             // parkRoomRepository.generateDBIfNotExist(applicationContext)
             moveToMainActivity()
-
            // moveToMainActivity()
 //            val db = parkDBInstance.build()
 //            var check = "DB 있음"
@@ -67,6 +66,7 @@ class Splash : AppCompatActivity() {
         return check
     }*/
 
+    // TODO 체크 비즈니스 로직 작성
     private suspend fun moveToMainActivity() {
 
 /*        if (check == "DB 없음") {
@@ -76,6 +76,7 @@ class Splash : AppCompatActivity() {
         } else {
             delay(1000)
         }*/
+        delay(2000)
         val intent = Intent(baseContext, MainActivity::class.java)
         startActivity(intent)
         finish()

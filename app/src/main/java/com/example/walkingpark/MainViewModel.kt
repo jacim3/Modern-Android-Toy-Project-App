@@ -18,6 +18,7 @@ class MainViewModel @Inject constructor() : ViewModel() {
     @Inject
     lateinit var restApiRepository:RestApiRepository
 
+
     val responseStationTmDataSet = MutableLiveData<Response<StationTmDTO>>()
     val responseAirDataSet = MutableLiveData<Response<AirDTO>>()
     val userAddressMap = MutableLiveData<MutableMap<Char, String>>()  // 사용자 위치에 대한 주소데이터 저장
@@ -55,4 +56,6 @@ class MainViewModel @Inject constructor() : ViewModel() {
         }
         return false
     }*/
+
+
 }
