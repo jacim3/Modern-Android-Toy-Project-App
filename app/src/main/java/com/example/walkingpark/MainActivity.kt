@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity() {
         val locationPermissionRequest = registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
         ) { permissions ->
-            startLocationAfterPermissionCheck()
+            locationRepository.startLocationAfterPermissionCheck(this, parkMapsService)
         }
         // 퍼미션 요청 수행!!
         locationPermissionRequest.launch(
@@ -79,27 +79,6 @@ class MainActivity : AppCompatActivity() {
                 viewModel.getAirDataFromApi(it.stationName)
             }
         }
-    }
-
-    // 위치 퍼미션 체크 이후, 위치정보 서비스 실행 메서드
-    private fun startLocationAfterPermissionCheck() {
-
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) // 퍼미션이 허용되지 않음 -> 종료
-        {
-            Toast.makeText(this, "퍼미션을 허용해야 앱 이용이 가능합니다.", Toast.LENGTH_SHORT).show()
-            finish()
-        }
-        // 퍼미션이 허용되었으므로 서비스 실행
-        val intent = Intent(this, ParkMapsService::class.java)
-        intent.putExtra("requestCode", Common.PERMISSION)
-        startParkMapsService(intent)
     }
 
     // 백그라운드 위치정보 서비스 활성 및 콜백 등록.
@@ -141,16 +120,7 @@ class MainActivity : AppCompatActivity() {
         bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
     }
 
-    // 서비스를 간단하게 호출하기 위한 메서드
-    // 서비스에 다른 요청사항을
-    private fun startParkMapsService(intent: Intent) {
-        Log.e("sendToService", "sendToService")
-        // 버전별 포그라운드 서비스 실행을 위한 별도의 처리 필요. 오레오 이상은 포그라운드 서비스를 명시해주어야 하는듯
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            startForegroundService(intent)
-        else
-            startService(intent)
-    }
+
 
     private fun setBottomMenuButtons() {
         // 홈프래그먼트를 기본프래그먼트로 설정
