@@ -11,7 +11,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProvider
 import com.example.walkingpark.components.foreground.service.ParkMapsService
 import com.example.walkingpark.data.enum.Common
 import com.example.walkingpark.databinding.ActivityMainBinding
@@ -47,10 +46,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-
+        Log.e("mainActivity", viewModel.hashCode().toString())
         locationRepository.locationCallback = viewModel.locationCallback
-        setBottomButtonsAsTab()         // 하단 버튼 설정
-        startParkMapsService()          // 위치데이터 서비스 실행
+        setBottomMenuButtons()         // 하단 버튼 설정
+        startParkMapsService()         // 위치데이터 서비스 실행
 
         // 퍼미션 요청 핸들링. (onActivityResult 대체)
         val locationPermissionRequest = registerForActivityResult(
@@ -153,7 +152,11 @@ class MainActivity : AppCompatActivity() {
             startService(intent)
     }
 
-    private fun setBottomButtonsAsTab() {
+    private fun setBottomMenuButtons() {
+        // 홈프래그먼트를 기본프래그먼트로 설정
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.fragmentContainer, HomeFragment()).commit()
+
         binding!!.buttonHome.setOnClickListener {
             val transaction1 = supportFragmentManager.beginTransaction()
             transaction1.replace(R.id.fragmentContainer, HomeFragment()).commit()

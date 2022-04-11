@@ -23,8 +23,14 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
 
-    //private val mainViewModel by activityViewModels<MainViewModel>()
-    val mainViewModel:MainViewModel by viewModels()
+
+/*
+    기존 뷰모델 생성법 : private val searchViewModel: SearchViewModel by viewModels()
+    프래그먼트- 액티비티간 뷰모델 공유 : private val searchViewModel: SearchViewModel by activityViewModels()
+    프래그먼트끼리 뷰모델 공유 : private val viewModel: ManageLocationViewModel by viewModels({requireParentFragment()})
+*/
+
+    val mainViewModel:MainViewModel by activityViewModels()
     private var binding: FragmentHomeBinding? = null
 
     override fun onAttach(context: Context) {
@@ -44,8 +50,6 @@ class HomeFragment : Fragment() {
         binding = FragmentHomeBinding.inflate(layoutInflater, container, false)
         Log.e("HomeFragment()", "onCreateView()")
 
-
-
         return binding!!.root
     }
 
@@ -53,6 +57,7 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         Log.e("HomeFragment()", "onViewCreated()")
 
+        Log.e("homeFragment", mainViewModel.hashCode().toString())
 
 
     }

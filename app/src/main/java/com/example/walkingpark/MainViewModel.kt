@@ -23,6 +23,7 @@ import retrofit2.Response
 import java.util.*
 import java.util.stream.Collectors
 import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.collections.HashMap
 import kotlin.math.abs
 

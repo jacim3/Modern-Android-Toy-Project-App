@@ -16,7 +16,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object RoomModule {
 
-    // DB 에 값이 초기화 되었는지 여부를 체크하여, 초기화가 되지 않은 경우 생성하기 위함.
+    //  DB 인스턴스 생성. 만약, 기존에 assets 파일로 제공되는 DB가 초기화되지 않은 경우, 이를 생성
     @Provides
     @Singleton
     fun provideDatabaseInstance(@ApplicationContext context: Context): AppDatabase {
@@ -28,5 +28,4 @@ object RoomModule {
             .createFromAsset(Common.DATABASE_DIR_PARK_DB)
             .build()
     }
-
 }
