@@ -3,9 +3,8 @@ package com.example.walkingpark.data.dto
 import com.google.gson.annotations.SerializedName
 
 /**
-*   공공데이터 - 대기정보를 받아 직렬화를 수행할 DTO 객체
-*/
-
+*   공공데이터 - 미세먼지 API Retrofit2 통신을 위한 DTO 객체.
+**/
 
 data class AirDTO(
 

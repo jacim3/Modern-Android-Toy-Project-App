@@ -1,19 +1,22 @@
-package com.example.walkingpark.template_resource
+package com.example.walkingpark.components.ui.fragment.tab_3
 
 import android.content.Context
 import android.os.Bundle
-import android.view.View
 import androidx.fragment.app.Fragment
-import com.example.walkingpark.tabs.tab_2.ParkMapsViewModel
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.viewModels
+import com.example.walkingpark.MainViewModel
+import com.example.walkingpark.databinding.FragmentSettingsBinding
+import dagger.hilt.android.AndroidEntryPoint
 
-/*
-* 프래그먼트 간편 생성을 위한 복붙용 템플릿.
-* */
 
-class FragmentTemplate : Fragment() {
+@AndroidEntryPoint
+class SettingsFragment : Fragment() {
 
-    private lateinit var viewModel: ParkMapsViewModel
-    //private var binding: ParkMapsFragmentBinding? = null
+    private val mainViewModel by viewModels<MainViewModel>()
+    private var binding: FragmentSettingsBinding? = null
     override fun onAttach(context: Context) {
         super.onAttach(context)
     }
@@ -22,14 +25,14 @@ class FragmentTemplate : Fragment() {
         super.onCreate(savedInstanceState)
     }
 
-/*    override fun onCreateView(
+    override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = ParkMapsFragmentBinding.inflate(layoutInflater, container, false)
+        binding = FragmentSettingsBinding.inflate(layoutInflater, container, false)
 
         return binding!!.root
-    }*/
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -42,11 +45,10 @@ class FragmentTemplate : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        //binding = null
+        binding = null
     }
 
     companion object {
         fun newInstance() = Fragment()
     }
-
 }

@@ -5,7 +5,7 @@ import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
 import android.util.Log
-import com.example.walkingpark.di.repository.LocationRepository
+import com.example.walkingpark.data.repository.LocationServiceRepository
 import com.example.walkingpark.data.enum.*
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -23,7 +23,7 @@ class ParkMapsService : Service() {
         get() = field + 1
 
     @Inject
-    lateinit var locationRepository: LocationRepository
+    lateinit var locationServiceRepository: LocationServiceRepository
 
     val thisService: ParkMapsService = this
 
@@ -45,7 +45,7 @@ class ParkMapsService : Service() {
     override fun onBind(sIntent: Intent?): IBinder {
         Log.e("ParkMapsService", "onBind")
 
-        startForeground(2, locationRepository.setLocationTrackNotification(this))
+        startForeground(2, locationServiceRepository.setLocationTrackNotification(this))
         return mBinder
     }
 
@@ -61,7 +61,7 @@ class ParkMapsService : Service() {
             when (requestCode) {
                 Common.PERMISSION -> {
 
-                    locationRepository.getUserLocationAfterInitFusedLocationProvider(
+                    locationServiceRepository.getUserLocationAfterInitFusedLocationProvider(
                         applicationContext
                     )
                     // 서비스의 위치정보 획득이 완료되었음을 알리고, 위치정보 서비스가 초기화가 완료되었음에 따라
@@ -72,10 +72,10 @@ class ParkMapsService : Service() {
 
                 }
                 Common.LOCATION_UPDATE -> {
-                    locationRepository.setUpdateUserLocation(applicationContext, locationRepository.locationCallback)
+                    locationServiceRepository.setUpdateUserLocation(applicationContext, locationServiceRepository.locationCallback)
                 }
                 Common.LOCATION_UPDATE_CANCEL -> {
-                    locationRepository.cancelUpdateLocation(locationRepository.locationCallback)
+                    locationServiceRepository.cancelUpdateLocation(locationServiceRepository.locationCallback)
                 }
                 Common.LOCATION_SETTINGS -> {
 

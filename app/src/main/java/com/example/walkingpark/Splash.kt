@@ -6,7 +6,6 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import com.example.walkingpark.di.repository.RoomRepository
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
@@ -23,8 +22,6 @@ class Splash : AppCompatActivity() {
      *  공원 데이터를 DB 에 적재해야 하므로, 최초 앱 실행시는 시간이 조금 걸릴 수 있음
      */
 
-    @Inject
-    lateinit var parkRoomRepository: RoomRepository     // 로컬 DB에 관한 비즈니스 로직 사용을 위한 repository
 
     /*
     *

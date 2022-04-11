@@ -1,4 +1,4 @@
-package com.example.walkingpark.tabs.tab_1
+package com.example.walkingpark.components.ui.fragment.tab_1
 
 import android.content.Context
 import android.os.Bundle
@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import com.example.walkingpark.MainActivity
 import com.example.walkingpark.MainViewModel
 import com.example.walkingpark.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -81,6 +82,8 @@ class HomeFragment : Fragment() {
             CoroutineScope(Dispatchers.IO).launch {
                 Log.e("received3", it.stationName)
                 mainViewModel.getDataFromAirAPI(it.stationName)
+
+                (requireActivity()as MainActivity).indicator.dismissIndicator()
             }
         }
     }

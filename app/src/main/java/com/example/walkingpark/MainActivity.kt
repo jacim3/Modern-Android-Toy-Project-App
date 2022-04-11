@@ -10,12 +10,13 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.example.walkingpark.components.foreground.service.ParkMapsService
+import com.example.walkingpark.components.ui.dialog.LoadingIndicator
 import com.example.walkingpark.data.enum.Common
 import com.example.walkingpark.databinding.ActivityMainBinding
-import com.example.walkingpark.di.repository.LocationRepository
-import com.example.walkingpark.tabs.tab_1.HomeFragment
-import com.example.walkingpark.tabs.tab_2.ParkMapsFragment
-import com.example.walkingpark.tabs.tab_3.SettingsFragment
+import com.example.walkingpark.data.repository.LocationServiceRepository
+import com.example.walkingpark.components.ui.fragment.tab_1.HomeFragment
+import com.example.walkingpark.components.ui.fragment.tab_2.ParkMapsFragment
+import com.example.walkingpark.components.ui.fragment.tab_3.SettingsFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -30,26 +31,27 @@ class MainActivity : AppCompatActivity() {
     //private val viewModel by viewModels<MainViewModel>()            // 뷰모델 주입
     val viewModel by viewModels<MainViewModel>()
     private var isParkMapsServiceRunning = false
-
+    lateinit var indicator:LoadingIndicator
     @Inject
-    lateinit var locationRepository: LocationRepository
+    lateinit var locationServiceRepository: LocationServiceRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         Log.e("mainActivity", viewModel.hashCode().toString())
-        locationRepository.locationCallback = viewModel.locationCallback
+        locationServiceRepository.locationCallback = viewModel.locationCallback
         setBottomMenuButtons()         // 하단 버튼 설정
-        locationRepository.startParkMapsService(this)         // 위치데이터 서비스 실행
+        locationServiceRepository.startParkMapsService(this)         // 위치데이터 서비스 실행
 
         // 퍼미션 요청 핸들링. (onActivityResult 대체)
         val locationPermissionRequest = registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
         ) { permissions ->
-
-            val check = locationRepository.sendPermissionResultToActivity(this)
+            indicator = LoadingIndicator(this)
+            val check = locationServiceRepository.sendPermissionResultToActivity(this)
             if (check) {
+                indicator.startLoadingIndicator()
                 // 퍼미션이 허용되었으므로 서비스 실행
                 val intent = Intent(this, ParkMapsService::class.java)
                 intent.putExtra("requestCode", Common.PERMISSION)
@@ -83,6 +85,13 @@ class MainActivity : AppCompatActivity() {
             CoroutineScope(Dispatchers.IO).launch {
                 Log.e("received3",it.stationName)
                 viewModel.getAirDataFromApi(it.stationName)
+            }
+        }*/
+
+/*        viewModel.userLiveHolderStation.observe(this){
+            CoroutineScope(Dispatchers.IO).launch {
+
+
             }
         }*/
     }
@@ -137,6 +146,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        // TODO 여기서 동적 리시버 해지
+
         binding = null
     }
 

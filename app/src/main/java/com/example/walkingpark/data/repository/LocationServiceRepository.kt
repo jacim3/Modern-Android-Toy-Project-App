@@ -1,4 +1,4 @@
-package com.example.walkingpark.di.repository
+package com.example.walkingpark.data.repository
 
 import android.Manifest
 import android.app.*
@@ -18,7 +18,6 @@ import com.example.walkingpark.components.foreground.service.ParkMapsService
 import com.example.walkingpark.data.enum.ADDRESS
 import com.example.walkingpark.data.enum.Common
 import com.example.walkingpark.data.enum.Settings
-import com.example.walkingpark.data.enum.UserData
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -33,8 +32,13 @@ import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/**
+*   MainActivity 에서 시작되는 위치검색 ForeGround Service 의 복잡한 비즈니스 로직을 분리
+*   Service 는 ViewModel 에서 수행할 경우 컨텍스트 낭비가 생기므로 권장되지 않는듯...??
+* */
+
 @Singleton
-class LocationRepository @Inject constructor() {
+class LocationServiceRepository @Inject constructor() {
 
     @Inject
     lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -50,8 +54,7 @@ class LocationRepository @Inject constructor() {
     val addressMap = HashMap<Char, String?>()
     val latLngMap = HashMap<String, Double>()
 
-    // 서비스에는 intentFilter 를 포함한 Intent 를 보내기 위한 리시버를 호출하며,
-    // 서비스로부터 받은 응답결과를 통해, 조건에 따른 비즈니스 로직 수행을 위한 동적리시버 정의
+    // 실행되는 포그라운드 서비스와 LocationServiceRepository IntentFilter 를 통한 통신을 위한 동적 리시버 정의.
     @AndroidEntryPoint
     class ParkMapsReceiver(val context: Context) :
         BroadcastReceiver() {
@@ -75,7 +78,7 @@ class LocationRepository @Inject constructor() {
     }
 
     // 위치정보를 받기 이전, 최초 서비스 시작 요청 메서드
-    fun startParkMapsService(@ApplicationContext context: Context) {
+    fun startParkMapsService(context: Context) {
 
         val serviceConnection: ServiceConnection = object : ServiceConnection {
             // 1. 서비스 연결 관련 콜백 등록
@@ -132,7 +135,7 @@ class LocationRepository @Inject constructor() {
     }
 
     // 포그라운드 서비스에 필요한 UI 인 Notification 설정 메서드.
-    fun setLocationTrackNotification(@ApplicationContext context: Context): Notification {
+    fun setLocationTrackNotification(context: Context): Notification {
         // 위치추적 관련 Notification 생성
         val notificationIntent = Intent(context, MainActivity::class.java)
         val pendingIntent =
@@ -157,7 +160,7 @@ class LocationRepository @Inject constructor() {
         return locationTrackNotification.build()
     }
 
-    fun getUserLocationAfterInitFusedLocationProvider(@ApplicationContext context: Context) {
+    fun getUserLocationAfterInitFusedLocationProvider(context: Context) {
 
         if (ActivityCompat.checkSelfPermission(
                 context,
@@ -179,9 +182,6 @@ class LocationRepository @Inject constructor() {
             Log.e("fusedLocationProvider", "fail")
         }.addOnSuccessListener {
             Log.e("fusedLocationProvider", "${it.latitude} ${it.longitude}")
-
-            UserData.currentLatitude = it.latitude
-            UserData.currentLongitude = it.longitude
 
             parsingAddressMap(context, it.latitude, it.longitude)
 
@@ -258,7 +258,10 @@ class LocationRepository @Inject constructor() {
                 locationRequest,
                 locationCallback,
                 Looper.getMainLooper()
-            ).addOnCompleteListener { Log.e("Completed", "Completed") }
+            ).addOnCompleteListener {
+
+                Log.e("LocationServiceRepository : ", "LocationUpdateCallbackRegistered.")
+            }
         }
     }
 

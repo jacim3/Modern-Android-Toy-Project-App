@@ -11,15 +11,12 @@ import com.example.walkingpark.data.dto.AirDTO
 import com.example.walkingpark.data.dto.StationDTO
 import com.example.walkingpark.data.dto.WeatherDTO
 import com.example.walkingpark.data.enum.ADDRESS
-import com.example.walkingpark.data.tool.LatLngToGridXy
-import com.example.walkingpark.di.repository.LocationRepository
-import com.example.walkingpark.di.repository.RestApiRepository
-import com.example.walkingpark.di.repository.RoomRepository
+import com.example.walkingpark.data.repository.LocationServiceRepository
+import com.example.walkingpark.data.repository.RestApiRepository
 import com.google.android.gms.location.LocationAvailability
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationResult
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import java.util.stream.Collectors
 import javax.inject.Inject
@@ -36,12 +33,8 @@ class MainViewModel @Inject constructor(application: Application) : AndroidViewM
 
     @Inject
     lateinit var restApiRepository: RestApiRepository
-
     @Inject
-    lateinit var locationRepository: LocationRepository
-
-    @Inject
-    lateinit var roomRepository: RoomRepository
+    lateinit var locationServiceRepository: LocationServiceRepository
 
     // TODO 임시. 데이터를 받아와 곧바로 DataBinding 을 통하여 출력. -> 나중에 UI 에 맞추어 수정 필요.
     // 1. 맨 처음 위치정보에 따른 위경도와 GeoCoder 를 통하여 받는 주소정보를 가공.
@@ -73,15 +66,17 @@ class MainViewModel @Inject constructor(application: Application) : AndroidViewM
                 val latLngMap = HashMap<String, Double>()
                 latLngMap["위도"] = latitude
                 latLngMap["경도"] = longitude
-                Log.e("onLocationResultCallback()", latLngMap.toString())
+                
+                userLiveHolderLatLng.postValue(latLngMap)       // 위도경도는 항상 업데이트
+
                 if (isInitialized) {
                     isInitialized = false
                     viewModelScope.launch {
 
                         // 1. 콜백 함수의 결과로, Observer 패턴을 적용하기 위한 liveDataHolder 업데이트
-                        userLiveHolderLatLng.postValue(latLngMap)
+           
                         userLiveHolderAddress.postValue(
-                            locationRepository.parsingAddressMap(
+                            locationServiceRepository.parsingAddressMap(
                                 application,
                                 latitude,
                                 longitude
@@ -94,15 +89,13 @@ class MainViewModel @Inject constructor(application: Application) : AndroidViewM
                         //getAirDataFromApi()
                         // TODO 3. 기상 정보 가져오기 로직 수행 -> Api 서버 오류로 호출 보류
                         // getDataFromWeatherAPI()
-
                     }
                 }
             }
 
             override fun onLocationAvailability(response: LocationAvailability) {
                 super.onLocationAvailability(response)
-                Log.e("LocationCallback", "onLocationAvailability")
-                Log.e("LocationCallback", "${response.isLocationAvailable}")
+
             }
         }
     }
@@ -111,8 +104,8 @@ class MainViewModel @Inject constructor(application: Application) : AndroidViewM
     // TODO 동네예보 조회서비스는 일단 보류.
     suspend fun getDataFromWeatherAPI() {
         val response = restApiRepository.getWeatherDataByGridXy(
-            locationRepository.latLngMap["위도"]!!,
-            locationRepository.latLngMap["경도"]!!
+            locationServiceRepository.latLngMap["위도"]!!,
+            locationServiceRepository.latLngMap["경도"]!!
         )
 
         if (response != null && response.isSuccessful) {
@@ -127,7 +120,7 @@ class MainViewModel @Inject constructor(application: Application) : AndroidViewM
 
         // TODO 이 때, LivaData = null. 대신, Repository 데이터를 대신 참조
         // TODO 통신장애등 예외사항에 대처하기 위하여 resultCode 를 통한 조건문 작성 필요.
-        val siName = locationRepository.addressMap[ADDRESS.SI.x]!!.split("시")[0]
+        val siName = locationServiceRepository.addressMap[ADDRESS.SI.x]!!.split("시")[0]
         Log.e("11111111", siName)
         val response = restApiRepository.getStationDataBySIName(siName)
 
@@ -136,8 +129,8 @@ class MainViewModel @Inject constructor(application: Application) : AndroidViewM
                 val data: List<StationDTO.Response.Body.Items> =
                     response.body()!!.response.body.items
 
-                val latitude = locationRepository.latLngMap["위도"]
-                val longitude = locationRepository.latLngMap["경도"]
+                val latitude = locationServiceRepository.latLngMap["위도"]
+                val longitude = locationServiceRepository.latLngMap["경도"]
 
                 // 여러 미세먼지 측정소 결과 중 사용자와 가장 가까운 위치 결과 받아내기.
                 val result = data.stream().sorted { p0, p1 ->

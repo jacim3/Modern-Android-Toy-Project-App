@@ -2,6 +2,9 @@ package com.example.walkingpark.data.enum
 
 enum class Enums(){}
 
+/**
+*   GoogleMaps 의 GeoCoder 의 주소변환 기능 로직 수행을 위한 Enum 클래스
+**/
 enum class ADDRESS(val x:Char
 ) {
     DO('도'),
@@ -13,6 +16,9 @@ enum class ADDRESS(val x:Char
     DONG('동')
 }
 
+/**
+*   동네예보 조회 API 에서 받아온 데이터를 파싱하기 위한 Enum 클래스
+**/
 enum class WEATHER(val x:String) {
     RAIN_RATIO("POP"),
     RAIN_TYPE("PTY"),
@@ -28,6 +34,9 @@ enum class WEATHER(val x:String) {
     WAVE_HEIGHT("VEC")
 }
 
+/**
+*   미세먼지 API 에서 받아온 데이터를 파싱하기 위한 Enum 클래스
+**/
 enum class AIR(val x: String) {
     PM25_24HOUR("pm25Value24"),
     UNIFIED_ATMOSPHERE_VALUE("khaiValue"),

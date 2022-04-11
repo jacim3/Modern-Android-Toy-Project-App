@@ -1,6 +1,5 @@
-package com.example.walkingpark.di.repository
+package com.example.walkingpark.data.repository
 
-import android.util.Log
 import com.example.walkingpark.di.module.ApiKeyModule
 import com.example.walkingpark.di.module.PublicDataApiModule
 import com.example.walkingpark.data.dto.AirDTO
@@ -8,7 +7,6 @@ import com.example.walkingpark.data.dto.StationDTO
 import com.example.walkingpark.data.dto.WeatherDTO
 import com.example.walkingpark.data.tool.LatLngToGridXy
 import com.example.walkingpark.retrofit2.PublicApiService
-import retrofit2.Call
 import retrofit2.Response
 import java.sql.Timestamp
 import javax.inject.Inject

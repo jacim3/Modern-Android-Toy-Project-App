@@ -1,24 +1,26 @@
-package com.example.walkingpark.tabs.tab_2
+package com.example.walkingpark.components.ui.fragment.tab_2
 
 import android.content.Context
-import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import com.example.walkingpark.MainActivity
 import com.example.walkingpark.MainViewModel
+import com.example.walkingpark.components.ui.dialog.LoadingIndicator
 import com.example.walkingpark.databinding.FragmentParkmapsBinding
-
+import com.example.walkingpark.data.repository.GoogleMapsRepository
+import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.maps.CameraUpdateFactory
+
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 /*
 *  뷰바인딩 사용 안함
@@ -27,9 +29,15 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class ParkMapsFragment : Fragment(), OnMapReadyCallback{
 
-    private val mainViewModel by viewModels<MainViewModel>()
-    private lateinit var googleMap:GoogleMap
+    @Inject
+    lateinit var googleMapsRepository: GoogleMapsRepository
+
+    private val mainViewModel:MainViewModel by activityViewModels()
+    private val parkMapsViewModel:ParkMapsViewModel by viewModels()
     private var binding:FragmentParkmapsBinding? = null
+
+    private lateinit var googleMap:GoogleMap
+    private lateinit var indicator:LoadingIndicator
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -53,11 +61,17 @@ class ParkMapsFragment : Fragment(), OnMapReadyCallback{
         Log.e("ParkMapsFragment()", "onViewCreated()")
 
         //Log.e("ParkMapsService()", (activity as MainActivity).parkMapsService.number.toString())
+
+        indicator = LoadingIndicator(requireActivity())
+        // mainViewModel 에 lazy 초기화한 콜백함수에 의하여 계속 observe 로 사용자 위치를 출력한다.
+        mainViewModel.userLiveHolderLatLng.observe(viewLifecycleOwner){
+            parkMapsViewModel.getParkData(it["위도"]!!, it["경도"]!!, indicator)
+        }
     }
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
         super.onViewStateRestored(savedInstanceState)
-        Log.e("ParkMapsFragment()", "onViewStateRestored()")
+        Log.e("ParkMapsFragment", "onViewStateRestored()")
     }
 
     override fun onStart() {
@@ -93,18 +107,12 @@ class ParkMapsFragment : Fragment(), OnMapReadyCallback{
         fun newInstance() = ParkMapsFragment()
     }
 
+    // 구글맵 준비가 완료된 이후 수행되는 콜백메서드.
     override fun onMapReady(googleMap: GoogleMap) {
-        this.googleMap = googleMap
-        val seoul = LatLng(37.56, 126.97);
-        val markerOptions= MarkerOptions()
-
-        markerOptions.position(seoul);
-        markerOptions.title("서울");
-        markerOptions.snippet("수도");
-
-        googleMap.addMarker(markerOptions);
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(seoul))
-        googleMap.animateCamera(CameraUpdateFactory.zoomTo(12f))
+        //this.googleMap = googleMap
+        Log.e("onMapReadyCallback", "executed!!!!")
+        googleMapsRepository.isMapLoaded = true
+        googleMapsRepository.googleMap = googleMap
     }
 
     private fun getCurrentPosition(){

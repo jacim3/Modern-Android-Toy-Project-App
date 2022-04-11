@@ -2,15 +2,14 @@ package com.example.walkingpark.data.room
 
 import androidx.room.Dao
 import androidx.room.Query
+import com.google.android.gms.maps.model.LatLng
 
 @Dao
 interface ParkDao {
-    @Query("SELECT * FROM ParkDB")
-    suspend fun getAll(): List<ParkDB>
 
-    @Query("SELECT * FROM ParkDB WHERE pk = 1")
-    suspend fun checkQuery(): List<ParkDB>
-
+    //  @Query("SELECT * FROM ParkDB WHERE (field6 BETWEEN :startLat AND :endLat ) AND (field6 BETWEEN :startLng AND :endLng )")
+    @Query("SELECT * FROM ParkDB WHERE (field6 BETWEEN :startLat AND :endLat) And (field7 BETWEEN :startLng AND :endLng) ")
+    suspend fun queryRangedDataFromLatLng(startLat:Double, endLat:Double, startLng:Double, endLng:Double):List<ParkDB>
 }
 
 @Dao

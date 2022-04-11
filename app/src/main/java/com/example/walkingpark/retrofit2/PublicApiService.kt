@@ -11,7 +11,6 @@ import retrofit2.http.Query
 
 interface PublicApiService {
 
-
     @GET("getMsrstnAcctoRltmMesureDnsty")
     suspend fun getAirDataByStationName(
         @Query(value= "serviceKey", encoded = true) serviceKey:String,
@@ -28,6 +27,8 @@ interface PublicApiService {
 
     ) : Response<StationDTO>
 
+
+    // TODO 동네예보 조회 Api : HttpException: resultCode 500 발생 !!
     @Headers("Content-Type: application/json; charset=utf-8")
     @GET("getUltraSrtFcst")
     suspend fun getWeatherByGridXY(

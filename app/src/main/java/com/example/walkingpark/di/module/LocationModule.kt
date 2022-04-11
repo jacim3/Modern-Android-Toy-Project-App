@@ -6,6 +6,7 @@ import com.example.walkingpark.R
 import com.example.walkingpark.data.enum.Common
 import com.example.walkingpark.data.enum.Settings
 import com.google.android.gms.location.*
+import com.google.android.gms.maps.GoogleMap
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -41,4 +42,5 @@ object LocationModule {
         }
         return locationTrackNotification
     }
+
 }
