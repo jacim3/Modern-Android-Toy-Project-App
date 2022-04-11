@@ -2,14 +2,12 @@ package com.example.walkingpark
 
 import android.Manifest
 import android.content.*
-import android.content.pm.PackageManager
 import android.os.*
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
 import com.example.walkingpark.components.foreground.service.ParkMapsService
 import com.example.walkingpark.data.enum.Common
@@ -19,9 +17,6 @@ import com.example.walkingpark.tabs.tab_1.HomeFragment
 import com.example.walkingpark.tabs.tab_2.ParkMapsFragment
 import com.example.walkingpark.tabs.tab_3.SettingsFragment
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 // TODO 데이터 바인딩 대체?? -> 자세히 알아볼 것 !!!!
@@ -33,11 +28,8 @@ class MainActivity : AppCompatActivity() {
 
     private var binding: ActivityMainBinding? = null
     //private val viewModel by viewModels<MainViewModel>()            // 뷰모델 주입
-
     val viewModel by viewModels<MainViewModel>()
-    lateinit var parkMapsService: ParkMapsService                   // 서비스 객체
     private var isParkMapsServiceRunning = false
-    lateinit var parkMapsReceiver: BroadcastReceiver
 
     @Inject
     lateinit var locationRepository: LocationRepository
@@ -49,13 +41,27 @@ class MainActivity : AppCompatActivity() {
         Log.e("mainActivity", viewModel.hashCode().toString())
         locationRepository.locationCallback = viewModel.locationCallback
         setBottomMenuButtons()         // 하단 버튼 설정
-        startParkMapsService()         // 위치데이터 서비스 실행
+        locationRepository.startParkMapsService(this)         // 위치데이터 서비스 실행
 
         // 퍼미션 요청 핸들링. (onActivityResult 대체)
         val locationPermissionRequest = registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
         ) { permissions ->
-            locationRepository.startLocationAfterPermissionCheck(this, parkMapsService)
+
+            val check = locationRepository.sendPermissionResultToActivity(this)
+            if (check) {
+                // 퍼미션이 허용되었으므로 서비스 실행
+                val intent = Intent(this, ParkMapsService::class.java)
+                intent.putExtra("requestCode", Common.PERMISSION)
+                // 버전별 포그라운드 서비스 실행을 위한 별도의 처리 필요. 오레오 이상은 포그라운드 서비스를 명시해주어야 하는듯
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                    startForegroundService(intent)
+                else
+                    startService(intent)
+            } else {
+                Toast.makeText(this, "퍼미션을 허용해야 앱 이용이 가능합니다.", Toast.LENGTH_SHORT).show()
+                finish()
+            }
         }
         // 퍼미션 요청 수행!!
         locationPermissionRequest.launch(
@@ -65,7 +71,7 @@ class MainActivity : AppCompatActivity() {
             )
         )
 
-        viewModel.userLocationHolder.observe(this) {
+/*        viewModel.userLocationHolder.observe(this) {
             Log.e("received1", it.toString())
         }
 
@@ -78,46 +84,7 @@ class MainActivity : AppCompatActivity() {
                 Log.e("received3",it.stationName)
                 viewModel.getAirDataFromApi(it.stationName)
             }
-        }
-    }
-
-    // 백그라운드 위치정보 서비스 활성 및 콜백 등록.
-    private fun startParkMapsService() {
-
-        val serviceConnection: ServiceConnection = object : ServiceConnection {
-            // 서비스 연결 관련 콜백
-            override fun onServiceConnected(
-                name: ComponentName,
-                service: IBinder
-            ) {
-                // 서비스와 연결되었을 때 호출되는 메서드
-                // 서비스 객체를 전역변수로 저장
-                parkMapsService = viewModel.getParkMapsService(service)
-                isParkMapsServiceRunning = true
-
-                // 서비스에서 작업이 완료됨에 따라, 서비스로부터 결과를 수신받을 리시버 등록
-                parkMapsReceiver = ParkMapsReceiver(applicationContext, viewModel)
-                val filter = IntentFilter().apply {
-                    addAction(Common.REQUEST_ACTION_UPDATE)
-                    addAction(Common.REQUEST_ACTION_PAUSE)
-                    addAction(Common.ACCEPT_ACTION_UPDATE)
-                }
-                registerReceiver(parkMapsReceiver, filter)
-            }
-
-            override fun onServiceDisconnected(name: ComponentName) {
-                // 서비스와 연결이 끊겼을 때 호출되는 메서드
-                isParkMapsServiceRunning = false
-                Toast.makeText(
-                    applicationContext,
-                    "위치 서비스 연결 해제됨",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-        }
-        // 서비스 실행
-        val intent = Intent(this, ParkMapsService::class.java)
-        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+        }*/
     }
 
 
@@ -149,38 +116,16 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        requestLocationUpdate()
+//        requestLocationUpdate()
     }
 
     private fun requestLocationUpdate() {
-        val intent = Intent(this, ParkMapsFragment::class.java)
-        intent.putExtra("requestCode", Common.LOCATION_UPDATE)
-        startParkMapsService(intent)
+//        val intent = Intent(this, ParkMapsFragment::class.java)
+//        intent.putExtra("requestCode", Common.LOCATION_UPDATE)
+//        startParkMapsService(intent)
     }
 
-    // 동적리시버를 통하여, ParkMapsService 에서 액티비티로 전달되는 로직 정의
-    // 서비스에서 최초 위치정보를 성공적으로 받아왔음을 알게되어, 이를 통하여 다시 서비스에 위치업데이트를 요청
-    @AndroidEntryPoint
-    class ParkMapsReceiver(val context: Context, val viewModel: MainViewModel) :
-        BroadcastReceiver() {
 
-        override fun onReceive(p0: Context?, result: Intent?) {
-            Log.e("ParkMapsReceiver", "ParkMapsReceiver")
-            when (result!!.action) {
-                // 서비스에
-                Common.REQUEST_ACTION_UPDATE -> {
-                    val intent = Intent(context, ParkMapsService::class.java)
-                    intent.putExtra("requestCode", Common.LOCATION_UPDATE)
-                    context.startService(intent)
-                }
-                Common.ACCEPT_ACTION_UPDATE -> {
-                    val addressMap: HashMap<Char, String> =
-                        result.getSerializableExtra("addressMap") as HashMap<Char, String>
-                    //viewModel.userAddressMap.value = addressMap
-                }
-            }
-        }
-    }
 
     override fun onPause() {
         super.onPause()

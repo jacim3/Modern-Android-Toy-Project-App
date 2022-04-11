@@ -2,22 +2,19 @@ package com.example.walkingpark.di.repository
 
 import android.Manifest
 import android.app.*
-import android.content.Context
-import android.content.Intent
+import android.content.*
 import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.os.Build
+import android.os.IBinder
 import android.os.Looper
 import android.util.Log
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.MutableLiveData
 import com.example.walkingpark.MainActivity
 import com.example.walkingpark.components.foreground.service.ParkMapsService
-import com.example.walkingpark.data.dto.AirDTO
-import com.example.walkingpark.data.dto.StationDTO
 import com.example.walkingpark.data.enum.ADDRESS
 import com.example.walkingpark.data.enum.Common
 import com.example.walkingpark.data.enum.Settings
@@ -27,17 +24,14 @@ import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.tasks.CancellationToken
 import com.google.android.gms.tasks.CancellationTokenSource
-import dagger.hilt.android.qualifiers.ActivityContext
+import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.lang.Exception
-import java.lang.IndexOutOfBoundsException
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.collections.HashMap
 
 @Singleton
 class LocationRepository @Inject constructor() {
@@ -52,13 +46,76 @@ class LocationRepository @Inject constructor() {
     lateinit var locationRequest: LocationRequest
 
     lateinit var locationCallback: LocationCallback
-
+    val service: ParkMapsService = ParkMapsService()
     val addressMap = HashMap<Char, String?>()
     val latLngMap = HashMap<String, Double>()
 
+    // 서비스에는 intentFilter 를 포함한 Intent 를 보내기 위한 리시버를 호출하며,
+    // 서비스로부터 받은 응답결과를 통해, 조건에 따른 비즈니스 로직 수행을 위한 동적리시버 정의
+    @AndroidEntryPoint
+    class ParkMapsReceiver(val context: Context) :
+        BroadcastReceiver() {
 
-    // 위치 퍼미션 체크 이후, 위치정보 서비스 실행 메서드
-    fun startLocationAfterPermissionCheck(@ApplicationContext context: Context, service: ParkMapsService) {
+        override fun onReceive(p0: Context?, result: Intent?) {
+            Log.e("ParkMapsReceiver", "ParkMapsReceiver")
+            when (result!!.action) {
+                // 서비스에
+                Common.REQUEST_ACTION_UPDATE -> {
+                    val intent = Intent(context, ParkMapsService::class.java)
+                    intent.putExtra("requestCode", Common.LOCATION_UPDATE)
+                    context.startService(intent)
+                }
+                Common.ACCEPT_ACTION_UPDATE -> {
+//                    val addressMap: HashMap<Char, String> =
+//                        result.getSerializableExtra("addressMap") as HashMap<Char, String>
+//                    //viewModel.userAddressMap.value = addressMap
+                }
+            }
+        }
+    }
+
+    // 위치정보를 받기 이전, 최초 서비스 시작 요청 메서드
+    fun startParkMapsService(@ApplicationContext context: Context) {
+
+        val serviceConnection: ServiceConnection = object : ServiceConnection {
+            // 1. 서비스 연결 관련 콜백 등록
+            override fun onServiceConnected(
+                name: ComponentName,
+                service: IBinder
+            ) {
+                // 서비스와 연결되었을 때 호출되는 메서드
+                // 서비스 객체를 전역변수로 저장
+                //parkMapsService = viewModel.getParkMapsService(service)
+                //isParkMapsServiceRunning = true
+
+                // 서비스에서 작업이 완료됨에 따라, 서비스로부터 결과를 수신받을 리시버 등록
+                val parkMapsReceiver = ParkMapsReceiver(context)
+                val filter = IntentFilter().apply {
+                    addAction(Common.REQUEST_ACTION_UPDATE)
+                    addAction(Common.REQUEST_ACTION_PAUSE)
+                    addAction(Common.ACCEPT_ACTION_UPDATE)
+                }
+                context.registerReceiver(parkMapsReceiver, filter)
+            }
+
+            override fun onServiceDisconnected(name: ComponentName) {
+                // 서비스와 연결이 끊겼을 때 호출되는 메서드
+                //isParkMapsServiceRunning = false
+                Toast.makeText(
+                    context,
+                    "위치 서비스 연결 해제됨",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+        // 2. 서비스 실행
+        val intent = Intent(context, ParkMapsService::class.java)
+        context.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+    }
+
+    // 퍼미션이 허용되어 Intent 를 통하여 서비스를 실행할 지 아니면, 앱을 종료할지 체크
+    // 서비스는 액티비티에서 실행해야 하므로 이후 로직은 액티비티에서 수행.
+    fun sendPermissionResultToActivity(context: Context): Boolean {
 
         if (ActivityCompat.checkSelfPermission(
                 context,
@@ -69,34 +126,17 @@ class LocationRepository @Inject constructor() {
             ) != PackageManager.PERMISSION_GRANTED
         ) // 퍼미션이 허용되지 않음 -> 종료
         {
-            Toast.makeText(context, "퍼미션을 허용해야 앱 이용이 가능합니다.", Toast.LENGTH_SHORT).show()
-
+            return false
         }
-        // 퍼미션이 허용되었으므로 서비스 실행
-        val intent = Intent(context, ParkMapsService::class.java)
-        intent.putExtra("requestCode", Common.PERMISSION)
-        startParkMapsService(intent, service)
+        return true
     }
 
-    // 서비스를 간단하게 호출하기 위한 메서드
-    // 서비스에 다른 요청사항을
-    private fun startParkMapsService(intent: Intent, service: ParkMapsService) {
-        Log.e("sendToService", "sendToService")
-        // 버전별 포그라운드 서비스 실행을 위한 별도의 처리 필요. 오레오 이상은 포그라운드 서비스를 명시해주어야 하는듯
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            service.startForegroundService(intent)
-        else
-            service.startService(intent)
-    }
-
+    // 포그라운드 서비스에 필요한 UI 인 Notification 설정 메서드.
     fun setLocationTrackNotification(@ApplicationContext context: Context): Notification {
         // 위치추적 관련 Notification 생성
         val notificationIntent = Intent(context, MainActivity::class.java)
-        val pendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        val pendingIntent =
             PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
-        } else {
-            PendingIntent.getActivity(context, 0, notificationIntent, 0)
-        }
         locationTrackNotification.setContentIntent(pendingIntent)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val manager: NotificationManager =
@@ -117,7 +157,7 @@ class LocationRepository @Inject constructor() {
         return locationTrackNotification.build()
     }
 
-    fun getUserLocationAfterInitFusedLocationProvider(@ApplicationContext context:Context){
+    fun getUserLocationAfterInitFusedLocationProvider(@ApplicationContext context: Context) {
 
         if (ActivityCompat.checkSelfPermission(
                 context,
@@ -153,7 +193,11 @@ class LocationRepository @Inject constructor() {
     // TODO 이 앱은 반드시 '한국' 에서만 작동. 도 시 군 구 읍 면 동만 추출.
     // 주소정보를 굳이 가져오는 이유는 공공데이터 api 에서 TM 좌표 조회 기능이 올바르게 작동하지 않음
     // 추가로 동네 예보 정보를 가져오기 위한 주소데이터 필요.
-    fun parsingAddressMap(context: Context, latitude: Double, longitude: Double): HashMap<Char, String?>? {
+    fun parsingAddressMap(
+        context: Context,
+        latitude: Double,
+        longitude: Double
+    ): HashMap<Char, String?>? {
 
         // 사용자 위치정보 업데이트!! TM 좌표는 오류가 있움.
 
@@ -192,7 +236,10 @@ class LocationRepository @Inject constructor() {
     }
 
     // 주기적인 위치 업데이트 수행
-    fun setUpdateUserLocation(@ApplicationContext context: Context, locationCallback:LocationCallback) {
+    fun setUpdateUserLocation(
+        @ApplicationContext context: Context,
+        locationCallback: LocationCallback
+    ) {
 
         if (ActivityCompat.checkSelfPermission(
                 context,

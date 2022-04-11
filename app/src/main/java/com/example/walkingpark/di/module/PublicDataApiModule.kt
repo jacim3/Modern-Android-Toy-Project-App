@@ -65,8 +65,8 @@ object PublicDataApiModule {
         val retrofit: Retrofit by lazy {
             Retrofit.Builder()
                 .baseUrl(Common.BASE_URL_API_WEATHER)
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(UnsafeOkHttpClient.unsafeOkHttpClient().build())
+                .addConverterFactory(ScalarsConverterFactory.create())
+
                 .build()
         }
 

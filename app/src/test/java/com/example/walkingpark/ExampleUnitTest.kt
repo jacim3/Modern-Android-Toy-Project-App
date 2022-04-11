@@ -1,5 +1,7 @@
 package com.example.walkingpark
 
+import android.util.Log
+import com.example.walkingpark.data.tool.LatLngToGridXy
 import org.junit.Test
 
 import org.junit.Assert.*

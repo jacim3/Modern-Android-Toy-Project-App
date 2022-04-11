@@ -52,7 +52,7 @@ class ParkMapsFragment : Fragment(), OnMapReadyCallback{
         //viewModel = ViewModelProvider(this)[ParkMapsViewModel::class.java]
         Log.e("ParkMapsFragment()", "onViewCreated()")
 
-        Log.e("ParkMapsService()", (activity as MainActivity).parkMapsService.number.toString())
+        //Log.e("ParkMapsService()", (activity as MainActivity).parkMapsService.number.toString())
     }
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {

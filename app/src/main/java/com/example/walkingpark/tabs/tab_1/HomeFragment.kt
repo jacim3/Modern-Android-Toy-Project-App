@@ -8,10 +8,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import com.example.walkingpark.MainViewModel
 import com.example.walkingpark.databinding.FragmentHomeBinding
-import com.example.walkingpark.tabs.tab_2.ParkMapsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -30,7 +28,7 @@ class HomeFragment : Fragment() {
     프래그먼트끼리 뷰모델 공유 : private val viewModel: ManageLocationViewModel by viewModels({requireParentFragment()})
 */
 
-    val mainViewModel:MainViewModel by activityViewModels()
+    val mainViewModel: MainViewModel by activityViewModels()
     private var binding: FragmentHomeBinding? = null
 
     override fun onAttach(context: Context) {
@@ -48,6 +46,10 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentHomeBinding.inflate(layoutInflater, container, false)
+
+        binding!!.mainViewModel = mainViewModel
+        binding!!.lifecycleOwner = this
+
         Log.e("HomeFragment()", "onCreateView()")
 
         return binding!!.root
@@ -67,20 +69,20 @@ class HomeFragment : Fragment() {
         Log.e("HomeFragment()", "onViewStateRestored()")
 
 
-    /*    //TODO DI 를통하여 주입받은 ViewModel 이 Observer 패턴이 적용되지 않음.
+        //TODO DI 를통하여 주입받은 ViewModel 이 Observer 패턴이 적용되지 않음.
 
-        mainViewModel.userAddressHolder.observe(viewLifecycleOwner){
+        mainViewModel.userLiveHolderAddress.observe(viewLifecycleOwner) {
             Log.e("received2", it.toString())
         }
-        mainViewModel.userLocationHolder.observe(viewLifecycleOwner) {
+        mainViewModel.userLiveHolderLatLng.observe(viewLifecycleOwner) {
             Log.e("received1", it.toString())
         }
-        mainViewModel.userStationHolder.observe(viewLifecycleOwner) {
+        mainViewModel.userLiveHolderStation.observe(viewLifecycleOwner) {
             CoroutineScope(Dispatchers.IO).launch {
-                Log.e("received3",it.stationName)
-                mainViewModel.getAirDataFromApi(it.stationName)
+                Log.e("received3", it.stationName)
+                mainViewModel.getDataFromAirAPI(it.stationName)
             }
-        }*/
+        }
     }
 
     override fun onDestroyView() {

@@ -1,10 +1,12 @@
 package com.example.walkingpark.di.repository
 
+import android.util.Log
 import com.example.walkingpark.di.module.ApiKeyModule
 import com.example.walkingpark.di.module.PublicDataApiModule
 import com.example.walkingpark.data.dto.AirDTO
 import com.example.walkingpark.data.dto.StationDTO
 import com.example.walkingpark.data.dto.WeatherDTO
+import com.example.walkingpark.data.tool.LatLngToGridXy
 import com.example.walkingpark.retrofit2.PublicApiService
 import retrofit2.Call
 import retrofit2.Response
@@ -56,9 +58,9 @@ class RestApiRepository @Inject constructor() {
         return null
     }
 
-    // 한번에 제공되는 데이터량이 많으므로, 이를 전부 넣고
-    //
-    suspend fun getWeatherDataByGridXy(): Response<WeatherDTO>? {
+
+    // TODO 데이터는 모두 올바르게 서버로 보내나, HTTP 500 Internal Server Error 발생.
+    suspend fun getWeatherDataByGridXy(latitude:Double, longitude:Double): Response<WeatherDTO.Response.Body.Items>? {
 
         val stamp = Timestamp(System.currentTimeMillis())
         val dateTime = stamp.toString().replace("-", "").replace(":", "").split(".")[0].split(" ")
@@ -80,8 +82,10 @@ class RestApiRepository @Inject constructor() {
             }
 
 
+        val grid = LatLngToGridXy(latitude, longitude)
+
         if (publicApiKey != "") {
-            return airApi.getWeatherByGridXY(publicApiKey, "json", date, hourMinute, 1000, 0.0, 0.0)
+            return airApi.getWeatherByGridXY(publicApiKey, "json", date, hourMinute, 1000, grid.locX, grid.locY)
         }
         return null
     }
