@@ -39,11 +39,12 @@
         <!-- 공공데이터 포털 키 -->
         <meta-data
             android:name="public.data.api.key"
-            android:value="" />
+            android:value="${public_api_key}" />
         <!-- Google Maps Api 키 -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="" />
+            android:value="${google_api_key}" />
+        <!-- Google Map Api 를 사용하기 위해 다음 서비스 필요. -->
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />

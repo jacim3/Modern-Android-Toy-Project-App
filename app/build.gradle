@@ -5,6 +5,9 @@ plugins {
     id 'dagger.hilt.android.plugin'
 }
 
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
 android {
     compileSdk 32
 
@@ -25,6 +28,10 @@ android {
                         "room.expandProjection":"true"]
             }
         }
+        buildConfigField "String", "PUBLIC_API_KEY", properties['public_api_key']
+        buildConfigField "String", "GOOGLE_API_KEY", properties['google_api_key']
+        manifestPlaceholders["PUBLIC_API_KEY"] = "public_api_key"
+        manifestPlaceholders["GOOGLE_API_KEY"] = "google_api_key"
     }
 
     buildTypes {
