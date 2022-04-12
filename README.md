@@ -1,20 +1,30 @@
-# WalkingPark 
-- 개인 앱 개발 프로젝트 (GoogleMaps Api 와 공원정보 Api 를 활용한 산책관련 앱 개발 및 출시 목표)
+# 앱 이름 : WalkingPark (임시) 
 
 ## 설명 :
-- 현재는 기획및 설계에 따라 컴포넌트 관련 로직에 집중 중. 이러한 세팅이 완료된 이후, 본격적으로 비즈니스 로직 작성 예정
-- 앱 권장 아키텍쳐(3Layer : Presentation, Domain(Optional), Data) 패턴을 준수하려 노력
-- ViewModel은 현재 적용중. 추후 DataBinding 도입으로 뷰화 뷰모델을 완전히 분리하는 것으로 MVVM 패턴 완성 예정 
-- Google Maps Api 와 공공데이터 포털을 이용하므로, Manifest의 meta-data에 키 등록 필요.
 
-## App Development 
-- 2022.04.02 공공데이터 포털 + 레트로핏2 연동 
-- 2022.04.03 기획 수정 + 로컬 DB 연동 및 초기화 관련 로직 작성
-- 2022.04.04 기획 수정 + 포그라운드 서비스 로직 작정
+## 개발 현황 : 
+1. Layered 앱 아키텍처 패턴에 맞추어 코드 리팩토링 및 Dagger-Hilt 를 통한 DI 패턴 적용 완료<br/><br/>
+1. 레트로핏2 를 통하여 다음의 공공데이터 포털 REST API 연동 완료
+    1. <a href="https://www.data.go.kr/tcs/dss/selectApiDataDetailView.do?publicDataPk=15084084">기상청 단기예보 조회<a>
+    2. <a href="https://www.data.go.kr/tcs/dss/selectApiDataDetailView.do?publicDataPk=15073861">에어코리아 대기오렴 정보<a>
+    3. <a href="https://www.data.go.kr/tcs/dss/selectApiDataDetailView.do?publicDataPk=15073877">에어코리아 측정소 정보<a><br/><br/>
+3. 위치 검색 및 지속적인 업데이트 작업을 수행하며 사용자에게 NoTfication 을 통한 UI를 제공할 Foreground Service 작성.<br/><br/>
+    1. Activity 에서는 서비스 호출만 담당하며, LocationServiceRepository 에 정의된 비즈니스 로직이 포함된 메서드를 ViewModel 에서 호출하여 LiveData 를 업데이트 하는 방식<br/><br/>
+    2. 위치정보 업데이트 등록에 필요한 FusedLocationProviderClient, LocationRequest 객체는 DI 모듈로 정의. LocationCallback 은 ViewModel 에서 관리할 수 있도록 ViewModel에서 lazy를 통한 초기화 수행 후 이를 LocationServiceRepository 에 Argument 로 전달하여 위치업데이트 로직을 수행.<br/><br/>
+    3. 전국 공원정보 데이터는 <a href="https://www.data.go.kr/data/15012890/standard.do">여기</a>에서 획득하여 assets 를 통하여 Room DB로 전달
+        1. Rest Api 형태로도 제공되나, 제공되는 데이터량이 많아, Api 설계상 한계로 인해 효율적으로 데이터를 쿼리하기가 힘듬. 또한 많은 데이터를 한번에 처리하면 리소스 낭비가 심함
+        2. Room DB 를 통한 (latitude between A and B) and (longitude between C and D) 쿼리를 통하여 보다 효율적으로 데이터를 추출할 수 있음.
+    4. RestApi 통신 및 Room DB 작업의 비동기 처리는 코루틴의 suspend 키워드를 통하여 간편하게 완료  
 
+## 미흡한 점 : 
+    1. 공공데이터의 기상청 단기예보 조회 Api의 경우 http 500
+    2. 현재는 TextView or Log 를 통한 데이터 수신여부만 간단하게 체크 ->    
+    3. 
+  
 # 현재 적용중인 컴포넌트
-- Foreground Service (사용자 위치 추적 수행 및 이러한 상황을 노티피케이션으로 알림)
-- Broadcast Receiver (동적 리시버. 서비스로부터 얻어온 결과를 추기적으로 리턴. 알맞은 요청을 다시 RequestCode와 함께 onStartCommand()로 서비스에 전달)
+1. Foreground Service 
+    1. ㅁㄴㅇㄻㄴㅇㄻㄴㅇㄹ
+2. Broadcast Receiver (동적 리시버. 서비스로부터 얻어온 결과를 추기적으로 리턴. 알맞은 요청을 다시 RequestCode와 함께 onStartCommand()로 서비스에 전달)
 
 # 현재 적용중인 AAC 컴포넌트
 - Room (스플래시에서 미리 준비된 db 파일을 Room 으로 초기화하는데 따른 별도 시간 소요. (최초 앱 실행시에만))
