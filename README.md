@@ -1,7 +1,8 @@
 # 앱 이름 : WalkingPark (임시) 
 
 ## 설명 :
-
+사용자 근처 공원에 대한 자세한 정보를 GoogleMaps에 출력되는 Marker 와 함께 제공하며, 이를 통하여 앱의 운동모드 
+추후 소셜기능을 구현한다면, 이에 대한 고민이 조금 더 필요
 ## 개발 현황 : 
 1. Layered 앱 아키텍처 패턴에 맞추어 코드 리팩토링 및 Dagger-Hilt 를 통한 DI 패턴 적용 완료<br/><br/>
 2. 레트로핏2 를 통하여 다음의 공공데이터 포털 REST API 연동 미리 정의한 DTO 객체를 토대로 직렬화 수행 완료
@@ -18,8 +19,8 @@
 4. Activity, Fragment 같은 UI 클래스에서는 1. 서비스 호출, 2. 퍼미션 체크, 3.로딩 다이얼로그의 Show() 및 DIsmiss() 호출 관련 Observer 패턴 등록 이외 가능한 데이터를 보유하지 않고, 비즈니스 로직 또한 수행하지 않도록 설계하였고, 앞으로도 이러한 방향을 Datatingbinding 을 고도화 하여, 구현할 예정  
     
 ## 현재 미흡한 점 : 
-    1. UI 에 대한 데이터 처리 비즈니스 로직 미 작성 -> MutableLiveData를 Databinding을 통하여 TextView에 출력하여 데이터 수신여부만 간편하게 확인
-    2. 구글맵 관련 비즈니스 로직을 관리할 GoogleMapServiceRepository 의 비즈니스 로직을 작성중에 있으며, 작성된 로직의 고도화 작업 또한 필요. 
+1. UI 에 대한 데이터 처리 비즈니스 로직 미 작성 -> MutableLiveData를 Databinding을 통하여 TextView에 출력하여 데이터 수신여부만 간편하게 확인
+2. 구글맵 관련 비즈니스 로직을 관리할 GoogleMapServiceRepository 의 비즈니스 로직을 작성중에 있으며, 작성된 로직의 고도화 작업 또한 필요. 
 
 ## 현재 적용중인 컴포넌트
 1. Foreground Service 
