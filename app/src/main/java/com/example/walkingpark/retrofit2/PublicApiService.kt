@@ -29,7 +29,6 @@ interface PublicApiService {
 
 
     // TODO 동네예보 조회 Api : HttpException: resultCode 500 발생 !!
-    @Headers("Content-Type: application/json; charset=utf-8")
     @GET("getUltraSrtFcst")
     suspend fun getWeatherByGridXY(
         @Query(value = "serviceKey", encoded = true) serviceKey: String,
@@ -39,5 +38,5 @@ interface PublicApiService {
         @Query("numOfRows") numOfRows:Int,
         @Query("nx") gridX:Int,
         @Query("ny") gridY:Int
-    ) :  Response<WeatherDTO.Response.Body.Items>
+    ) :  Response<WeatherDTO>
 }

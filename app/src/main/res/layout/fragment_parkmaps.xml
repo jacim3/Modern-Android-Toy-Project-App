@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".components.ui.fragment.tab_2.ParkMapsFragment">
-
 
     <!-- Fragment 에서 Map 을 띄우기 위해 MapView 필요-->
     <com.google.android.gms.maps.MapView
@@ -13,4 +13,45 @@
         android:layout_height="match_parent"
         android:name="com.google.android.gms.maps.MapFragment" />
 
-</FrameLayout>
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/buttonChaseCamera"
+        android:text="카메라 체이스 : ON"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/spinnerMapsZooming" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/buttonStartWorkout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="운동모드"
+        app:layout_constraintBottom_toTopOf="@+id/buttonPrintMarkers"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/buttonRemoveMarkers"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="마커 모두 지우기"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/buttonPrintMarkers"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="마커 찍기"
+        app:layout_constraintBottom_toTopOf="@+id/buttonRemoveMarkers"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+    <androidx.appcompat.widget.AppCompatSpinner
+        android:id="@+id/spinnerMapsZooming"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -17,6 +17,7 @@
             android:id="@+id/textViewWeather"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:gravity="center"
             android:text="@{mainViewModel.userLiveHolderWeather.toString()}"
             app:layout_constraintHeight_percent="0.33"
             app:layout_constraintTop_toTopOf="parent" />
@@ -25,6 +26,7 @@
             android:id="@+id/textViewStation"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:gravity="center"
             android:text="@{mainViewModel.userLiveHolderStation.toString()}"
             app:layout_constraintHeight_percent="0.33"
             app:layout_constraintTop_toBottomOf="@+id/textViewWeather" />
@@ -33,6 +35,7 @@
             android:id="@+id/textViewAir"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:gravity="center"
             android:text="@{mainViewModel.userLiveHolderAir.toString()}"
             app:layout_constraintHeight_percent="0.33"
             app:layout_constraintTop_toBottomOf="@+id/textViewStation" />

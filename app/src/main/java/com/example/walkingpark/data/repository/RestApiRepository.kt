@@ -5,7 +5,7 @@ import com.example.walkingpark.di.module.PublicDataApiModule
 import com.example.walkingpark.data.dto.AirDTO
 import com.example.walkingpark.data.dto.StationDTO
 import com.example.walkingpark.data.dto.WeatherDTO
-import com.example.walkingpark.data.tool.LatLngToGridXy
+import com.example.walkingpark.data.tools.LatLngToGridXy
 import com.example.walkingpark.retrofit2.PublicApiService
 import retrofit2.Response
 import java.sql.Timestamp
@@ -26,7 +26,7 @@ class RestApiRepository @Inject constructor() {
 
     @PublicDataApiModule.WeatherApi
     @Inject
-    lateinit var weatherApiL: PublicApiService
+    lateinit var weatherApi: PublicApiService
 
     @ApiKeyModule.PublicApiKey
     @Inject
@@ -58,7 +58,7 @@ class RestApiRepository @Inject constructor() {
 
 
     // TODO 데이터는 모두 올바르게 서버로 보내나, HTTP 500 Internal Server Error 발생.
-    suspend fun getWeatherDataByGridXy(latitude:Double, longitude:Double): Response<WeatherDTO.Response.Body.Items>? {
+    suspend fun getWeatherDataByGridXy(latitude:Double, longitude:Double): Response<WeatherDTO>? {
 
         val stamp = Timestamp(System.currentTimeMillis())
         val dateTime = stamp.toString().replace("-", "").replace(":", "").split(".")[0].split(" ")
@@ -79,11 +79,10 @@ class RestApiRepository @Inject constructor() {
                 "$hour$minute"
             }
 
-
         val grid = LatLngToGridXy(latitude, longitude)
 
         if (publicApiKey != "") {
-            return airApi.getWeatherByGridXY(publicApiKey, "json", date, hourMinute, 1000, grid.locX, grid.locY)
+            return weatherApi.getWeatherByGridXY(publicApiKey, "json", date, hourMinute, 1000, grid.locX, grid.locY)
         }
         return null
     }

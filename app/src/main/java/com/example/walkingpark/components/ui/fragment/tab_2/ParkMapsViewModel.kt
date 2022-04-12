@@ -20,16 +20,16 @@ class ParkMapsViewModel @Inject constructor() : ViewModel() {
     @Inject
     lateinit var googleMapsRepository: GoogleMapsRepository
 
-    fun getParkData(latitude: Double, longitude: Double, indicator: LoadingIndicator) {
+    fun getParkData(latitude: Double, longitude: Double) {
         viewModelScope.launch {
-            indicator.startLoadingIndicator()
+            // indicator.startLoadingIndicator()
             val response = googleMapsRepository.getParkDataForMaps(latitude, longitude)
             if (response.isNotEmpty()) liveHolderParkData.postValue(response)
             Log.e("parkMapsViewModel", liveHolderParkData.value?.size.toString())
 /*            liveHolderParkData.value?.forEach {
                 Log.e("Response : ", it.parkName.toString())
             }*/
-            indicator.dismissIndicator()
+            //indicator.dismissIndicator()
         }
     }
 }

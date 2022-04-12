@@ -87,7 +87,7 @@ class ParkMapsService : Service() {
             2. START_NOT_STICKY = Service 가 재시작되지 않음
             3. START_REDELIVER_INTENT = Service 가 재시작될 때 이전에 전달했던 intent 전달
         */
-        return START_STICKY
+        return START_REDELIVER_INTENT
     }
 
     override fun onDestroy() {

@@ -72,7 +72,7 @@ class HomeFragment : Fragment() {
 
         //TODO DI 를통하여 주입받은 ViewModel 이 Observer 패턴이 적용되지 않음.
 
-        mainViewModel.userLiveHolderAddress.observe(viewLifecycleOwner) {
+/*        mainViewModel.userLiveHolderAddress.observe(viewLifecycleOwner) {
             Log.e("received2", it.toString())
         }
         mainViewModel.userLiveHolderLatLng.observe(viewLifecycleOwner) {
@@ -81,10 +81,11 @@ class HomeFragment : Fragment() {
         mainViewModel.userLiveHolderStation.observe(viewLifecycleOwner) {
             CoroutineScope(Dispatchers.IO).launch {
                 Log.e("received3", it.stationName)
-                mainViewModel.getDataFromAirAPI(it.stationName)
-
-                (requireActivity()as MainActivity).indicator.dismissIndicator()
+                //mainViewModel.getDataFromAirAPI(it.stationName)
             }
+        }*/
+        mainViewModel.userLiveHolderWeather.observe(viewLifecycleOwner) {
+
         }
     }
 

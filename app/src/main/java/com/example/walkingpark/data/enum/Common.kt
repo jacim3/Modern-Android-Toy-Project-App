@@ -36,6 +36,7 @@ object Settings{
     const val LOCATION_UPDATE_INTERVAL: Long = 3000             // 위치 업데이트 간격
     const val LOCATION_UPDATE_INTERVAL_FASTEST: Long = 1000     // 위치 업데이트 간격(빠른)
     const val LOCATION_ADDRESS_SEARCH_COUNT = 5                 // 현재 위치 LatLng 에 대한 주소 검색 개수
+    const val LOCATION_SEARCH_RADIUS = 125.0                    // 위치 검색 반경. 다시 검색할때 해당 수치만큼 증가.
 
     const val GOOGLE_MAPS_PARK_MARKERS_REFRESH_INTERVAL = 50000 // DB 를 통하여 데이터를 쿼리할 간격 -> 5분
 
@@ -50,6 +51,7 @@ object Settings{
 **/
 object Logic {
     const val TIMEOUT_COUNT = 10000         // 데이터를 요청할 시간
-    const val SEARCH_LAT_AREA = 0.01        // 1도 = 대략 110.569km
+    const val SEARCH_LAT_AREA = 0.0025       // 1도 = 대략 110.569km
     const val SEARCH_LNG_AREA = 0.01        // 1도 = 대략 111.322km
+    const val SEARCH_AREA_KM = 1.0          // 현재 위치 기준
 }

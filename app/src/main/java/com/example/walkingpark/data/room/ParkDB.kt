@@ -35,19 +35,3 @@ data class ParkDB(
     @ColumnInfo(name = "field18") val institutionCode: String?,
     @ColumnInfo(name = "field19") val institutionName2: String?
 )
-
-@Entity
-data class GridDB (
-
-    @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "pk") val pk:Int?,
-    @ColumnInfo(name = "f1" ) val legionCode: Int?,
-    @ColumnInfo(name = "f2" ) val address1: String?,
-    @ColumnInfo(name = "f3" ) val address2: String?,
-    @ColumnInfo(name = "f4" ) val address3: String?,
-    @ColumnInfo(name = "f5" ) val gridX: Double?,
-    @ColumnInfo(name = "f6" ) val gridY: Double?,
-    @ColumnInfo(name = "f7" ) val latitude: Double?,
-    @ColumnInfo(name = "f8" ) val longitude: Double?,
-
-    )

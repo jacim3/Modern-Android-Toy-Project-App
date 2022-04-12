@@ -27,30 +27,33 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    private var binding: ActivityMainBinding? = null
-    //private val viewModel by viewModels<MainViewModel>()            // 뷰모델 주입
-    val viewModel by viewModels<MainViewModel>()
-    private var isParkMapsServiceRunning = false
-    lateinit var indicator:LoadingIndicator
     @Inject
     lateinit var locationServiceRepository: LocationServiceRepository
+
+    private var binding: ActivityMainBinding? = null
+    val viewModel by viewModels<MainViewModel>()
+
+    lateinit var parkMapsReceiver: ParkMapsReceiver
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-        Log.e("mainActivity", viewModel.hashCode().toString())
+
         locationServiceRepository.locationCallback = viewModel.locationCallback
         setBottomMenuButtons()         // 하단 버튼 설정
-        locationServiceRepository.startParkMapsService(this)         // 위치데이터 서비스 실행
+
+        parkMapsReceiver = ParkMapsReceiver(applicationContext)
+        locationServiceRepository.startParkMapsService(this, parkMapsReceiver)         // 위치데이터 서비스 실행
 
         // 퍼미션 요청 핸들링. (onActivityResult 대체)
         val locationPermissionRequest = registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
         ) { permissions ->
-            indicator = LoadingIndicator(this)
+            viewModel.loadingIndicator = LoadingIndicator(this)
             val check = locationServiceRepository.sendPermissionResultToActivity(this)
             if (check) {
-                indicator.startLoadingIndicator()
+                viewModel.loadingIndicator!!.startLoadingIndicator()
                 // 퍼미션이 허용되었으므로 서비스 실행
                 val intent = Intent(this, ParkMapsService::class.java)
                 intent.putExtra("requestCode", Common.PERMISSION)
@@ -95,7 +98,28 @@ class MainActivity : AppCompatActivity() {
         }*/
     }
 
+    // 실행되는 포그라운드 서비스와 LocationServiceRepository IntentFilter 를 통한 통신을 위한 동적 리시버 정의.
+    @AndroidEntryPoint
+    class ParkMapsReceiver(val context: Context) :
+        BroadcastReceiver() {
 
+        override fun onReceive(p0: Context?, result: Intent?) {
+            Log.e("ParkMapsReceiver", "ParkMapsReceiver")
+            when (result!!.action) {
+                // 서비스에
+                Common.REQUEST_ACTION_UPDATE -> {
+                    val intent = Intent(context, ParkMapsService::class.java)
+                    intent.putExtra("requestCode", Common.LOCATION_UPDATE)
+                    context.startService(intent)
+                }
+                Common.ACCEPT_ACTION_UPDATE -> {
+//                    val addressMap: HashMap<Char, String> =
+//                        result.getSerializableExtra("addressMap") as HashMap<Char, String>
+//                    //viewModel.userAddressMap.value = addressMap
+                }
+            }
+        }
+    }
 
     private fun setBottomMenuButtons() {
         // 홈프래그먼트를 기본프래그먼트로 설정
@@ -124,15 +148,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-//        requestLocationUpdate()
     }
-
-    private fun requestLocationUpdate() {
-//        val intent = Intent(this, ParkMapsFragment::class.java)
-//        intent.putExtra("requestCode", Common.LOCATION_UPDATE)
-//        startParkMapsService(intent)
-    }
-
 
 
     override fun onPause() {
@@ -146,9 +162,7 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         // TODO 여기서 동적 리시버 해지
-
         binding = null
     }
 
-    companion object {}
 }

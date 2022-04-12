@@ -1,6 +1,7 @@
 package com.example.walkingpark.data.repository
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.*
 import android.content.*
 import android.content.pm.PackageManager
@@ -54,31 +55,9 @@ class LocationServiceRepository @Inject constructor() {
     val addressMap = HashMap<Char, String?>()
     val latLngMap = HashMap<String, Double>()
 
-    // 실행되는 포그라운드 서비스와 LocationServiceRepository IntentFilter 를 통한 통신을 위한 동적 리시버 정의.
-    @AndroidEntryPoint
-    class ParkMapsReceiver(val context: Context) :
-        BroadcastReceiver() {
-
-        override fun onReceive(p0: Context?, result: Intent?) {
-            Log.e("ParkMapsReceiver", "ParkMapsReceiver")
-            when (result!!.action) {
-                // 서비스에
-                Common.REQUEST_ACTION_UPDATE -> {
-                    val intent = Intent(context, ParkMapsService::class.java)
-                    intent.putExtra("requestCode", Common.LOCATION_UPDATE)
-                    context.startService(intent)
-                }
-                Common.ACCEPT_ACTION_UPDATE -> {
-//                    val addressMap: HashMap<Char, String> =
-//                        result.getSerializableExtra("addressMap") as HashMap<Char, String>
-//                    //viewModel.userAddressMap.value = addressMap
-                }
-            }
-        }
-    }
 
     // 위치정보를 받기 이전, 최초 서비스 시작 요청 메서드
-    fun startParkMapsService(context: Context) {
+    fun startParkMapsService(context: Context, parkMapsReceiver:MainActivity.ParkMapsReceiver) {
 
         val serviceConnection: ServiceConnection = object : ServiceConnection {
             // 1. 서비스 연결 관련 콜백 등록
@@ -92,7 +71,7 @@ class LocationServiceRepository @Inject constructor() {
                 //isParkMapsServiceRunning = true
 
                 // 서비스에서 작업이 완료됨에 따라, 서비스로부터 결과를 수신받을 리시버 등록
-                val parkMapsReceiver = ParkMapsReceiver(context)
+
                 val filter = IntentFilter().apply {
                     addAction(Common.REQUEST_ACTION_UPDATE)
                     addAction(Common.REQUEST_ACTION_PAUSE)
@@ -160,6 +139,8 @@ class LocationServiceRepository @Inject constructor() {
         return locationTrackNotification.build()
     }
 
+
+    @SuppressLint("MissingPermission")
     fun getUserLocationAfterInitFusedLocationProvider(context: Context) {
 
         if (ActivityCompat.checkSelfPermission(
@@ -171,20 +152,21 @@ class LocationServiceRepository @Inject constructor() {
             ) != PackageManager.PERMISSION_GRANTED
         ) {
             Log.e("ParkMapsService::class", "퍼미션 허용 안됨")
-        }
+            return
+        } else {
+            val src = CancellationTokenSource()
+            val ct: CancellationToken = src.token
+            fusedLocationClient.getCurrentLocation(
+                LocationRequest.PRIORITY_HIGH_ACCURACY,
+                ct
+            ).addOnFailureListener {
+                Log.e("fusedLocationProvider", "fail")
+            }.addOnSuccessListener {
+                Log.e("fusedLocationProvider", "${it.latitude} ${it.longitude}")
 
-        val src = CancellationTokenSource()
-        val ct: CancellationToken = src.token
-        fusedLocationClient.getCurrentLocation(
-            LocationRequest.PRIORITY_HIGH_ACCURACY,
-            ct
-        ).addOnFailureListener {
-            Log.e("fusedLocationProvider", "fail")
-        }.addOnSuccessListener {
-            Log.e("fusedLocationProvider", "${it.latitude} ${it.longitude}")
+                parsingAddressMap(context, it.latitude, it.longitude)
 
-            parsingAddressMap(context, it.latitude, it.longitude)
-
+            }
         }
     }
 
@@ -218,6 +200,8 @@ class LocationServiceRepository @Inject constructor() {
             location.map {
                 it.getAddressLine(0).toString().split(" ")
             }.flatten().distinct().forEach {
+
+                Log.e("Geocoder : ", it)
                 for (enum in ADDRESS.values()) {
                     if (it[it.lastIndex] == enum.x && addressMap[enum.x] == null) {
                         addressMap[enum.x] = it
@@ -236,6 +220,7 @@ class LocationServiceRepository @Inject constructor() {
     }
 
     // 주기적인 위치 업데이트 수행
+    @SuppressLint("MissingPermission")
     fun setUpdateUserLocation(
         @ApplicationContext context: Context,
         locationCallback: LocationCallback
