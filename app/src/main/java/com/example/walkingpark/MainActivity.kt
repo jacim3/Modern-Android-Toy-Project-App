@@ -41,6 +41,7 @@ class MainActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
         locationServiceRepository.locationCallback = viewModel.locationCallback
+
         setBottomMenuButtons()         // 하단 버튼 설정
 
         parkMapsReceiver = ParkMapsReceiver(applicationContext)

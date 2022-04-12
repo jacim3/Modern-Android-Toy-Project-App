@@ -3,21 +3,25 @@ package com.example.walkingpark.components.ui.fragment.tab_2
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.example.walkingpark.MainViewModel
 import com.example.walkingpark.components.ui.dialog.LoadingIndicator
-import com.example.walkingpark.databinding.FragmentParkmapsBinding
 import com.example.walkingpark.data.repository.GoogleMapsRepository
-
+import com.example.walkingpark.data.tools.MyItem
+import com.example.walkingpark.databinding.FragmentParkmapsBinding
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.clustering.ClusterItem
+import com.google.maps.android.clustering.ClusterManager
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -36,6 +40,7 @@ class ParkMapsFragment : Fragment(), OnMapReadyCallback{
     private var binding:FragmentParkmapsBinding? = null
 
     private lateinit var googleMap:GoogleMap
+    lateinit var clusterManager: ClusterManager<ClusterItem>
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -60,7 +65,7 @@ class ParkMapsFragment : Fragment(), OnMapReadyCallback{
         mainViewModel.userLiveHolderLatLng.observe(viewLifecycleOwner){
             parkMapsViewModel.getParkData(it["위도"]!!, it["경도"]!!)
         }
-
+        googleMapsRepository.loadingIndicator = LoadingIndicator(requireActivity())
         // 지도 ZoomIn 관련 스피너 설정
         val options = arrayOf(1,2,3,4,5)
         val spinnerOptions = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, options)
@@ -100,10 +105,12 @@ class ParkMapsFragment : Fragment(), OnMapReadyCallback{
 
         binding!!.buttonPrintMarkers.setOnClickListener {
             googleMapsRepository.isAllMarkerPrintButtonClicked = true
+            googleMapsRepository.loadingIndicator.startLoadingIndicator()
         }
 
         binding!!.buttonRemoveMarkers.setOnClickListener {
             googleMapsRepository.isAllMarkerRemoveButtonClicked = true
+            googleMapsRepository.loadingIndicator.startLoadingIndicator()
         }
     }
 
@@ -151,9 +158,42 @@ class ParkMapsFragment : Fragment(), OnMapReadyCallback{
         Log.e("onMapReadyCallback", "executed!!!!")
         googleMapsRepository.isMapLoaded = true
         googleMapsRepository.googleMap = googleMap
+        googleMapsRepository.clusterManager = ClusterManager(context, googleMapsRepository.googleMap)
+        googleMapsRepository.googleMap.setOnCameraIdleListener(googleMapsRepository.clusterManager)
+    // setUpClusterer(googleMap)
     }
 
-    private fun getCurrentPosition(){
+    private fun setUpClusterer(map:GoogleMap) {
+        // Position the map.
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(51.503186, -0.126446), 10f))
 
+        // Initialize the manager with the context and the map.
+        // (Activity extends context, so we can pass 'this' in the constructor.)
+        clusterManager = ClusterManager(context, map)
+
+        // Point the map's listeners at the listeners implemented by the cluster
+        // manager.
+        // map.setOnMarkerClickListener(clusterManager)
+
+        // Add cluster items (markers) to the cluster manager.
+        addItems()
     }
+
+    private fun addItems() {
+
+        // Set some lat/lng coordinates to start with.
+        var lat = 51.5145160
+        var lng = -0.1270060
+
+        // Add ten cluster items in close proximity, for purposes of this example.
+        for (i in 0..9) {
+            val offset = i / 60.0
+            lat += offset
+            lng += offset
+            val offsetItem =
+                MyItem(lat, lng, "Title $i", "Snippet $i")
+            clusterManager.addItem(offsetItem)
+        }
+    }
+
 }

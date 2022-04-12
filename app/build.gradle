@@ -132,6 +132,8 @@ dependencies {
 
     // Google Maps Api
     implementation 'com.google.android.gms:play-services-maps:18.0.2'
+    // Utilities for Maps SDK for Android (requires Google Play Services)
+    implementation 'com.google.maps.android:android-maps-utils:2.3.0'
 
     // room
     def roomVersion = "2.4.2"

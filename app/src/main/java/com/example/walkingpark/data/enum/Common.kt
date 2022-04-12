@@ -33,16 +33,16 @@ object Common {
 *   앱 설정값 관련 상수 설정 클래스
 **/
 object Settings{
-    const val LOCATION_UPDATE_INTERVAL: Long = 3000             // 위치 업데이트 간격
+    const val LOCATION_UPDATE_INTERVAL: Long = 2000             // 위치 업데이트 간격
     const val LOCATION_UPDATE_INTERVAL_FASTEST: Long = 1000     // 위치 업데이트 간격(빠른)
     const val LOCATION_ADDRESS_SEARCH_COUNT = 5                 // 현재 위치 LatLng 에 대한 주소 검색 개수
     const val LOCATION_SEARCH_RADIUS = 125.0                    // 위치 검색 반경. 다시 검색할때 해당 수치만큼 증가.
 
     const val GOOGLE_MAPS_PARK_MARKERS_REFRESH_INTERVAL = 50000 // DB 를 통하여 데이터를 쿼리할 간격 -> 5분
 
-    const val AIR_API_REFRESH_INTERVAL = 100000                  // 미세먼지 10분마다 refresh
-    const val STATION_API_REFRESH_INTERVAL = 100000              // 측정소 10분마다 refresh
-    const val WEATHER_API_REFRESH_INTERVAL = 100000              // 측정소 10분마다 refresh
+    const val AIR_API_REFRESH_INTERVAL = 100000                  // 미세먼지 5분마다 refresh
+    const val STATION_API_REFRESH_INTERVAL = 100000              // 측정소 5분마다 refresh
+    const val WEATHER_API_REFRESH_INTERVAL = 100000              // 측정소 5분마다 refresh
 }
 
 /**
