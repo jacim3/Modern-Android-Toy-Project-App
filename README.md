@@ -18,9 +18,9 @@
     4. RestApi 통신 및 Room DB 작업의 비동기 처리는 ViewModel에서 Repository의 메서드를 호출하는 것으로 수행되고, 이는 코루틴의 suspend 키워드를 통하여 간단하게 구현
 4. Activity, Fragment 같은 UI 클래스에서는 1. 서비스 호출, 2. 퍼미션 체크, 3.로딩 다이얼로그의 Show() 및 DIsmiss() 호출 관련 Observer 패턴 등록 이외 가능한 데이터를 보유하지 않고, 비즈니스 로직 또한 수행하지 않도록 설계하였고, 앞으로도 이러한 방향을 Datatingbinding 을 고도화 하여, 구현할 예정  
     
-## 현재 미흡한 점 : 
+## 앞으로 해야할 일: 
 1. UI 에 대한 데이터 처리 비즈니스 로직 미 작성 -> MutableLiveData를 Databinding을 통하여 TextView에 출력하여 데이터 수신여부만 간편하게 확인
-2. 구글맵 관련 비즈니스 로직을 관리할 GoogleMapServiceRepository 의 비즈니스 로직을 작성중에 있으며, 작성된 로직의 고도화 작업 또한 필요. 
+2. GoogleMapServiceRepository의 구글맵 관련 비즈니스 로직 로직의 보완 및 고도화 작업 수행 필요. 
 
 ## 현재 적용중인 컴포넌트
 1. Foreground Service 
@@ -28,16 +28,16 @@
 2. Broadcast Receiver (동적 리시버. 서비스로부터 얻어온 결과를 추기적으로 리턴. 알맞은 요청을 다시 RequestCode와 함께 onStartCommand()로 서비스에 전달)
 
 ## 현재 적용중인 AAC 컴포넌트
-- Room (최초 앱 시행 시, createFromAssets() 를 통하여 미리 준비된 db 파일을 Room 환경에 Migration 하는데 약간의 시간 소요.)
+- Room (최초 앱 실행 시, createFromAssets() 를 통하여 미리 준비된 db 파일을 Room 환경에 Migration 하는데 약간의 시간 소요.)
   1. Room DB 를 통한 (latitude between A and B) and (longitude between C and D) 쿼리를 통하여 보다 효율적으로 데이터를 추출하며 위의 문제 해결
   3. 공공데이터 Rest-Api 에서 기상 정보를 얻기 위하여 URI에 제공해야 하는 좌표값을 계산하기 위한 로컬 DB 구축
-- ViewModel (DI를 통한 액티비티와 프래그먼트간 동일한 MainViewModel 의 자원 공유 및 각 UI 컴포넌트 간 ViewModel 을 별도로 두어, 비즈니스 로직과 UI 로직을 완벽히 분리)
+- ViewModel (액티비티와 프래그먼트간 동일한 MainViewModel 의 자원 공유 및 각 UI 컴포넌트 간 ViewModel 을 별도로 두어, 비즈니스 로직과 UI 로직을 분리)
 - LiveData (Observe 패턴 및 Databinding 관련 간단한 로직 구현)
 
 ## 현재 적용중인 라이브러리
 - Retrofit2 (공공데이터 Rest Api 연동)
 - Coroutine (네트워크 및 RoomDB 비동기 처리)
-- Google Maps Api (포그라운드 서비스에서 작동하여, 사용자 좌표 추적 후 리턴)
+- Google Maps Api (구글맵에서 작동하도록 작성한, 비즈니스 로직을 출력하기 위하여 사용)
 - Dagger-hilt (DI)
 
 ## 추후 적용 예정 라이브러리 
