@@ -1,12 +1,10 @@
-package com.example.walkingpark.retrofit2
+package com.example.walkingpark.api
 
 import com.example.walkingpark.data.dto.AirDTO
 import com.example.walkingpark.data.dto.StationDTO
 import com.example.walkingpark.data.dto.WeatherDTO
-import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.GET
-import retrofit2.http.Headers
 import retrofit2.http.Query
 
 interface PublicApiService {

@@ -1,4 +1,4 @@
-package com.example.walkingpark.components.ui.fragment.tab_2
+package com.example.walkingpark
 
 import android.content.Context
 import android.os.Bundle
@@ -12,11 +12,12 @@ import android.widget.SeekBar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import com.example.walkingpark.MainViewModel
-import com.example.walkingpark.components.ui.dialog.LoadingIndicator
+import com.example.walkingpark.viewmodels.ParkMapsViewModel
+import com.example.walkingpark.view.LoadingIndicator
 import com.example.walkingpark.data.enum.Settings
 import com.example.walkingpark.data.repository.GoogleMapsRepository
 import com.example.walkingpark.databinding.FragmentParkmapsBinding
+import com.example.walkingpark.viewmodels.MainViewModel
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.maps.android.clustering.ClusterManager
@@ -30,6 +31,8 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class ParkMapsFragment : Fragment(), OnMapReadyCallback {
 
+
+    // TODO ParkMapsFragment 에서 Repository 에 직접 의존하는 코드를 제거하기 위한 리팩토링 필요.
     @Inject
     lateinit var googleMapsRepository: GoogleMapsRepository
 
@@ -64,6 +67,10 @@ class ParkMapsFragment : Fragment(), OnMapReadyCallback {
         setSpinner()
         setButtons()
         setSeekBar()
+
+        parkMapsViewModel.liveHolderSeekBar.observe(viewLifecycleOwner){
+            Log.e("eventTriggered !!!", it.toString())
+        }
     }
 
     private fun setSeekBar() {
@@ -77,10 +84,14 @@ class ParkMapsFragment : Fragment(), OnMapReadyCallback {
             }
 
             override fun onStopTrackingTouch(bar: SeekBar?) {
+                parkMapsViewModel.liveHolderSeekBar.value = bar?.progress
                 googleMapsRepository.loadingIndicator.startLoadingIndicator()
+                googleMapsRepository.loadingIndicator.setDescription("검색범위 재 설정 하는중")
+                googleMapsRepository.loadingIndicator.flag = "rangeChange"
                 googleMapsRepository.getSearchRangeFromSeekBar = bar!!.progress
             }
         })
+        binding!!.seekBarSearchScale.progress = 3
     }
 
     private fun setButtons() {
@@ -94,11 +105,14 @@ class ParkMapsFragment : Fragment(), OnMapReadyCallback {
         binding!!.buttonPrintMarkers.setOnClickListener {
             googleMapsRepository.isClickedMarkerPrintButton = true
             googleMapsRepository.loadingIndicator.startLoadingIndicator()
+            googleMapsRepository.loadingIndicator.setDescription("마커 찍는중")
+
         }
 
         binding!!.buttonRemoveMarkers.setOnClickListener {
             googleMapsRepository.isClickedMarkerRemoveButton = true
             googleMapsRepository.loadingIndicator.startLoadingIndicator()
+            googleMapsRepository.loadingIndicator.setDescription("마커 삭제하는중")
         }
     }
 
@@ -121,31 +135,28 @@ class ParkMapsFragment : Fragment(), OnMapReadyCallback {
                     when (position) {
                         0 -> {
                             googleMapsRepository.googleMapsZoomLevel =
-                                Settings.GOOGLE_MAPS__ZOOM_LEVEL_VERY_LOW
+                                Settings.GOOGLE_MAPS_ZOOM_LEVEL_VERY_HIGH
                             googleMapsRepository.isSelectedZoomInMenuSpinner = true
                         }
                         1 -> {
                             googleMapsRepository.googleMapsZoomLevel =
-                                Settings.GOOGLE_MAPS__ZOOM_LEVEL_LOW
+                                Settings.GOOGLE_MAPS_ZOOM_LEVEL_HIGH
                             googleMapsRepository.isSelectedZoomInMenuSpinner = true
                         }
                         2 -> {
                             googleMapsRepository.googleMapsZoomLevel =
-                                Settings.GOOGLE_MAPS__ZOOM_LEVEL_DEFAULT
+                                Settings.GOOGLE_MAPS_ZOOM_LEVEL_DEFAULT
                             googleMapsRepository.isSelectedZoomInMenuSpinner = true
-
                         }
                         3 -> {
                             googleMapsRepository.googleMapsZoomLevel =
-                                Settings.GOOGLE_MAPS__ZOOM_LEVEL_HIGH
+                                Settings.GOOGLE_MAPS_ZOOM_LEVEL_LOW
                             googleMapsRepository.isSelectedZoomInMenuSpinner = true
-
                         }
                         4 -> {
                             googleMapsRepository.googleMapsZoomLevel =
-                                Settings.GOOGLE_MAPS__ZOOM_LEVEL_VERY_HIGH
+                                Settings.GOOGLE_MAPS_ZOOM_LEVEL_VERY_LOW
                             googleMapsRepository.isSelectedZoomInMenuSpinner = true
-
                         }
                     }
                 }
@@ -195,16 +206,12 @@ class ParkMapsFragment : Fragment(), OnMapReadyCallback {
         Log.e("ParkMapsFragment()", "onDestroyView()")
     }
 
-    companion object {
-        fun newInstance() = ParkMapsFragment()
-    }
-
-    // 구글맵 준비가 완료된 이후 수행 및 GoogleMap 관련 비즈니스 로직을 GoogleMapRepository 로 옮기기
+    // 구글맵 준비가 완료된 이후 수행 및 GoogleMap 관련 구체적인 비즈니스 로직은 GoogleMapsRepository 에서 수행
     override fun onMapReady(googleMap: GoogleMap) {
         googleMapsRepository.isMapLoadCompleted = true
         googleMapsRepository.googleMap = googleMap
         googleMapsRepository.clusterManager =
             ClusterManager(context, googleMapsRepository.googleMap)
-        googleMapsRepository.googleMap.setOnCameraIdleListener(googleMapsRepository.clusterManager)
+        googleMapsRepository.onMapReady()
     }
 }

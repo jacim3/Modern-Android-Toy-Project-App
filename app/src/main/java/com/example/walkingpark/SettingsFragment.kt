@@ -1,4 +1,4 @@
-package com.example.walkingpark.components.ui.fragment.tab_3
+package com.example.walkingpark
 
 import android.content.Context
 import android.os.Bundle
@@ -7,7 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import com.example.walkingpark.MainViewModel
+import com.example.walkingpark.viewmodels.MainViewModel
 import com.example.walkingpark.databinding.FragmentSettingsBinding
 import dagger.hilt.android.AndroidEntryPoint
 

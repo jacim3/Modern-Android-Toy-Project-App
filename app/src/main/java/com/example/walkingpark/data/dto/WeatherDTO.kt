@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 import retrofit2.Response
 
 /**
-*   공공데이터 - 동네예보 API Retrofit2 통신을 위한 DTO 객체.
+*   공공데이터 - 동네예보 API Retrofit2 통신결과의 직렬화를 위한 DTO 객체.
 **/
 data class WeatherDTO(
     @SerializedName("response") val response : Response

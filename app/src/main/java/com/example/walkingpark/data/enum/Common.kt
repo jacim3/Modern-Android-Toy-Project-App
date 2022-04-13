@@ -39,7 +39,7 @@ object Common {
 *   앱 설정값 관련 상수 설정 클래스
 **/
 object Settings {
-    const val LOCATION_UPDATE_INTERVAL: Long = 2000             // 위치 업데이트 간격
+    const val LOCATION_UPDATE_INTERVAL: Long = 1000             // 위치 업데이트 간격
     const val LOCATION_UPDATE_INTERVAL_FASTEST: Long = 1000     // 위치 업데이트 간격(빠른)
     const val LOCATION_ADDRESS_SEARCH_COUNT = 5                 // 현재 위치 LatLng 에 대한 주소 검색 개수
     const val LOCATION_SEARCH_RADIUS = 125.0                    // 위치 검색 반경. 다시 검색할때 해당 수치만큼 증가.
@@ -50,11 +50,12 @@ object Settings {
     const val STATION_API_REFRESH_INTERVAL = 100000              // 측정소 5분마다 refresh
     const val WEATHER_API_REFRESH_INTERVAL = 100000              // 측정소 5분마다 refresh
 
-    const val GOOGLE_MAPS__ZOOM_LEVEL_VERY_HIGH = 20f
-    const val GOOGLE_MAPS__ZOOM_LEVEL_HIGH = 17f
-    const val GOOGLE_MAPS__ZOOM_LEVEL_DEFAULT = 14f
-    const val GOOGLE_MAPS__ZOOM_LEVEL_LOW = 11f
-    const val GOOGLE_MAPS__ZOOM_LEVEL_VERY_LOW = 8f
+    // Google Maps 에서 적용할 레벨 0(min) ~ 21(max)
+    const val GOOGLE_MAPS_ZOOM_LEVEL_VERY_LOW = 20f
+    const val GOOGLE_MAPS_ZOOM_LEVEL_LOW = 17f
+    const val GOOGLE_MAPS_ZOOM_LEVEL_DEFAULT = 14f
+    const val GOOGLE_MAPS_ZOOM_LEVEL_HIGH = 11f
+    const val GOOGLE_MAPS_ZOOM_LEVEL_VERY_HIGH = 8f
 }
 
 /**

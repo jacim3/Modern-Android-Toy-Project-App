@@ -1,8 +1,8 @@
 package com.example.walkingpark.di.module
 
 import com.example.walkingpark.data.enum.Common
-import com.example.walkingpark.retrofit2.PublicApiService
-import com.example.walkingpark.retrofit2.UnsafeOkHttpClient
+import com.example.walkingpark.api.PublicApiService
+import com.example.walkingpark.api.UnsafeOkHttpClient
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -10,7 +10,6 @@ import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.converter.scalars.ScalarsConverterFactory
 import java.util.concurrent.TimeUnit
 import javax.inject.Qualifier
 
@@ -19,12 +18,14 @@ import javax.inject.Qualifier
 @InstallIn(SingletonComponent::class)
 object PublicDataApiModule {
 
+/*
     // TODO RestApi TimeOut 관련.
     var okHttpClient: OkHttpClient = OkHttpClient.Builder()
         .connectTimeout(1, TimeUnit.MINUTES)
         .readTimeout(30, TimeUnit.SECONDS)
         .writeTimeout(15, TimeUnit.SECONDS)
         .build()
+*/
 
     @AirAPI
     @Provides

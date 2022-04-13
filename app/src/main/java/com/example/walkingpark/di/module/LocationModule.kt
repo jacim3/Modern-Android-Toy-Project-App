@@ -42,5 +42,4 @@ object LocationModule {
         }
         return locationTrackNotification
     }
-
 }

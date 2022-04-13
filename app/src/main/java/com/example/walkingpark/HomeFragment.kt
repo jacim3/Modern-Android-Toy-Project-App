@@ -1,4 +1,4 @@
-package com.example.walkingpark.components.ui.fragment.tab_1
+package com.example.walkingpark
 
 import android.content.Context
 import android.os.Bundle
@@ -8,13 +8,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import com.example.walkingpark.MainActivity
-import com.example.walkingpark.MainViewModel
+import com.example.walkingpark.viewmodels.MainViewModel
 import com.example.walkingpark.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 // TODO 1. 동네예보 Api 연동 -> x,y 구하는 방법에 대한 고민 필요.
 // TODO 미세먼지 정보를 가져오는 가장 쉬운 방법
@@ -29,7 +25,7 @@ class HomeFragment : Fragment() {
     프래그먼트끼리 뷰모델 공유 : private val viewModel: ManageLocationViewModel by viewModels({requireParentFragment()})
 */
 
-    val mainViewModel: MainViewModel by activityViewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
     private var binding: FragmentHomeBinding? = null
 
     override fun onAttach(context: Context) {
@@ -69,21 +65,6 @@ class HomeFragment : Fragment() {
         super.onViewStateRestored(savedInstanceState)
         Log.e("HomeFragment()", "onViewStateRestored()")
 
-
-        //TODO DI 를통하여 주입받은 ViewModel 이 Observer 패턴이 적용되지 않음.
-
-/*        mainViewModel.userLiveHolderAddress.observe(viewLifecycleOwner) {
-            Log.e("received2", it.toString())
-        }
-        mainViewModel.userLiveHolderLatLng.observe(viewLifecycleOwner) {
-            Log.e("received1", it.toString())
-        }
-        mainViewModel.userLiveHolderStation.observe(viewLifecycleOwner) {
-            CoroutineScope(Dispatchers.IO).launch {
-                Log.e("received3", it.stationName)
-                //mainViewModel.getDataFromAirAPI(it.stationName)
-            }
-        }*/
         mainViewModel.userLiveHolderWeather.observe(viewLifecycleOwner) {
 
         }

@@ -1,4 +1,4 @@
-package com.example.walkingpark.retrofit2
+package com.example.walkingpark.api
 
 import okhttp3.OkHttpClient
 import java.security.SecureRandom

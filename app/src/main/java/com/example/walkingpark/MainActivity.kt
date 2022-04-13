@@ -10,13 +10,11 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.example.walkingpark.components.foreground.service.ParkMapsService
-import com.example.walkingpark.components.ui.dialog.LoadingIndicator
+import com.example.walkingpark.view.LoadingIndicator
 import com.example.walkingpark.data.enum.Common
 import com.example.walkingpark.databinding.ActivityMainBinding
 import com.example.walkingpark.data.repository.LocationServiceRepository
-import com.example.walkingpark.components.ui.fragment.tab_1.HomeFragment
-import com.example.walkingpark.components.ui.fragment.tab_2.ParkMapsFragment
-import com.example.walkingpark.components.ui.fragment.tab_3.SettingsFragment
+import com.example.walkingpark.viewmodels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -27,8 +25,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    @Inject
-    lateinit var locationServiceRepository: LocationServiceRepository
 
     private var binding: ActivityMainBinding? = null
     val viewModel by viewModels<MainViewModel>()
@@ -39,19 +35,19 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
-        locationServiceRepository.locationCallback = viewModel.locationCallback
+        viewModel.locationServiceRepository.locationCallback = viewModel.locationCallback
 
         setBottomMenuButtons()         // 하단 버튼 설정
 
         parkMapsReceiver = ParkMapsReceiver(applicationContext)
-        locationServiceRepository.startParkMapsService(this, parkMapsReceiver)         // 위치데이터 서비스 실행
+        viewModel.locationServiceRepository.startParkMapsService(this, parkMapsReceiver)         // 위치데이터 서비스 실행
 
         // 퍼미션 요청 핸들링. (onActivityResult 대체)
         val locationPermissionRequest = registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
         ) { permissions ->
             viewModel.loadingIndicator = LoadingIndicator(this, "RestApi 데이터 읽어오는중....")
-            val check = locationServiceRepository.sendPermissionResultToActivity(this)
+            val check = viewModel.locationServiceRepository.sendPermissionResultToActivity(this)
             if (check) {
                 viewModel.loadingIndicator!!.startLoadingIndicator()
                 // 퍼미션이 허용되었으므로 서비스 실행

@@ -6,7 +6,7 @@ import com.example.walkingpark.data.dto.AirDTO
 import com.example.walkingpark.data.dto.StationDTO
 import com.example.walkingpark.data.dto.WeatherDTO
 import com.example.walkingpark.data.tools.LatLngToGridXy
-import com.example.walkingpark.retrofit2.PublicApiService
+import com.example.walkingpark.api.PublicApiService
 import retrofit2.Response
 import java.sql.Timestamp
 import javax.inject.Inject

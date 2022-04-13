@@ -3,7 +3,7 @@ package com.example.walkingpark.data.repository
 import android.graphics.Color
 import android.graphics.PointF
 import android.util.Log
-import com.example.walkingpark.components.ui.dialog.LoadingIndicator
+import com.example.walkingpark.view.LoadingIndicator
 import com.example.walkingpark.data.enum.Settings
 import com.example.walkingpark.data.room.AppDatabase
 import com.example.walkingpark.data.room.ParkDB
@@ -19,6 +19,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.math.PI
+import kotlin.math.sqrt
 
 /**
  *   Google Maps APi 관련 비즈니스 로직 수행
@@ -36,7 +38,6 @@ class GoogleMapsRepository @Inject constructor() {
     var isMapLoadCompleted = false          // onMapReady() 호출 후 google Map 객체가 초기화되므로 이를 확인하기 위함
     var isRefreshRequested = true    // 맵 마커 refresh 요청 체크. 기존의 마커를 모두 지우고 다시 생성해야 함.
 
-
     var isStartWorkoutButtonClicked = false
     var isClickedMarkerPrintButton = false
     var isClickedMarkerRemoveButton = false
@@ -47,16 +48,47 @@ class GoogleMapsRepository @Inject constructor() {
 
     var userGoogleMapZoomLevel: Double = 0.0      // 사용자의 조작에 따른 구글맵 확대/축소값
     var getSearchRangeFromSeekBar = 3
+    var parkNameSizeMap = HashMap<String, Double>()
+    var parkNameLatLngMap = HashMap<String, String>()
 
     private var currentMarker: Marker? = null
     lateinit var loadingIndicator: LoadingIndicator
 
     lateinit var clusterManager: ClusterManager<ClusterItem>
 
-    private var circleRadiusUserLocation: Circle? = null
-    lateinit var circleRadiusClickedItem: Circle
+    private var markerCircleUserLocation: Circle? = null
+    private var markerCircleClusterItem: Circle? = null
 
     private var counter = 0             // 현재 콜백에 따라 로직이 몇번이나 수행되었는지 체크하기 위한 변수.
+
+
+    // ParkMapsFragment 의 onMapReady() 에서 수행되는 로직
+    fun onMapReady(){
+        googleMap.setOnCameraIdleListener(clusterManager)
+
+        // MarkerCluster 에서 클러스터 하나하나를 이루는 아이템 (마커) 의 클릭 이벤트.
+        clusterManager.setOnClusterItemClickListener {
+            if (markerCircleClusterItem != null) markerCircleClusterItem!!.remove()
+
+            // 각각의 마커정보에 대하여 DB 에서 제공하는 면적 정보를 가져와, 반지름으로 변환.
+            val radius = sqrt(parkNameSizeMap[it.title]!! / PI)
+            markerCircleClusterItem = googleMap.addCircle(CircleOptions().apply {
+                val latLng = parkNameLatLngMap[it.title]!!.split(" ")
+                center(LatLng(latLng[0].toDouble(), latLng[1].toDouble()))
+                radius(radius)
+                strokeColor(Color.YELLOW)
+            })
+            false
+        }
+
+        // 클러스터를 눌렀을 때 수행할 이벤트값.
+        clusterManager.setOnClusterClickListener {
+            googleMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(it.position.latitude, it.position.longitude)))
+/*            googleMap.animateCamera(CameraUpdateFactory.zoomTo(Settings.GOOGLE_MAPS__ZOOM_LEVEL_HIGH))
+            clusterManager.clusterMarkerCollection.markers.*/
+            false
+        }
+    }
 
     // 사용자의 위경도 위치를 기준으로 근처 아이템을 찾을때까지 범위를 확장한 between 쿼리 반복을 통하여 Room 에서
     // 데이터를 가져온다. 가져온 데이터는 GoogleMaps 비즈니스 로직 수행을 위해 MapsRepository 로 전달.
@@ -78,7 +110,12 @@ class GoogleMapsRepository @Inject constructor() {
             count++
             getSearchRangeFromSeekBar = rangeArray[4].toInt()
         }
-
+        CoroutineScope(Dispatchers.Main).launch {
+            if (markerCircleUserLocation != null) {
+                markerCircleUserLocation!!.remove()
+            }
+            addCircleToMarker("user", latitude, longitude, getSearchRangeFromSeekBar*1000.0)
+        }
         return receivedData
     }
 
@@ -143,12 +180,18 @@ class GoogleMapsRepository @Inject constructor() {
     suspend fun getParkDataForMaps(latitude: Double, longitude: Double): List<ParkDB> {
 
         if (isMapLoadCompleted) {
+
+            if (loadingIndicator.flag !== "None") {
+                loadingIndicator.flag = "None"
+                loadingIndicator.dismissIndicator()
+            }
+
             counter ++
             CoroutineScope(Dispatchers.Main).launch {
-                if (circleRadiusUserLocation != null) {
-                    circleRadiusUserLocation!!.remove()
+                if (markerCircleUserLocation != null) {
+                    markerCircleUserLocation!!.remove()
                 }
-                addCircleToMarker("user", latitude, longitude, getSearchRangeFromSeekBar*2000.0)
+                addCircleToMarker("user", latitude, longitude, getSearchRangeFromSeekBar*1000.0)
             }
 
             // TODO 1. 공원 검색 (마커 출력) 버튼이 눌렸을 때 수행할 로직 정의
@@ -176,7 +219,7 @@ class GoogleMapsRepository @Inject constructor() {
 
             }
 
-            // TODO 2. 마커 모두 삭제 버튽이 눌렸을 때 수행할 동작 정의
+            // TODO 2. 마커 모두 삭제 버튼이 눌렸을 때 수행할 동작 정의
             if (isClickedMarkerRemoveButton) {
                 isClickedMarkerRemoveButton = false
 
@@ -201,28 +244,27 @@ class GoogleMapsRepository @Inject constructor() {
             if (isSelectedZoomInMenuSpinner) {
                 isSelectedZoomInMenuSpinner = false
                 clusterManager.cluster()
-                // googleMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(latitude, longitude)))
+                googleMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(latitude, longitude)))
                 googleMap.animateCamera(CameraUpdateFactory.zoomTo(googleMapsZoomLevel))
             }
 
-            // TODO 사용자의 위치는 계속 업데이트 해 줄것. -> 지도 정보를 계속 업데이트 하여 정확도를 높이는 방식.
-            // TODO 처음엔 자신의 위치에 대한 정확도를 높여야 하므로, 최초 3번정도는 업데이트를 수행하도록
+            // TODO 사용자의 위치를 추적하여 마커를 출력하되, 이전 마커는 지워야 마커가 누적되지 않는다.
             googleMap.apply {
                 currentMarker?.remove()
                 currentMarker = addMarker(setUserMarkerOptions(latitude, longitude))
             }
 
+            // TODO 초기에는 사용자의 위치는 계속 업데이트 해 줄것 -> 지도 정보를 계속 업데이트 하여 정확도를 높이는 방식인듯 함.
             if (isClickedLocationReturnButton || counter <= 3) {
                 isClickedLocationReturnButton = false
                 clusterManager.cluster()
                 googleMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(latitude, longitude)))
-                googleMap.animateCamera(CameraUpdateFactory.zoomTo(Settings.GOOGLE_MAPS__ZOOM_LEVEL_DEFAULT))     // min:2f max:21f
+                googleMap.animateCamera(CameraUpdateFactory.zoomTo(Settings.GOOGLE_MAPS_ZOOM_LEVEL_DEFAULT))     // min:2f max:21f
 
-                if (counter == 3) {
+                if (counter == 2) {
                     loadingIndicator.dismissIndicator()
                 }
             }
-
         }
         return emptyList()
     }
@@ -242,7 +284,7 @@ class GoogleMapsRepository @Inject constructor() {
                     radius(scale)
                     strokeColor(Color.RED)
                 }
-                circleRadiusUserLocation = googleMap.addCircle(options)
+                markerCircleUserLocation = googleMap.addCircle(options)
             }
             "click" -> {
                 val options = CircleOptions().apply {
@@ -250,7 +292,7 @@ class GoogleMapsRepository @Inject constructor() {
                     radius(scale)
                     strokeColor(Color.RED)
                 }
-                circleRadiusClickedItem = googleMap.addCircle(options)
+                //circleRadiusClickedItem = googleMap.addCircle(options)
             }
         }
     }
@@ -266,30 +308,35 @@ class GoogleMapsRepository @Inject constructor() {
         return markerOptions
     }
 
-    // param 1 : List<ParkDB> 의 객체값중 하나를 받아와 MarkerOptions 객체를 만들어 리턴.
+    // TODO 마커클러스터 커스터마이징 필요. -> 현재는 HashMap 을 통하여 개별 마커에 대한 정보를 저장.
+    // param 1 : List<ParkDB> 의 객체값중 하나를 받아와 item 을 생성해서 clusterManager 에 등록하여 마커 저장
     private fun setMarkerOptions(it: ParkDB) {
-        val markerOptions = MarkerOptions()
+      //  val markerOptions = MarkerOptions()
 
-        val parkName = it.parkName
-        val oldAddress = it.addressDoro
-        val newAddress = it.addressJibun
-        val phoneNumber = it.phoneNumber
-        val category = it.parkCategory
-        markerOptions.position(LatLng(it.latitude!!, it.longitude!!));
-        if (parkName != null) {
-            Log.e("setMarkerOptions() : ", it.parkName)
-            markerOptions.title(parkName);
-        } else {
-            markerOptions.title("????")
-        }
-        if (category != null) {
+    //    markerOptions.position(LatLng(it.latitude!!, it.longitude!!));
+
+        val parkName = it.parkName ?: "공원이름 없음"
+        val parkAddress = it.addressDoro ?: it.addressJibun
+        val phoneNumber = it.phoneNumber ?: "전화번호 없음"
+        val parkSize = it.parkSize ?: 0.0
+        val parkCategory = it.parkCategory ?: "공원"
+        val parkFacilityCulture = it.facilityCulture ?: "문화시설 없음"
+        val parkFacilityHealth = it.facilityHealth ?: "건강시설 없음"
+        val parkFacilityJoy = it.facilityJoy ?: "오락시설 없음"
+        val parkFacilityUseful = it.facilityUseFul ?: "편의시설 없음"
+        val parkFacilityEtc = it.facilityEtc ?: "그외시설 없음"
+
+/*        if (category != null) {
             Log.e("setMarkerOptions() : ", it.parkCategory)
             markerOptions.snippet("${it.latitude}   ${it.longitude}");
         } else {
             markerOptions.snippet("???")
-        }
+        }*/
 
-        val item = MyItem(it.latitude, it.longitude, "safdasdf", "asfdasdffsad")
+        // 위도경도는 DB 에서 Null 값을 걸러냈으므로 Null 값이 들어가지 않음.
+        val item = MyItem(it.latitude!!, it.longitude!!, parkName, parkCategory)
+        parkNameSizeMap[parkName] = parkSize
+        parkNameLatLngMap[parkName] = "${it.latitude} ${it.longitude}"
         clusterManager.addItem(item)
         // return markerOptions
     }

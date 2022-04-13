@@ -1,4 +1,4 @@
-package com.example.walkingpark
+package com.example.walkingpark.view
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,11 +6,12 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import com.example.walkingpark.MainActivity
+import com.example.walkingpark.R
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
 import java.lang.Exception
-import javax.inject.Inject
 
 
 @AndroidEntryPoint

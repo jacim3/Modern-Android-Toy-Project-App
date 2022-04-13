@@ -1,13 +1,11 @@
-package com.example.walkingpark
+package com.example.walkingpark.viewmodels
 
 import android.app.Application
-import android.os.IBinder
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.example.walkingpark.components.foreground.service.ParkMapsService
-import com.example.walkingpark.components.ui.dialog.LoadingIndicator
+import com.example.walkingpark.view.LoadingIndicator
 import com.example.walkingpark.data.dto.AirDTO
 import com.example.walkingpark.data.dto.StationDTO
 import com.example.walkingpark.data.dto.WeatherDTO

@@ -14,9 +14,10 @@ import javax.inject.Qualifier
 object ApiKeyModule {
 
 
+    // Http 에 항상 감싸서 보내야 하는 RestApi 키
     @PublicApiKey
     @Provides
-    fun getMapsApiKey(@ApplicationContext context:Context): String {
+    fun providePublicApiKey(@ApplicationContext context:Context): String {
         try {
             val metaSet = context.packageManager.getApplicationInfo(
                 context.packageName,
@@ -35,32 +36,8 @@ object ApiKeyModule {
         return ""
     }
 
-    @MapsApiKey
-    @Provides
-    fun getPublicDataApiKey(@ApplicationContext context: Context): String {
-        try {
-            val metaSet = context.packageManager.getApplicationInfo(
-                context.packageName,
-                PackageManager.GET_META_DATA
-            );
-            if (metaSet.metaData != null) {
-                val apiKey = metaSet.metaData.getString("com.google.android.geo.API_KEY")
-                if (apiKey != null) {
-
-                    return apiKey
-                }
-            }
-        } catch (e: PackageManager.NameNotFoundException) {
-
-        }
-        return ""
-    }
-
     @Qualifier
     @Retention(AnnotationRetention.RUNTIME)
     annotation class PublicApiKey
 
-    @Qualifier
-    @Retention(AnnotationRetention.RUNTIME)
-    annotation class MapsApiKey
 }

@@ -1,4 +1,4 @@
-package com.example.walkingpark.components.ui.dialog
+package com.example.walkingpark.view
 
 import android.app.Activity
 import android.app.AlertDialog
@@ -12,6 +12,8 @@ import com.example.walkingpark.data.enum.Common
 
 class LoadingIndicator(private val activity: Activity, private val text:String) {
     lateinit var dialog: AlertDialog
+
+    var flag = "None"           // 특정 목적에 따라 다이얼로를 구분하기 위한 변수.
 
     fun startLoadingIndicator() {
         val builder = AlertDialog.Builder(activity)
@@ -31,7 +33,7 @@ class LoadingIndicator(private val activity: Activity, private val text:String) 
         }, Common.LOADING_INDICATOR_DISMISS_TIME.toLong())
     }
 
-    fun setText(text:String){
+    fun setDescription(text:String){
         dialog.findViewById<AppCompatTextView>(R.id.textViewDescription).text = text
     }
 }
