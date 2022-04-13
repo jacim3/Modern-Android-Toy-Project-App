@@ -21,6 +21,7 @@
 ## 앞으로 해야할 일: 
 1. UI 에 대한 데이터 처리 비즈니스 로직 미 작성 -> MutableLiveData를 Databinding을 통하여 TextView에 출력하여 데이터 수신여부만 간편하게 확인
 2. GoogleMapServiceRepository의 구글맵 관련 비즈니스 로직 로직의 보완 및 고도화 작업 수행 필요. 
+3. Api 통신 중 타임아웃으로 인한 java.net.SocketTimeoutException 의 처리가 필요. 현재 SSL 인증서를 우회하는 중이라, 네트워크 타임아웃을 설정할 수가 없음..
 
 ## 현재 적용중인 컴포넌트
 1. Foreground Service 
