@@ -51,7 +51,7 @@ class LocationServiceRepository @Inject constructor() {
     lateinit var locationRequest: LocationRequest
 
     lateinit var locationCallback: LocationCallback
-    val service: ParkMapsService = ParkMapsService()
+
     val addressMap = HashMap<Char, String?>()
     val latLngMap = HashMap<String, Double>()
 
@@ -248,9 +248,5 @@ class LocationServiceRepository @Inject constructor() {
                 Log.e("LocationServiceRepository : ", "LocationUpdateCallbackRegistered.")
             }
         }
-    }
-
-    fun cancelUpdateLocation(locationCallback: LocationCallback) {
-        fusedLocationClient.removeLocationUpdates(locationCallback)
     }
 }

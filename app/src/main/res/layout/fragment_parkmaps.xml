@@ -15,7 +15,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/buttonChaseCamera"
-        android:text="카메라 체이스 : ON"
+        android:text="원래위치로"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
@@ -52,6 +52,14 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/seekBarSearchScale" />
+
+    <SeekBar
+        android:id="@+id/seekBarSearchScale"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="10"
+        android:progress="3"
         app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

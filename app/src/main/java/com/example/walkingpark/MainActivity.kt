@@ -35,7 +35,6 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var parkMapsReceiver: ParkMapsReceiver
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
@@ -51,7 +50,7 @@ class MainActivity : AppCompatActivity() {
         val locationPermissionRequest = registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
         ) { permissions ->
-            viewModel.loadingIndicator = LoadingIndicator(this)
+            viewModel.loadingIndicator = LoadingIndicator(this, "RestApi 데이터 읽어오는중....")
             val check = locationServiceRepository.sendPermissionResultToActivity(this)
             if (check) {
                 viewModel.loadingIndicator!!.startLoadingIndicator()
@@ -75,28 +74,6 @@ class MainActivity : AppCompatActivity() {
                 Manifest.permission.ACCESS_COARSE_LOCATION
             )
         )
-
-/*        viewModel.userLocationHolder.observe(this) {
-            Log.e("received1", it.toString())
-        }
-
-        viewModel.userAddressHolder.observe(this){
-            Log.e("received2", it.toString())
-        }
-
-        viewModel.userStationHolder.observe(this) {
-            CoroutineScope(Dispatchers.IO).launch {
-                Log.e("received3",it.stationName)
-                viewModel.getAirDataFromApi(it.stationName)
-            }
-        }*/
-
-/*        viewModel.userLiveHolderStation.observe(this){
-            CoroutineScope(Dispatchers.IO).launch {
-
-
-            }
-        }*/
     }
 
     // 실행되는 포그라운드 서비스와 LocationServiceRepository IntentFilter 를 통한 통신을 위한 동적 리시버 정의.
@@ -162,8 +139,11 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        // TODO 여기서 동적 리시버 해지
         binding = null
+        // 위치 업데이트 콜백 해지.
+        viewModel.cancelUpdateLocation(viewModel.locationCallback)
+        // 포그라운드 서비스 정지.
+        val intent = Intent(this, ParkMapsService::class.java)
+        stopService(intent)
     }
-
 }

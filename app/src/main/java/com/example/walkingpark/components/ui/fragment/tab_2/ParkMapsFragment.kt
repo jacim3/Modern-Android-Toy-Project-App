@@ -8,19 +8,17 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.SeekBar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.example.walkingpark.MainViewModel
 import com.example.walkingpark.components.ui.dialog.LoadingIndicator
+import com.example.walkingpark.data.enum.Settings
 import com.example.walkingpark.data.repository.GoogleMapsRepository
-import com.example.walkingpark.data.tools.MyItem
 import com.example.walkingpark.databinding.FragmentParkmapsBinding
-import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.clustering.ClusterItem
 import com.google.maps.android.clustering.ClusterManager
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -30,17 +28,14 @@ import javax.inject.Inject
 */
 
 @AndroidEntryPoint
-class ParkMapsFragment : Fragment(), OnMapReadyCallback{
+class ParkMapsFragment : Fragment(), OnMapReadyCallback {
 
     @Inject
     lateinit var googleMapsRepository: GoogleMapsRepository
 
-    private val mainViewModel:MainViewModel by activityViewModels()
-    private val parkMapsViewModel:ParkMapsViewModel by viewModels()
-    private var binding:FragmentParkmapsBinding? = null
-
-    private lateinit var googleMap:GoogleMap
-    lateinit var clusterManager: ClusterManager<ClusterItem>
+    private val mainViewModel: MainViewModel by activityViewModels()
+    private val parkMapsViewModel: ParkMapsViewModel by viewModels()
+    private var binding: FragmentParkmapsBinding? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -60,58 +55,110 @@ class ParkMapsFragment : Fragment(), OnMapReadyCallback{
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        //viewModel = ViewModelProvider(this)[ParkMapsViewModel::class.java]
-        // mainViewModel 에 lazy 초기화한 콜백함수에 의하여 계속 observe 로 사용자 위치를 출력한다.
-        mainViewModel.userLiveHolderLatLng.observe(viewLifecycleOwner){
+        mainViewModel.userLiveHolderLatLng.observe(viewLifecycleOwner) {
             parkMapsViewModel.getParkData(it["위도"]!!, it["경도"]!!)
         }
-        googleMapsRepository.loadingIndicator = LoadingIndicator(requireActivity())
-        // 지도 ZoomIn 관련 스피너 설정
-        val options = arrayOf(1,2,3,4,5)
-        val spinnerOptions = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, options)
-        binding!!.spinnerMapsZooming.adapter = spinnerOptions
-        binding!!.spinnerMapsZooming.onItemSelectedListener = object :AdapterView.OnItemSelectedListener,
-            AdapterView.OnItemClickListener {
+        googleMapsRepository.loadingIndicator =
+            LoadingIndicator(requireActivity(), "지도정보 초기화 하는중...")
+        googleMapsRepository.loadingIndicator.startLoadingIndicator()
+        setSpinner()
+        setButtons()
+        setSeekBar()
+    }
 
-            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, p3: Long) {
-                when(position) {
-                    0 -> {googleMapsRepository.googleMapsZoomLevel = 9.0f}
-                    1 -> {googleMapsRepository.googleMapsZoomLevel = 11.0f}
-                    2 -> {googleMapsRepository.googleMapsZoomLevel = 13.0f}
-                    3 -> {googleMapsRepository.googleMapsZoomLevel = 15.0f}
-                    4 -> {googleMapsRepository.googleMapsZoomLevel = 17.0f}
-                }
+    private fun setSeekBar() {
+        binding!!.seekBarSearchScale.setOnSeekBarChangeListener(object :
+            SeekBar.OnSeekBarChangeListener {
+
+            override fun onProgressChanged(bar: SeekBar?, p1: Int, p2: Boolean) {
             }
 
-            override fun onNothingSelected(p0: AdapterView<*>?) {
-                TODO("Not yet implemented")
+            override fun onStartTrackingTouch(p0: SeekBar?) {
             }
 
-            override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                TODO("Not yet implemented")
+            override fun onStopTrackingTouch(bar: SeekBar?) {
+                googleMapsRepository.loadingIndicator.startLoadingIndicator()
+                googleMapsRepository.getSearchRangeFromSeekBar = bar!!.progress
             }
-        }
+        })
+    }
 
+    private fun setButtons() {
         binding!!.buttonChaseCamera.setOnClickListener {
-            googleMapsRepository.isGoogleMapChasingCamera = !googleMapsRepository.isGoogleMapChasingCamera
-            if (googleMapsRepository.isGoogleMapChasingCamera) {
-                binding!!.buttonChaseCamera.text = "카메라체이스 : ON"
-            } else
-                binding!!.buttonChaseCamera.text = "카메라체이스 : OFF"
+            googleMapsRepository.isClickedLocationReturnButton = true
         }
 
         binding!!.buttonStartWorkout.setOnClickListener {
         }
 
         binding!!.buttonPrintMarkers.setOnClickListener {
-            googleMapsRepository.isAllMarkerPrintButtonClicked = true
+            googleMapsRepository.isClickedMarkerPrintButton = true
             googleMapsRepository.loadingIndicator.startLoadingIndicator()
         }
 
         binding!!.buttonRemoveMarkers.setOnClickListener {
-            googleMapsRepository.isAllMarkerRemoveButtonClicked = true
+            googleMapsRepository.isClickedMarkerRemoveButton = true
             googleMapsRepository.loadingIndicator.startLoadingIndicator()
         }
+    }
+
+    // 맵 축소 관련 스피너
+    private fun setSpinner() {
+        val options = arrayOf("작게 축소", "축소", "보통", "확대", "크게 확대")
+        val spinnerOptions =
+            ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, options)
+        binding!!.spinnerMapsZooming.adapter = spinnerOptions
+        binding!!.spinnerMapsZooming.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener,
+                AdapterView.OnItemClickListener {
+
+                override fun onItemSelected(
+                    p0: AdapterView<*>?,
+                    p1: View?,
+                    position: Int,
+                    p3: Long
+                ) {
+                    when (position) {
+                        0 -> {
+                            googleMapsRepository.googleMapsZoomLevel =
+                                Settings.GOOGLE_MAPS__ZOOM_LEVEL_VERY_LOW
+                            googleMapsRepository.isSelectedZoomInMenuSpinner = true
+                        }
+                        1 -> {
+                            googleMapsRepository.googleMapsZoomLevel =
+                                Settings.GOOGLE_MAPS__ZOOM_LEVEL_LOW
+                            googleMapsRepository.isSelectedZoomInMenuSpinner = true
+                        }
+                        2 -> {
+                            googleMapsRepository.googleMapsZoomLevel =
+                                Settings.GOOGLE_MAPS__ZOOM_LEVEL_DEFAULT
+                            googleMapsRepository.isSelectedZoomInMenuSpinner = true
+
+                        }
+                        3 -> {
+                            googleMapsRepository.googleMapsZoomLevel =
+                                Settings.GOOGLE_MAPS__ZOOM_LEVEL_HIGH
+                            googleMapsRepository.isSelectedZoomInMenuSpinner = true
+
+                        }
+                        4 -> {
+                            googleMapsRepository.googleMapsZoomLevel =
+                                Settings.GOOGLE_MAPS__ZOOM_LEVEL_VERY_HIGH
+                            googleMapsRepository.isSelectedZoomInMenuSpinner = true
+
+                        }
+                    }
+                }
+
+                override fun onNothingSelected(p0: AdapterView<*>?) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                    TODO("Not yet implemented")
+                }
+            }
+        binding!!.spinnerMapsZooming.setSelection(2)
     }
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
@@ -152,48 +199,12 @@ class ParkMapsFragment : Fragment(), OnMapReadyCallback{
         fun newInstance() = ParkMapsFragment()
     }
 
-    // 구글맵 준비가 완료된 이후 수행되는 콜백메서드.
+    // 구글맵 준비가 완료된 이후 수행 및 GoogleMap 관련 비즈니스 로직을 GoogleMapRepository 로 옮기기
     override fun onMapReady(googleMap: GoogleMap) {
-        //this.googleMap = googleMap
-        Log.e("onMapReadyCallback", "executed!!!!")
-        googleMapsRepository.isMapLoaded = true
+        googleMapsRepository.isMapLoadCompleted = true
         googleMapsRepository.googleMap = googleMap
-        googleMapsRepository.clusterManager = ClusterManager(context, googleMapsRepository.googleMap)
+        googleMapsRepository.clusterManager =
+            ClusterManager(context, googleMapsRepository.googleMap)
         googleMapsRepository.googleMap.setOnCameraIdleListener(googleMapsRepository.clusterManager)
-    // setUpClusterer(googleMap)
     }
-
-    private fun setUpClusterer(map:GoogleMap) {
-        // Position the map.
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(51.503186, -0.126446), 10f))
-
-        // Initialize the manager with the context and the map.
-        // (Activity extends context, so we can pass 'this' in the constructor.)
-        clusterManager = ClusterManager(context, map)
-
-        // Point the map's listeners at the listeners implemented by the cluster
-        // manager.
-        // map.setOnMarkerClickListener(clusterManager)
-
-        // Add cluster items (markers) to the cluster manager.
-        addItems()
-    }
-
-    private fun addItems() {
-
-        // Set some lat/lng coordinates to start with.
-        var lat = 51.5145160
-        var lng = -0.1270060
-
-        // Add ten cluster items in close proximity, for purposes of this example.
-        for (i in 0..9) {
-            val offset = i / 60.0
-            lat += offset
-            lng += offset
-            val offsetItem =
-                MyItem(lat, lng, "Title $i", "Snippet $i")
-            clusterManager.addItem(offsetItem)
-        }
-    }
-
 }

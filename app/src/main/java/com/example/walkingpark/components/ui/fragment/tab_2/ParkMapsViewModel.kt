@@ -20,6 +20,7 @@ class ParkMapsViewModel @Inject constructor() : ViewModel() {
     @Inject
     lateinit var googleMapsRepository: GoogleMapsRepository
 
+    // 위, 경도 업데이트에 따라 수행되는 메서드
     fun getParkData(latitude: Double, longitude: Double) {
         viewModelScope.launch {
             // indicator.startLoadingIndicator()

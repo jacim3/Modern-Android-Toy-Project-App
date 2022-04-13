@@ -75,7 +75,7 @@ class ParkMapsService : Service() {
                     locationServiceRepository.setUpdateUserLocation(applicationContext, locationServiceRepository.locationCallback)
                 }
                 Common.LOCATION_UPDATE_CANCEL -> {
-                    locationServiceRepository.cancelUpdateLocation(locationServiceRepository.locationCallback)
+                    //locationServiceRepository.cancelUpdateLocation(locationServiceRepository.locationCallback)
                 }
                 Common.LOCATION_SETTINGS -> {
 

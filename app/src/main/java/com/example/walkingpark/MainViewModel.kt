@@ -177,6 +177,10 @@ class MainViewModel @Inject constructor(application: Application) : AndroidViewM
         }
     }
 
+    fun cancelUpdateLocation(locationCallback: LocationCallback) {
+        locationServiceRepository.fusedLocationClient.removeLocationUpdates(locationCallback)
+    }
+
 /*        fun getParkMapsService(service: IBinder): ParkMapsService {
 
             val mb: ParkMapsService.LocalBinder = service as ParkMapsService.LocalBinder
