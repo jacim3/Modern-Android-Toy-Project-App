@@ -1,4 +1,4 @@
-package com.example.walkingpark.view
+package com.example.walkingpark.presentation.view
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,7 +6,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import com.example.walkingpark.MainActivity
+import com.example.walkingpark.presentation.MainActivity
 import com.example.walkingpark.R
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
@@ -21,12 +21,8 @@ class Splash : AppCompatActivity() {
     /**
      *  SingleTon 클래스인 database.room.AppDatabase 의 appDatabase (공원정보 데이터를 참조할 Room 객체) 를 초기화.
      *  공원 데이터를 DB 에 적재해야 하므로, 최초 앱 실행시는 시간이 조금 걸릴 수 있음
+     *  또한 퍼미션을 체크하여, 허용을 하거나, 허용된 이후에만 앱 이용이 가능.
      */
-
-
-    /*
-    *
-    * .createFromAsset(Common.DATABASE_DIR) .fallbackToDestructiveMigration()*/
 
     // TODO 스플래시 체크 메시지
     public override fun onCreate(savedInstanceState: Bundle?) {

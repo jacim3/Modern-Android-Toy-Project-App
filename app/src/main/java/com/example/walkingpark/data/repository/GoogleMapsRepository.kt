@@ -1,9 +1,10 @@
 package com.example.walkingpark.data.repository
 
+import android.content.Context
 import android.graphics.Color
 import android.graphics.PointF
 import android.util.Log
-import com.example.walkingpark.view.LoadingIndicator
+import com.example.walkingpark.presentation.view.LoadingIndicator
 import com.example.walkingpark.data.enum.Settings
 import com.example.walkingpark.data.room.AppDatabase
 import com.example.walkingpark.data.room.ParkDB
@@ -14,6 +15,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.*
 import com.google.maps.android.clustering.ClusterItem
 import com.google.maps.android.clustering.ClusterManager
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -28,7 +30,7 @@ import kotlin.math.sqrt
  * */
 
 @Singleton
-class GoogleMapsRepository @Inject constructor() {
+class GoogleMapsRepository @Inject constructor(@ApplicationContext context: Context) {
 
     @Inject
     lateinit var appDatabase: AppDatabase
@@ -52,7 +54,7 @@ class GoogleMapsRepository @Inject constructor() {
     var parkNameLatLngMap = HashMap<String, String>()
 
     private var currentMarker: Marker? = null
-    lateinit var loadingIndicator: LoadingIndicator
+    var loadingIndicator = LoadingIndicator(context, "asfd")
 
     lateinit var clusterManager: ClusterManager<ClusterItem>
 

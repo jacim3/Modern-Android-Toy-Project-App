@@ -1,4 +1,4 @@
-package com.example.walkingpark.data.dto
+package com.example.walkingpark.domain.model
 
 import com.google.gson.annotations.SerializedName
 

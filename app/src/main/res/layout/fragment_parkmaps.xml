@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ParkMapsFragment">
+    tools:context=".presentation.ParkMapsFragment">
 
     <!-- Fragment 에서 Map 을 띄우기 위해 MapView 필요-->
     <com.google.android.gms.maps.MapView

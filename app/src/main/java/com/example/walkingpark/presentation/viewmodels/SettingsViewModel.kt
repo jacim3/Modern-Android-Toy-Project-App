@@ -1,4 +1,4 @@
-package com.example.walkingpark.viewmodels
+package com.example.walkingpark.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 

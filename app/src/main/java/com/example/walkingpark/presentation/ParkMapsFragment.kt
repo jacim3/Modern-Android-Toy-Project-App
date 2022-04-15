@@ -1,4 +1,4 @@
-package com.example.walkingpark
+package com.example.walkingpark.presentation
 
 import android.content.Context
 import android.os.Bundle
@@ -12,12 +12,11 @@ import android.widget.SeekBar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import com.example.walkingpark.viewmodels.ParkMapsViewModel
-import com.example.walkingpark.view.LoadingIndicator
+import com.example.walkingpark.presentation.viewmodels.ParkMapsViewModel
 import com.example.walkingpark.data.enum.Settings
 import com.example.walkingpark.data.repository.GoogleMapsRepository
 import com.example.walkingpark.databinding.FragmentParkmapsBinding
-import com.example.walkingpark.viewmodels.MainViewModel
+import com.example.walkingpark.presentation.viewmodels.MainViewModel
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.maps.android.clustering.ClusterManager
@@ -58,15 +57,16 @@ class ParkMapsFragment : Fragment(), OnMapReadyCallback {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mainViewModel.userLiveHolderLatLng.observe(viewLifecycleOwner) {
-            parkMapsViewModel.getParkData(it["위도"]!!, it["경도"]!!)
-        }
-        googleMapsRepository.loadingIndicator =
-            LoadingIndicator(requireActivity(), "지도정보 초기화 하는중...")
-        googleMapsRepository.loadingIndicator.startLoadingIndicator()
+
+            /*LoadingIndicator(requireActivity(), "지도정보 초기화 하는중...")
+        googleMapsRepository.loadingIndicator.startLoadingIndicator()*/
         setSpinner()
         setButtons()
         setSeekBar()
+
+        mainViewModel.userLiveHolderLatLng.observe(viewLifecycleOwner) {
+            //parkMapsViewModel.getParkData(it["위도"]!!, it["경도"]!!)
+        }
 
         parkMapsViewModel.liveHolderSeekBar.observe(viewLifecycleOwner){
             Log.e("eventTriggered !!!", it.toString())

@@ -15,7 +15,6 @@ object ApiKeyModule {
 
 
     // Http 에 항상 감싸서 보내야 하는 RestApi 키
-    @PublicApiKey
     @Provides
     fun providePublicApiKey(@ApplicationContext context:Context): String {
         try {
@@ -35,9 +34,4 @@ object ApiKeyModule {
         }
         return ""
     }
-
-    @Qualifier
-    @Retention(AnnotationRetention.RUNTIME)
-    annotation class PublicApiKey
-
 }

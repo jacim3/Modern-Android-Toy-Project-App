@@ -1,26 +1,34 @@
-package com.example.walkingpark.viewmodels
+package com.example.walkingpark.presentation.viewmodels
 
+import android.app.Application
 import android.util.Log
+import androidx.databinding.ObservableField
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.walkingpark.data.room.ParkDB
 import com.example.walkingpark.data.repository.GoogleMapsRepository
+import com.example.walkingpark.presentation.view.LoadingIndicator
+import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ParkMapsViewModel @Inject constructor() : ViewModel() {
+class ParkMapsViewModel @Inject constructor(application: Application, private val googleMapsRepository: GoogleMapsRepository) : AndroidViewModel(application) {
 
+
+    val loadingIndicator = LoadingIndicator(application, "초기화")
     val liveHolderParkData = MutableLiveData<List<ParkDB>>()
     val liveHolderSeekBar = MutableLiveData<Int>()
+    val myLocationLatLng = ObservableField<LatLng>()
+    val otherLocationsLatLng = ObservableField<MutableList<LatLng>>()
+    init {
+        Log.e("init","constructor")
+        loadingIndicator.startLoadingIndicator()
+    }
 
-
-    @Inject
-    lateinit var googleMapsRepository: GoogleMapsRepository
-
-    // 위, 경도 업데이트에 따라 수행되는 메서드
+    // MainViewModel 의 위경도 업데이트를 제공받아, 위치업데이트를 수행.
     fun getParkData(latitude: Double, longitude: Double) {
         viewModelScope.launch {
             // indicator.startLoadingIndicator()
