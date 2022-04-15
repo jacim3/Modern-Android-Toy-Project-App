@@ -32,10 +32,6 @@
         android:theme="@style/Theme.WalkingPark">
 
         <service
-            android:name="com.example.walkingpark.components.foreground.service.ParkMapsService"
-            android:enabled="true"
-            android:exported="false" />
-        <service
             android:name="com.example.walkingpark.presentation.service.LocationService"
             android:enabled="true"
             android:exported="false" />

@@ -1,18 +1,14 @@
 package com.example.walkingpark.presentation.viewmodels
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.*
-import com.example.walkingpark.domain.model.AirDTO
-import com.example.walkingpark.domain.model.StationDTO
-import com.example.walkingpark.domain.model.WeatherDTO
-import com.example.walkingpark.data.enum.Settings
-import com.example.walkingpark.data.repository.LocationReceiverRepository
+import com.example.walkingpark.constants.Settings
 import com.example.walkingpark.presentation.view.LoadingIndicator
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlin.collections.HashMap
 
 
 @HiltViewModel
@@ -21,10 +17,8 @@ import javax.inject.Inject
 // 3. 예외적으로 locationCallback 은 위치정보 업데이트 시 호출되는 콜백함수며, 여기에서 사용할 비즈니스 로직을
 // ViewModel 에서 관리하기 위해 ViewModel 에서 lazy 를 통하여 초기화하며 이를 LocationRepository 에 전달.
 class MainViewModel @Inject constructor(
-    application: Application,
-    private val receiverRepository: LocationReceiverRepository
-
-    ) : AndroidViewModel(application) {
+    application: Application
+) : AndroidViewModel(application) {
 
     // TODO 임시. 데이터를 받아와 곧바로 DataBinding 을 통하여 출력. -> 나중에 UI 에 맞추어 수정 필요.
     // 1. 맨 처음 위치정보에 따른 위경도와 GeoCoder 를 통하여 받는 주소정보를 가공.
@@ -34,12 +28,8 @@ class MainViewModel @Inject constructor(
 
     val userLiveHolderLatLng = MutableLiveData<LatLng>()
     val userLiveHolderAddress = MutableLiveData<HashMap<Char, String?>>()
-    val userLiveHolderStation = MutableLiveData<StationDTO.Response.Body.Items>()
-    val userLiveHolderAir = MutableLiveData<List<AirDTO.Response.Body.Items>?>()
-    val userLiveHolderWeather = MutableLiveData<
-            List<WeatherDTO.Response.Body.Items.Item>>()
 
-    var isAppInitialized = true
+
 
     var loadingIndicator: LoadingIndicator? = null
 
@@ -53,39 +43,40 @@ class MainViewModel @Inject constructor(
         priority = LocationRequest.PRIORITY_HIGH_ACCURACY
     }
 
- /*   val locationCallback =
-        object : LocationCallback() {
-            override fun onLocationResult(result: LocationResult) {
-                super.onLocationResult(result)
 
-                //UserData.currentLatitude = result.lastLocation.latitude
-                //UserData.currentLongitude = result.lastLocation.longitude
+    /*   val locationCallback =
+           object : LocationCallback() {
+               override fun onLocationResult(result: LocationResult) {
+                   super.onLocationResult(result)
 
-                val latitude = result.lastLocation.latitude
-                val longitude = result.lastLocation.longitude
+                   //UserData.currentLatitude = result.lastLocation.latitude
+                   //UserData.currentLongitude = result.lastLocation.longitude
 
-                val latLngMap = HashMap<String, Double>()
-                latLngMap["위도"] = latitude
-                latLngMap["경도"] = longitude
+                   val latitude = result.lastLocation.latitude
+                   val longitude = result.lastLocation.longitude
 
-                userLiveHolderLatLng.postValue(LatLng(latitude, longitude))       // 위도경도는 항상 업데이트
+                   val latLngMap = HashMap<String, Double>()
+                   latLngMap["위도"] = latitude
+                   latLngMap["경도"] = longitude
 
-                // TODO Location 콜백을 통하여 위경도 업데이트가 될 때, Coroutine 을 통한 비동기 처리.
-                // TODO 위치업데이트 콜백이 발생할때마다 Api 통신을 하면 리소스 낭비가 심하므로, 효율적인 Delay 방법 필요
-                if (isAppInitialized) {
-                    isAppInitialized = false
-                    viewModelScope.launch {
+                   userLiveHolderLatLng.postValue(LatLng(latitude, longitude))       // 위도경도는 항상 업데이트
 
-                        // 1. 콜백 함수의 결과로, Observer 패턴을 적용하기 위한 liveDataHolder 업데이트
+                   // TODO Location 콜백을 통하여 위경도 업데이트가 될 때, Coroutine 을 통한 비동기 처리.
+                   // TODO 위치업데이트 콜백이 발생할때마다 Api 통신을 하면 리소스 낭비가 심하므로, 효율적인 Delay 방법 필요
+                   if (isAppInitialized) {
+                       isAppInitialized = false
+                       viewModelScope.launch {
 
-                        val addressMap = locationServiceRepository.parsingAddressMap(
-                            application,
-                            latitude,
-                            longitude
-                        )
-                        userLiveHolderAddress.postValue(addressMap!!)
+                           // 1. 콜백 함수의 결과로, Observer 패턴을 적용하기 위한 liveDataHolder 업데이트
 
-*//*                        Log.e("addressMap", addressMap.toString())
+                           val addressMap = locationServiceRepository.parsingAddressMap(
+                               application,
+                               latitude,
+                               longitude
+                           )
+                           userLiveHolderAddress.postValue(addressMap!!)
+
+   *//*                        Log.e("addressMap", addressMap.toString())
                         // 1. 기상정보 가져오기 ( 위,경도 좌표만 얻어오면 수행 가능)
                         val weatherJob = async { getDataFromWeatherAPI() }
                         // 2. 측정소 정보 얻어오기 ( 위,경도 좌표만 얻어오면 수행 가능)
@@ -119,9 +110,6 @@ class MainViewModel @Inject constructor(
             )
         }*/
 
-    fun getData(): LiveData<String> {
-        return receiverRepository.getData()
-    }
 /*    fun registerServiceAndLocationCallback() {
         locationServiceRepository.locationCallback = locationCallback
     }*/

@@ -1,17 +1,22 @@
 package com.example.walkingpark.di.module
 
-import com.example.walkingpark.data.enum.Common
-import com.example.walkingpark.api.PublicApiService
-import com.example.walkingpark.api.UnsafeOkHttpClient
+import com.example.walkingpark.constants.Common
+import com.example.walkingpark.data.repository.AirApiRepositoryImpl
+import com.example.walkingpark.data.repository.StationApiRepositoryImpl
+import com.example.walkingpark.data.repository.WeatherApiRepositoryImpl
+import com.example.walkingpark.data.source.api.PublicApiService
+import com.example.walkingpark.data.source.api.UnsafeOkHttpClient
+import com.example.walkingpark.domain.StationApiRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import okhttp3.OkHttpClient
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.util.concurrent.TimeUnit
 import javax.inject.Qualifier
+import javax.inject.Singleton
 
 
 @Module
@@ -29,14 +34,14 @@ object PublicDataApiModule {
 
     @AirAPI
     @Provides
-    fun provideDataFromAirApi() : PublicApiService {
+    fun provideDataFromAirApi(): PublicApiService {
 
         val retrofit: Retrofit by lazy {
             Retrofit.Builder()
                 .baseUrl(Common.BASE_URL_API_AIR)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(UnsafeOkHttpClient.unsafeOkHttpClient().build())
-              //  .client(okHttpClient)
+                //  .client(okHttpClient)
                 .build()
         }
 
@@ -59,7 +64,7 @@ object PublicDataApiModule {
                 .build()
         }
 
-        val api:PublicApiService by lazy {
+        val api: PublicApiService by lazy {
             retrofit.create(PublicApiService::class.java)
         }
 
@@ -75,16 +80,45 @@ object PublicDataApiModule {
                 .baseUrl(Common.BASE_URL_API_WEATHER)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(UnsafeOkHttpClient.unsafeOkHttpClient().build())
-           //     .client(okHttpClient)
+                //     .client(okHttpClient)
                 .build()
         }
 
-        val api:PublicApiService by lazy {
+        val api: PublicApiService by lazy {
             retrofit.create(PublicApiService::class.java)
         }
 
         return api
     }
+
+
+/*    @Singleton
+    @Provides
+    fun provideAirApiRepository(
+        apiKey: String,
+        @AirAPI
+        airApiService: PublicApiService
+    ) = AirApiRepositoryImpl(apiKey, airApiService)
+
+    @Singleton
+    @Provides
+    fun provideWeatherApiRepository(
+        apiKey: String,
+        @WeatherApi
+        weatherApiService: PublicApiService
+    ) = WeatherApiRepositoryImpl(apiKey, weatherApiService)
+
+    @Singleton
+    @Provides
+    fun provideStationApiRepository(
+        apiKey: String,
+        @StationAPI
+        stationApiService: PublicApiService,
+        ) = StationApiRepositoryImpl(apiKey, stationApiService)*/
+
+
+    @Provides
+    fun providesDefaultDispatcher(): CoroutineDispatcher = Dispatchers.Default
 
     @Qualifier
     @Retention(AnnotationRetention.RUNTIME)

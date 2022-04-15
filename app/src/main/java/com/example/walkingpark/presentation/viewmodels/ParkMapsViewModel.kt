@@ -6,7 +6,7 @@ import androidx.databinding.ObservableField
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.example.walkingpark.data.room.ParkDB
+import com.example.walkingpark.data.source.room.ParkDB
 import com.example.walkingpark.data.repository.GoogleMapsRepository
 import com.example.walkingpark.presentation.view.LoadingIndicator
 import com.google.android.gms.maps.model.LatLng

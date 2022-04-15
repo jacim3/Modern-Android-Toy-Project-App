@@ -2,9 +2,9 @@ package com.example.walkingpark.di.module
 
 import android.content.Context
 import androidx.room.Room
-import com.example.walkingpark.data.enum.Common
-import com.example.walkingpark.data.room.AppDatabase
-import com.example.walkingpark.data.room.ParkDao
+import com.example.walkingpark.constants.Common
+import com.example.walkingpark.data.source.room.AppDatabase
+import com.example.walkingpark.data.source.room.ParkDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

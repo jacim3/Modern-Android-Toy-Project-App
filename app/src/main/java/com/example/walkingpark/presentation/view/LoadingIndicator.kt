@@ -9,7 +9,7 @@ import android.os.Looper
 import android.view.LayoutInflater
 import androidx.appcompat.widget.AppCompatTextView
 import com.example.walkingpark.R
-import com.example.walkingpark.data.enum.Common
+import com.example.walkingpark.constants.Common
 
 
 class LoadingIndicator(private val context: Context, private val text:String) {

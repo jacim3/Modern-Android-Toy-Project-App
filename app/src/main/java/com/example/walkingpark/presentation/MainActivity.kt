@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.*
 import android.content.pm.PackageManager
 import android.os.*
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -14,7 +13,7 @@ import androidx.databinding.DataBindingUtil
 import com.example.walkingpark.R
 import com.example.walkingpark.presentation.receiver.LocationReceiver
 import com.example.walkingpark.presentation.view.LoadingIndicator
-import com.example.walkingpark.data.enum.Common
+import com.example.walkingpark.constants.Common
 import com.example.walkingpark.databinding.ActivityMainBinding
 import com.example.walkingpark.presentation.service.LocationService
 import com.example.walkingpark.presentation.viewmodels.MainViewModel
@@ -91,10 +90,6 @@ class MainActivity : AppCompatActivity() {
             )
         )
 
-        LocationService.userLocation.observe(this){
-            Log.e("asdfasdfasdf", it?.latitude.toString())
-            Log.e("asdfasdfasdf", it?.longitude.toString())
-        }
     }
 
 

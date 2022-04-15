@@ -5,9 +5,9 @@ import android.graphics.Color
 import android.graphics.PointF
 import android.util.Log
 import com.example.walkingpark.presentation.view.LoadingIndicator
-import com.example.walkingpark.data.enum.Settings
-import com.example.walkingpark.data.room.AppDatabase
-import com.example.walkingpark.data.room.ParkDB
+import com.example.walkingpark.constants.Settings
+import com.example.walkingpark.data.source.room.AppDatabase
+import com.example.walkingpark.data.source.room.ParkDB
 import com.example.walkingpark.data.tools.LatLngPoints
 import com.example.walkingpark.data.tools.MyItem
 import com.google.android.gms.maps.CameraUpdateFactory

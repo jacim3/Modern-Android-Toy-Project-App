@@ -13,7 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.example.walkingpark.presentation.viewmodels.ParkMapsViewModel
-import com.example.walkingpark.data.enum.Settings
+import com.example.walkingpark.constants.Settings
 import com.example.walkingpark.data.repository.GoogleMapsRepository
 import com.example.walkingpark.databinding.FragmentParkmapsBinding
 import com.example.walkingpark.presentation.viewmodels.MainViewModel

@@ -1,28 +1,13 @@
 package com.example.walkingpark.presentation.receiver
 
-import android.Manifest
-import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Build
-import android.os.Looper
-import android.util.Log
-import androidx.core.app.ActivityCompat
 import androidx.lifecycle.MutableLiveData
-import com.example.walkingpark.components.foreground.service.ParkMapsService
-import com.example.walkingpark.data.enum.Common
+import com.example.walkingpark.constants.Common
 import com.example.walkingpark.presentation.service.LocationService
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.tasks.CancellationToken
-import com.google.android.gms.tasks.CancellationTokenSource
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class LocationReceiver : BroadcastReceiver() {

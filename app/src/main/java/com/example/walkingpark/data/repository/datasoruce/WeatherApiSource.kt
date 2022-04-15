@@ -1,6 +1,6 @@
 package com.example.walkingpark.data.repository.datasoruce
 
-import com.example.walkingpark.api.PublicApiService
+import com.example.walkingpark.data.source.api.PublicApiService
 import com.example.walkingpark.domain.model.WeatherDTO
 import com.example.walkingpark.data.tools.LatLngToGridXy
 import com.google.android.gms.maps.model.LatLng
@@ -51,8 +51,6 @@ class WeatherApiSource(
             this["nx"] = grid.locX.toString()
             this["ny"] = grid.locX.toString()
         }
-
         return queryMap
     }
-
 }

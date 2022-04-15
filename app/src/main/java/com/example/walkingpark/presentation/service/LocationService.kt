@@ -13,8 +13,8 @@ import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.MutableLiveData
 import com.example.walkingpark.R
-import com.example.walkingpark.data.enum.Common
-import com.example.walkingpark.data.enum.Settings
+import com.example.walkingpark.constants.Common
+import com.example.walkingpark.constants.Settings
 import com.example.walkingpark.presentation.MainActivity
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.model.LatLng
@@ -51,12 +51,12 @@ class LocationService : LifecycleService() {
 
         when (intent?.getStringExtra("intent-filter")) {
             Common.REQUEST_LOCATION_INIT -> {
-                setLocationInit(this)
+                startLocationInit(this)
                 sendBroadcast(Intent().apply { action = Common.REQUEST_LOCATION_UPDATE_START })
             }
 
             Common.REQUEST_LOCATION_UPDATE_START -> {
-                setLocationUpdate(this)
+                startLocationUpdate(this)
                 sendBroadcast(Intent().apply { action })
             }
 
@@ -123,7 +123,7 @@ class LocationService : LifecycleService() {
     }
 
     @SuppressLint("MissingPermission")
-    private fun setLocationInit(context: Context) {
+    private fun startLocationInit(context: Context) {
         if (ActivityCompat.checkSelfPermission(
                 context,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -157,7 +157,7 @@ class LocationService : LifecycleService() {
 
     // 주기적인 위치 업데이트 수행
     @SuppressLint("MissingPermission")
-    private fun setLocationUpdate(
+    private fun startLocationUpdate(
         context: Context
     ) {
         if (ActivityCompat.checkSelfPermission(
@@ -179,6 +179,10 @@ class LocationService : LifecycleService() {
         ).addOnCompleteListener {
             Log.e("LocationServiceRepository : ", "LocationUpdateCallbackRegistered.")
         }
+    }
+
+    private fun stopLocationUpdate(){
+        fusedLocationProviderClient.removeLocationUpdates(locationCallback)
     }
 
     // 포그라운드 서비스에 필요한 UI 인 Notification 설정 메서드.
