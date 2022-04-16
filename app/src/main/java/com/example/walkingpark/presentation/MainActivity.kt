@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity() {
         val locationPermissionRequest = registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
         ) {
-            viewModel.loadingIndicator = LoadingIndicator(this, "RestApi 데이터 읽어오는중....")
+           // viewModel.loadingIndicator = LoadingIndicator(this, "RestApi 데이터 읽어오는중....")
             val check = permissionCheck(this)
             if (check) {
                 viewModel.loadingIndicator!!.startLoadingIndicator()

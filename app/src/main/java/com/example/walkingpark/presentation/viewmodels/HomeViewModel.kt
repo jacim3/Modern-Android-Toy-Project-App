@@ -50,8 +50,8 @@ class HomeViewModel @Inject constructor(
 
             Log.e("coder", response.toString())
 
-            if (response != null) {
-                userLiveHolderStation.value = response
+            response?.let {
+                userLiveHolderStation.postValue(it)
             }
         }
     }
@@ -59,19 +59,23 @@ class HomeViewModel @Inject constructor(
     suspend fun startWeatherApi(latLng: LatLng) {
         viewModelScope.launch {
             val response = getWeatherUseCase(latLng)
-            if (response.isSuccessful) {
-                Log.e("weatherApi : ", response.body()?.response?.body?.items?.size.toString())
+            if (!response.isNullOrEmpty()) {
+                Log.e("weatherApi : ", response.size.toString())
+                response.let {
+                    userLiveHolderWeather.postValue(it)
+                }
             }
         }
     }
 
-    suspend fun startAirApi(stationName: String){
+    suspend fun startAirApi(stationName: String) {
         viewModelScope.launch {
             val response = getAirUseCase(stationName)
             if (!response.isNullOrEmpty()) {
-                Log.e("airApi : ", response.size.toString())
+                response.let {
+                    userLiveHolderAir.postValue(it)
+                }
             }
         }
     }
-
 }

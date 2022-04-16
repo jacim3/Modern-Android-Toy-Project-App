@@ -26,6 +26,9 @@ import javax.inject.Inject
 /*
 *  뷰바인딩 사용 안함
 */
+// TODO 클린아키텍쳐 엔티티 공부할것 -> 추후 GSON 을 통하여 받은 데이터를 한번 더 정리해야 함
+//
+
 
 @AndroidEntryPoint
 class ParkMapsFragment : Fragment(), OnMapReadyCallback {
