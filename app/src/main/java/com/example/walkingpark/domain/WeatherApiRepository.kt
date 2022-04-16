@@ -1,7 +1,7 @@
 package com.example.walkingpark.domain
 
 import com.example.walkingpark.data.tools.LatLngToGridXy
-import com.example.walkingpark.domain.model.WeatherDTO
+import com.example.walkingpark.data.source.api.dto.WeatherDTO
 import com.google.android.gms.maps.model.LatLng
 
 interface WeatherApiRepository {

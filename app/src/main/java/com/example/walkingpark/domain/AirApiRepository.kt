@@ -1,6 +1,6 @@
 package com.example.walkingpark.domain
 
-import com.example.walkingpark.domain.model.AirDTO
+import com.example.walkingpark.data.source.api.dto.AirDTO
 
 
 interface AirApiRepository {

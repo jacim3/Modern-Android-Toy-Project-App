@@ -1,10 +1,10 @@
-package com.example.walkingpark.domain.usecase.api.weather
+package com.example.walkingpark.domain.usecase.api.weather.child
 
 import com.example.walkingpark.domain.WeatherApiRepository
 import com.google.android.gms.maps.model.LatLng
 import javax.inject.Inject
 
-class ExtractGridUseCase @Inject constructor(
+class GetGridUseCase @Inject constructor(
     private val weatherRepository: WeatherApiRepository
 ) {
 

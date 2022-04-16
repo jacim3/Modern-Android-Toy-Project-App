@@ -5,8 +5,8 @@ import com.example.walkingpark.data.source.api.PublicApiService
 import com.example.walkingpark.data.tools.LatLngToGridXy
 import com.example.walkingpark.di.module.PublicDataApiModule
 import com.example.walkingpark.domain.WeatherApiRepository
-import com.example.walkingpark.domain.model.StationDTO
-import com.example.walkingpark.domain.model.WeatherDTO
+import com.example.walkingpark.data.source.api.dto.StationDTO
+import com.example.walkingpark.data.source.api.dto.WeatherDTO
 import com.google.android.gms.maps.model.LatLng
 import java.sql.Timestamp
 import javax.inject.Inject

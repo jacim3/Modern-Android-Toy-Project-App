@@ -8,12 +8,15 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.walkingpark.constants.Settings
-import com.example.walkingpark.domain.model.AirDTO
-import com.example.walkingpark.domain.model.StationDTO
-import com.example.walkingpark.domain.model.WeatherDTO
-import com.example.walkingpark.domain.usecase.api.air.GetAirUseCase
-import com.example.walkingpark.domain.usecase.api.station.GetStationUseCase
-import com.example.walkingpark.domain.usecase.api.weather.GetWeatherUseCase
+import com.example.walkingpark.data.source.api.dto.AirDTO
+import com.example.walkingpark.data.source.api.dto.StationDTO
+import com.example.walkingpark.data.source.api.dto.WeatherDTO
+import com.example.walkingpark.domain.usecase.api.air.child.GetAirUseCase
+import com.example.walkingpark.domain.usecase.api.air.parent.ResultAirUseCase
+import com.example.walkingpark.domain.usecase.api.station.child.GetStationUseCase
+import com.example.walkingpark.domain.usecase.api.station.parent.ResultStationUseCase
+import com.example.walkingpark.domain.usecase.api.weather.child.GetWeatherUseCase
+import com.example.walkingpark.domain.usecase.api.weather.parent.ResultWeatherUseCase
 import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -27,9 +30,9 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     application: Application,
-    private val getWeatherUseCase: GetWeatherUseCase,
-    private val getAirUseCase: GetAirUseCase,
-    private val getStationUseCase: GetStationUseCase
+    private val weatherUseCase: ResultWeatherUseCase,
+    private val airUseCase: ResultAirUseCase,
+    private val stationUseCase: ResultStationUseCase,
 ) : AndroidViewModel(application) {
 
     val userLiveHolderStation = MutableLiveData<StationDTO.Response.Body.Items?>()
@@ -46,7 +49,7 @@ class HomeViewModel @Inject constructor(
                     latLng.longitude,
                     Settings.LOCATION_ADDRESS_SEARCH_COUNT
                 )
-            val response = getStationUseCase(location, latLng)
+            val response = stationUseCase(location, latLng)
 
             Log.e("coder", response.toString())
 
@@ -58,7 +61,7 @@ class HomeViewModel @Inject constructor(
 
     suspend fun startWeatherApi(latLng: LatLng) {
         viewModelScope.launch {
-            val response = getWeatherUseCase(latLng)
+            val response = weatherUseCase(latLng)
             if (!response.isNullOrEmpty()) {
                 Log.e("weatherApi : ", response.size.toString())
                 response.let {
@@ -70,7 +73,7 @@ class HomeViewModel @Inject constructor(
 
     suspend fun startAirApi(stationName: String) {
         viewModelScope.launch {
-            val response = getAirUseCase(stationName)
+            val response = airUseCase(stationName)
             if (!response.isNullOrEmpty()) {
                 response.let {
                     userLiveHolderAir.postValue(it)

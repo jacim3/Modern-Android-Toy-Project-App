@@ -4,9 +4,8 @@ import android.location.Address
 import android.util.Log
 import com.example.walkingpark.constants.ADDRESS
 import com.example.walkingpark.data.source.api.PublicApiService
-import com.example.walkingpark.domain.model.AirDTO
-import com.example.walkingpark.domain.model.StationDTO
-import com.example.walkingpark.domain.model.WeatherDTO
+import com.example.walkingpark.data.source.api.dto.StationDTO
+import com.example.walkingpark.data.source.api.dto.WeatherDTO
 import com.example.walkingpark.di.module.PublicDataApiModule
 import com.example.walkingpark.domain.StationApiRepository
 import com.google.android.gms.maps.model.LatLng

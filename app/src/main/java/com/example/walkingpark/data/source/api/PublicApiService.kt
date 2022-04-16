@@ -1,8 +1,8 @@
 package com.example.walkingpark.data.source.api
 
-import com.example.walkingpark.domain.model.AirDTO
-import com.example.walkingpark.domain.model.StationDTO
-import com.example.walkingpark.domain.model.WeatherDTO
+import com.example.walkingpark.data.source.api.dto.AirDTO
+import com.example.walkingpark.data.source.api.dto.StationDTO
+import com.example.walkingpark.data.source.api.dto.WeatherDTO
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query

@@ -1,13 +1,9 @@
 package com.example.walkingpark.domain
 
 import android.location.Address
-import com.example.walkingpark.domain.model.AirDTO
-import com.example.walkingpark.domain.model.StationDTO
-import com.example.walkingpark.domain.model.WeatherDTO
+import com.example.walkingpark.data.source.api.dto.StationDTO
 import com.google.android.gms.maps.model.LatLng
 import retrofit2.Response
-import javax.inject.Inject
-import javax.inject.Singleton
 
 
 interface StationApiRepository {

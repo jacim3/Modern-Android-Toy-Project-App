@@ -25,16 +25,15 @@ import kotlinx.coroutines.Job
 // TODO Repository 는 어떤 요청에 따라 데이터를 반환, ViewModel 은 어떤 작업에 반응할지 결정.
 // TODO 앱에서 사용할 서비스 및 브로드캐스트 리시버 등록.
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
-
-
+class MainActivity : AppCompatActivity(
+) {
     private var binding: ActivityMainBinding? = null
     val viewModel by viewModels<MainViewModel>()
 
     private var weatherApiJob: Job? = null
     private var stationApiJob: Job? = null
     private lateinit var locationReceiver: LocationReceiver
-    private var locationService:LocationService? = null
+    private var locationService: LocationService? = null
     // Monitors the state of the connection to the service.
 
     private val serviceConnection = object : ServiceConnection {
@@ -51,6 +50,7 @@ class MainActivity : AppCompatActivity() {
 
         }
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
@@ -69,10 +69,10 @@ class MainActivity : AppCompatActivity() {
         val locationPermissionRequest = registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
         ) {
-           // viewModel.loadingIndicator = LoadingIndicator(this, "RestApi 데이터 읽어오는중....")
+            // viewModel.loadingIndicator = LoadingIndicator(this, "RestApi 데이터 읽어오는중....")
             val check = permissionCheck(this)
             if (check) {
-                viewModel.loadingIndicator!!.startLoadingIndicator()
+                //viewModel.loadingIndicator!!.startLoadingIndicator()
                 // 퍼미션이 허용되었으므로 서비스 실행
                 val requestIntent = Intent()
                 requestIntent.action = Common.REQUEST_LOCATION_INIT
@@ -93,7 +93,6 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-
     private fun setBottomMenuButtons() {
         // 홈프래그먼트를 기본프래그먼트로 설정
         val transaction = supportFragmentManager.beginTransaction()
@@ -106,7 +105,7 @@ class MainActivity : AppCompatActivity() {
 
         binding!!.buttonMaps.setOnClickListener {
             val transaction2 = supportFragmentManager.beginTransaction()
-            transaction2.replace(R.id.fragmentContainer, ParkMapsFragment()).commit()
+            transaction2.replace(R.id.fragmentContainer, MapsFragment()).commit()
         }
 
         binding!!.buttonSettings.setOnClickListener {

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="mapsViewModel"
+            type="com.example.walkingpark.presentation.viewmodels.MapsViewModel" />
+    </data>
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Fragment 에서 Map 을 띄우기 위해 MapView 필요-->
+        <com.google.android.gms.maps.MapView
+            android:id="@+id/mapFragment"
+            android:name="com.google.android.gms.maps.MapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/buttonToReturn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="본래 위치"
+            android:onClick="@{(view) -> mapsViewModel.setButtonEventHandler(view)}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/buttonZoomOut" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/buttonStartWorkout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="운동모드"
+            android:onClick="@{(view) -> mapsViewModel.setButtonEventHandler(view)}"
+            app:layout_constraintBottom_toTopOf="@+id/buttonPrintMarkers"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/buttonRemoveMarkers"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="마커 모두 지우기"
+            android:onClick="@{(view) -> mapsViewModel.setButtonEventHandler(view)}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/buttonPrintMarkers"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="마커 찍기"
+            android:onClick="@{(view) -> mapsViewModel.setButtonEventHandler(view)}"
+            app:layout_constraintBottom_toTopOf="@+id/buttonRemoveMarkers"
+            app:layout_constraintStart_toStartOf="parent" />
+
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/buttonZoomOut"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:onClick="@{(view) -> mapsViewModel.setButtonEventHandler(view)}"
+            android:text="-"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/buttonZoomIn"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:gravity="center"
+            android:onClick="@{(view) -> mapsViewModel.setButtonEventHandler(view)}"
+            android:text="+"
+            app:layout_constraintEnd_toStartOf="@+id/buttonZoomOut"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <FrameLayout
+            android:layout_width="50dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="16dp"
+            android:translationX="185dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/buttonChaseCamera">
+
+            <SeekBar
+                android:id="@+id/seekBarSearchScale"
+                android:layout_width="790dp"
+                android:layout_height="match_parent"
+                android:max="10"
+                android:progress="@{mapsViewModel.liveHolderSeekBar}"
+                android:onProgressChanged="@{mapsViewModel.onSeekBarChanged}"
+                android:rotation="270"
+                android:translationX="-375dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </FrameLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

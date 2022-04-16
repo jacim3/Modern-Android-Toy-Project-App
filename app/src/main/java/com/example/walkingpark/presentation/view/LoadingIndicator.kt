@@ -12,7 +12,7 @@ import com.example.walkingpark.R
 import com.example.walkingpark.constants.Common
 
 
-class LoadingIndicator(private val context: Context, private val text:String) {
+class LoadingIndicator(context: Context, private val text:String) {
 
     var dialog: AlertDialog
     var flag = "None"           // 특정 목적에 따라 다이얼로를 구분하기 위한 변수.

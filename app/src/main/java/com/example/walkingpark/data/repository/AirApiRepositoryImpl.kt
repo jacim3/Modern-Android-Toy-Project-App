@@ -3,7 +3,7 @@ package com.example.walkingpark.data.repository
 import com.example.walkingpark.data.source.api.PublicApiService
 import com.example.walkingpark.di.module.PublicDataApiModule
 import com.example.walkingpark.domain.AirApiRepository
-import com.example.walkingpark.domain.model.AirDTO
+import com.example.walkingpark.data.source.api.dto.AirDTO
 import javax.inject.Inject
 import javax.inject.Singleton
 
