@@ -5,10 +5,8 @@
 추후 소셜기능을 구현한다면, 이에 대한 고민이 조금 더 필요
 ## 개발 현황 : 
 1. Layered 앱 아키텍처 패턴에 맞추어 코드 리팩토링 및 Dagger-Hilt 를 통한 DI 패턴 적용 완료<br/><br/>
-2. 레트로핏2 를 통하여 다음의 공공데이터 포털 REST API 연동 미리 정의한 DTO 객체를 토대로 직렬화 수행 완료
-    1. <a href="https://www.data.go.kr/tcs/dss/selectApiDataDetailView.do?publicDataPk=15084084">기상청 단기예보 조회<a>
-    2. <a href="https://www.data.go.kr/tcs/dss/selectApiDataDetailView.do?publicDataPk=15073861">에어코리아 대기오렴 정보<a>
-    3. <a href="https://www.data.go.kr/tcs/dss/selectApiDataDetailView.do?publicDataPk=15073877">에어코리아 측정소 정보<a><br/><br/>
+2. 레트로핏2 를 통하여 다음의 공공데이터 포털 REST API 연동 미리 정의한 DTO 객체를 토대로 직렬화 수행 완료<br/><br/>
+    1. <a href="https://www.data.go.kr/tcs/dss/selectApiDataDetailView.do?publicDataPk=15084084">기상청 단기예보 조회<a> 2. <a href="https://www.data.go.kr/tcs/dss/selectApiDataDetailView.do?publicDataPk=15073861">에어코리아 대기오렴 정보<a> 3. <a href="https://www.data.go.kr/tcs/dss/selectApiDataDetailView.do?publicDataPk=15073877">에어코리아 측정소 정보<a><br/><br/>
 3. 위치 검색 및 지속적인 업데이트 작업을 수행하며 사용자에게 NoTfication 을 통한 UI를 제공할 Foreground Service 작성.<br/><br/>
     1. Activity 에서는 서비스 호출만 담당하며, LocationServiceRepository 에 정의된 비즈니스 로직이 포함된 메서드를 ViewModel 에서 호출하여 LiveData 를 업데이트 하는 방식<br/><br/>
     2. 위치정보 업데이트 등록에 필요한 FusedLocationProviderClient, LocationRequest 객체는 DI 모듈로 정의. LocationCallback 은 MainViewModel 에서 관리할 수 있도록 MainViewModel에서 lazy를 통한 초기화 수행 후 이를 LocationServiceRepository 에 Argument 로 전달하여 위치업데이트 로직을 수행.<br/><br/>
@@ -42,6 +40,5 @@
 - Dagger-hilt (DI)
 
 ## 추후 적용 예정 라이브러리 
-- Databinding ( 현재는 LivaData 에 대하여 간단한 lambda 를 통해 텍스트뷰에 출력. 추후, 고도화 작업 필요 )
 - Firebase Auth (회원 로그인 관련-> 추후 소셜 기능이 추가될 경우.)
 - Firebase FireStore (회원 데이터 저장-> 추후 소셜 기능이 추가될 경우)
