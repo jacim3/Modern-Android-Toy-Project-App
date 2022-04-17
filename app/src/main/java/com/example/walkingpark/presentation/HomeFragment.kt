@@ -10,6 +10,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.example.walkingpark.databinding.FragmentHomeBinding
 import com.example.walkingpark.presentation.service.LocationService
+import com.example.walkingpark.presentation.view.LoadingIndicator
 import com.example.walkingpark.presentation.viewmodels.HomeViewModel
 import com.example.walkingpark.presentation.viewmodels.MainViewModel
 import com.google.android.gms.maps.model.LatLng
@@ -17,9 +18,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-
-// TODO 1. 동네예보 Api 연동 -> x,y 구하는 방법에 대한 고민 필요.
-// TODO 미세먼지 정보를 가져오는 가장 쉬운 방법
+import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
@@ -30,11 +29,11 @@ class HomeFragment : Fragment() {
     프래그먼트끼리 뷰모델 공유 : private val viewModel: ManageLocationViewModel by viewModels({requireParentFragment()})
 */
 
-    private val mainViewModel: MainViewModel by activityViewModels()
     private val homeViewModel: HomeViewModel by viewModels()
     private var binding: FragmentHomeBinding? = null
-    private var isInit = true
-    private var isInit2 = true
+    private lateinit var loadingIndicator: LoadingIndicator
+    private var isUiInitialized = false
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -47,44 +46,33 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Log.e("homeFragment", mainViewModel.hashCode().toString())
 
-
+        loadingIndicator = LoadingIndicator(requireContext(), "RestApi 통신중...")
+        loadingIndicator.startLoadingIndicator()
         LocationService.userLocation.observe(viewLifecycleOwner) {
-
-            if (isInit) {
-                CoroutineScope(Dispatchers.Main).launch {
+            if (!isUiInitialized) {
+                isUiInitialized = true
+                CoroutineScope(Dispatchers.Default).launch {
                     it?.let { it1 ->
                         homeViewModel.startStationApi(it1)
-                       homeViewModel.startWeatherApi(it1)
-                        isInit = false
                     }
                 }
-            }
-        }
-
-        homeViewModel.userLiveHolderStation.observe(viewLifecycleOwner) {
-            if (isInit2) {
-                CoroutineScope(Dispatchers.Main).launch {
+                CoroutineScope(Dispatchers.Default).launch {
                     it?.let { it1 ->
-                        homeViewModel.startAirApi(it1.stationName)
-                        isInit2 = false
+                        homeViewModel.startWeatherApi(it1)
                     }
                 }
             }
         }
-    }
 
-
-    override fun onViewStateRestored(savedInstanceState: Bundle?) {
-        super.onViewStateRestored(savedInstanceState)
-        Log.e("HomeFragment()", "onViewStateRestored()")
+        homeViewModel.userLiveHolderLoadedStatus.observe(viewLifecycleOwner){
+            if (it["station"] == "success" && it["air"] == "success" && it["weather"] == "success")
+                loadingIndicator.dismissIndicator()
+        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
-        Log.e("HomeFragment()", "onDestroyView()")
     }
-
 }

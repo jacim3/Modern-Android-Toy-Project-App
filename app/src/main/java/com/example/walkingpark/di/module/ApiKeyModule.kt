@@ -14,7 +14,7 @@ import javax.inject.Qualifier
 object ApiKeyModule {
 
 
-    // Http 에 항상 감싸서 보내야 하는 RestApi 키
+    // 공공데이터 포털 Api Key
     @Provides
     fun providePublicApiKey(@ApplicationContext context:Context): String {
         try {

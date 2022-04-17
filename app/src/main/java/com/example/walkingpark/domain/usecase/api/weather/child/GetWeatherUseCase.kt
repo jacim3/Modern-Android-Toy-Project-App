@@ -1,6 +1,6 @@
 package com.example.walkingpark.domain.usecase.api.weather.child
 
-import com.example.walkingpark.domain.WeatherApiRepository
+import com.example.walkingpark.domain.repository.WeatherApiRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -12,7 +12,6 @@ class GetWeatherUseCase @Inject constructor(
 ) {
 
     suspend operator fun invoke(query: Map<String, String>) = withContext(defaultDispatcher) {
-
         weatherRepository.startWeatherApi(query)
     }
 }

@@ -1,4 +1,4 @@
-package com.example.walkingpark.data.tools
+package com.example.walkingpark.domain.model.tools
 
 var TO_GRID = 0        // 격자로 변환
 var TO_GPS = 1         // 위경도 변환

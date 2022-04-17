@@ -30,17 +30,14 @@ class MainActivity : AppCompatActivity(
     private var binding: ActivityMainBinding? = null
     val viewModel by viewModels<MainViewModel>()
 
-    private var weatherApiJob: Job? = null
-    private var stationApiJob: Job? = null
     private lateinit var locationReceiver: LocationReceiver
     private var locationService: LocationService? = null
-    // Monitors the state of the connection to the service.
 
     private val serviceConnection = object : ServiceConnection {
 
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
 
-            // 서비스 연결이 완료됨에 따라 MainViewModel 에 생성해 두었던 콜백 등록.
+            // TODO 여기에서 서비스에 Callback 을 인자로 전달하여, 위치 업데이트 이벤트를 처리할 수 있다.
             val binder = service as LocationService.LocalBinder
             locationService = binder.service
             // locationService?.getLocationCallback(viewModel.locationCallback)
@@ -89,9 +86,7 @@ class MainActivity : AppCompatActivity(
                 Manifest.permission.ACCESS_COARSE_LOCATION
             )
         )
-
     }
-
 
     private fun setBottomMenuButtons() {
         // 홈프래그먼트를 기본프래그먼트로 설정
@@ -123,7 +118,6 @@ class MainActivity : AppCompatActivity(
         val intent = Intent(this, LocationService::class.java)
         stopService(intent)
         unregisterReceiver(locationReceiver)
-
     }
 
     // 퍼미션이 허용되어 Intent 를 통하여 서비스를 실행할 지 아니면, 앱을 종료할지 체크

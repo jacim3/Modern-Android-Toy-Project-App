@@ -1,4 +1,4 @@
-package com.example.walkingpark.domain
+package com.example.walkingpark.domain.repository
 
 import android.location.Address
 import com.example.walkingpark.data.source.api.dto.StationDTO
@@ -8,15 +8,20 @@ import retrofit2.Response
 
 interface StationApiRepository {
 
+
+    fun extractQuery(addresses: List<Address>): Map<String, String>
+
     suspend fun startStationApi(
         query: Map<String, String>,
         latLng: LatLng
     ): Response<StationDTO>
 
-    fun extractQuery(addresses: List<Address>): Map<String, String>
+    fun handleResponse(response: Response<StationDTO>) :  List<StationDTO.Response.Body.Items>?
 
     fun extractNearStationByLatLng(
-        response: Response<StationDTO>,
+        items: List<StationDTO.Response.Body.Items>?,
         latLng: LatLng
     ): StationDTO.Response.Body.Items?
+
+
 }

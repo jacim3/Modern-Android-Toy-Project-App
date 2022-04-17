@@ -1,12 +1,8 @@
 package com.example.walkingpark.di.module
 
 import com.example.walkingpark.constants.Common
-import com.example.walkingpark.data.repository.AirApiRepositoryImpl
-import com.example.walkingpark.data.repository.StationApiRepositoryImpl
-import com.example.walkingpark.data.repository.WeatherApiRepositoryImpl
 import com.example.walkingpark.data.source.api.PublicApiService
 import com.example.walkingpark.data.source.api.UnsafeOkHttpClient
-import com.example.walkingpark.domain.StationApiRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,7 +12,6 @@ import kotlinx.coroutines.Dispatchers
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Qualifier
-import javax.inject.Singleton
 
 
 @Module
@@ -90,32 +85,6 @@ object PublicDataApiModule {
 
         return api
     }
-
-
-/*    @Singleton
-    @Provides
-    fun provideAirApiRepository(
-        apiKey: String,
-        @AirAPI
-        airApiService: PublicApiService
-    ) = AirApiRepositoryImpl(apiKey, airApiService)
-
-    @Singleton
-    @Provides
-    fun provideWeatherApiRepository(
-        apiKey: String,
-        @WeatherApi
-        weatherApiService: PublicApiService
-    ) = WeatherApiRepositoryImpl(apiKey, weatherApiService)
-
-    @Singleton
-    @Provides
-    fun provideStationApiRepository(
-        apiKey: String,
-        @StationAPI
-        stationApiService: PublicApiService,
-        ) = StationApiRepositoryImpl(apiKey, stationApiService)*/
-
 
     @Provides
     fun providesDefaultDispatcher(): CoroutineDispatcher = Dispatchers.Default

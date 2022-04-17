@@ -1,4 +1,4 @@
-package com.example.walkingpark.data.tools
+package com.example.walkingpark.domain.model.tools
 
 import android.graphics.PointF
 import kotlin.math.asin

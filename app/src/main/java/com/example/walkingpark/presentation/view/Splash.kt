@@ -8,10 +8,12 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.example.walkingpark.presentation.MainActivity
 import com.example.walkingpark.R
+import com.example.walkingpark.data.source.room.AppDatabase
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
 import java.lang.Exception
+import javax.inject.Inject
 
 
 @AndroidEntryPoint
@@ -63,13 +65,6 @@ class Splash : AppCompatActivity() {
     // TODO 체크 비즈니스 로직 작성
     private suspend fun moveToMainActivity() {
 
-/*        if (check == "DB 없음") {
-            Handler(Looper.getMainLooper()).post {
-                Toast.makeText(applicationContext, "최초 DB 생성이 완료되었습니다.", Toast.LENGTH_SHORT).show()
-            }
-        } else {
-            delay(1000)
-        }*/
         delay(2000)
         val intent = Intent(baseContext, MainActivity::class.java)
         startActivity(intent)

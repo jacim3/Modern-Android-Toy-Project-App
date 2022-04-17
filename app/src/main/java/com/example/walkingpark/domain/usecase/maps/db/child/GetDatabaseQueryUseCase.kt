@@ -1,7 +1,6 @@
 package com.example.walkingpark.domain.usecase.maps.db.child
 
-import com.example.walkingpark.data.repository.MapsRepositoryImpl
-import com.example.walkingpark.domain.MapsRepository
+import com.example.walkingpark.domain.repository.MapsRepository
 import com.google.android.gms.maps.model.LatLng
 import javax.inject.Inject
 

@@ -2,8 +2,10 @@ package com.example.walkingpark.data.repository
 
 import com.example.walkingpark.data.source.api.PublicApiService
 import com.example.walkingpark.di.module.PublicDataApiModule
-import com.example.walkingpark.domain.AirApiRepository
+import com.example.walkingpark.domain.repository.AirApiRepository
 import com.example.walkingpark.data.source.api.dto.AirDTO
+import retrofit2.Response
+import java.lang.Exception
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -14,15 +16,9 @@ class AirApiRepositoryImpl @Inject constructor(
     private val airApi: PublicApiService
 ): AirApiRepository {
 
-    private var responseAirApi: List<AirDTO.Response.Body.Items>? = null
+    override suspend fun startAirApi(query: Map<String, String>): Response<AirDTO> {
 
-    override suspend fun startAirApi(query: Map<String, String>): List<AirDTO.Response.Body.Items>? {
-
-        val response = airApi.getAirDataByStationName(apiKey, query)
-        if (response.isSuccessful) {
-            return response.body()?.response?.body?.items
-        }
-        return null
+        return  airApi.getAirDataByStationName(apiKey, query)
     }
 
     override fun extractQuery(stationName: String): Map<String, String> {
@@ -32,5 +28,12 @@ class AirApiRepositoryImpl @Inject constructor(
             this["dataTerm"] = "DAILY"
         }
         return queryMap
+    }
+
+    override fun handleResponse(response: Response<AirDTO>): List<AirDTO.Response.Body.Items>? {
+        try {
+            return response.body()?.response?.body?.items
+        } catch (e: Exception) { }
+        return null
     }
 }

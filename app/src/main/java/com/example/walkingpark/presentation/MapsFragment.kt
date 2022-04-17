@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
@@ -30,14 +31,10 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MapsFragment : Fragment(), OnMapReadyCallback {
 
-    private val mainViewModel: MainViewModel by activityViewModels()
+    // private val mainViewModel: MainViewModel by activityViewModels()
     private val mapsViewModel: MapsViewModel by viewModels()
     private var binding: FragmentMapsBinding? = null
     private lateinit var loadingIndicator: LoadingIndicator
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -54,24 +51,14 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        /*LoadingIndicator(requireActivity(), "지도정보 초기화 하는중...")
-    googleMapsRepository.loadingIndicator.startLoadingIndicator()*/
-
-
-/*        mainViewModel.userLiveHolderLatLng.observe(viewLifecycleOwner) {
-            //parkMapsViewModel.getParkData(it["위도"]!!, it["경도"]!!)
-        }*/
-
         loadingIndicator = LoadingIndicator(requireContext(), "지도 초기화중...")
-
-        mapsViewModel.liveHolderSeekBar.observe(viewLifecycleOwner) {
-            Log.e("eventTriggered !!!", it.toString())
-        }
+        loadingIndicator.startLoadingIndicator()
 
         LocationService.userLocation.observe(viewLifecycleOwner) {
             if (it != null) mapsViewModel.requestUserLocationUpdate(it)
         }
 
+        // LoadingIndicator 관련
         mapsViewModel.liveHolderIndicatorFlag.observe(viewLifecycleOwner){
            when(it[0]) {
                 "show" -> {
@@ -83,15 +70,6 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
                 }
            }
         }
-
-/*        mapsViewModel.myGoogleMap.observe(viewLifecycleOwner) {
-            mapsViewModel.onMapReady()
-        }*/
-    }
-
-    override fun onViewStateRestored(savedInstanceState: Bundle?) {
-        super.onViewStateRestored(savedInstanceState)
-        Log.e("ParkMapsFragment", "onViewStateRestored()")
     }
 
     override fun onStart() {

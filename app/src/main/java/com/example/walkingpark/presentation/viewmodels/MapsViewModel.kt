@@ -1,23 +1,22 @@
 package com.example.walkingpark.presentation.viewmodels
 
 import android.app.Application
-import android.graphics.Camera
 import android.graphics.Color
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
+import android.view.View.OnTouchListener
 import android.widget.SeekBar
-import androidx.databinding.ObservableField
+import androidx.databinding.BindingAdapter
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.walkingpark.R
-import com.example.walkingpark.constants.Common
 import com.example.walkingpark.constants.Settings
 import com.example.walkingpark.data.source.room.ParkDB
 import com.example.walkingpark.domain.model.MarkerItem
-import com.example.walkingpark.domain.usecase.maps.db.ParsingItemUseCase
+import com.example.walkingpark.domain.usecase.maps.db.normal.ParsingItemUseCase
 import com.example.walkingpark.domain.usecase.maps.db.parent.ResultDataBaseUseCase
-import com.example.walkingpark.presentation.view.LoadingIndicator
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.*
@@ -28,6 +27,7 @@ import javax.inject.Inject
 import kotlin.math.PI
 import kotlin.math.sqrt
 
+// SocketTimeoutException
 @HiltViewModel
 class MapsViewModel @Inject constructor(
     application: Application,
@@ -35,13 +35,16 @@ class MapsViewModel @Inject constructor(
     private val resultDataBaseUseCase: ResultDataBaseUseCase
 ) : AndroidViewModel(application) {
 
+    lateinit var onTouchListener : View.OnTouchListener
     val liveHolderParkData = MutableLiveData<List<ParkDB>>()
-    val liveHolderSeekBar = MutableLiveData<Int>()
+    val liveHolderSeekBar = MutableLiveData<Int>().apply {
+        this.postValue(3)
+    }
     val liveHolderMapsZoomLevel = MutableLiveData<Double>()
     val liveHolderIndicatorFlag = MutableLiveData<Array<String>>()
 
-    var userMarker: Marker? = null
-    var userMarkerCircle: Circle? = null
+    private var userMarker: Marker? = null
+    private var userMarkerCircle: Circle? = null
 
     lateinit var userLatLng: LatLng
 
@@ -49,108 +52,33 @@ class MapsViewModel @Inject constructor(
     var parkMarkerCircle: Circle? = null
     lateinit var myGoogleMap: GoogleMap
 
-    private var isButtonZoomInClicked = false
-    private var isButtonZoomOutClicked = false
-
-    private var isButtonRemoveMarkerClicked = false
-    private var isButtonAddMarkerClicked = false
-
-    private var isButtonReturnClicked = false
-    private var isButtonWorkoutClicked = false
-
     private var mapsUpdateCount = 0
-
-
-    val myLocationLatLng = ObservableField<LatLng>()
-    val otherLocationsLatLng = ObservableField<MutableList<LatLng>>()
-
     private var isOnMapReadyCalled = false
 
     lateinit var clusterManager: ClusterManager<MarkerItem>
-    private var markerCircleClusterItem: Circle? = null
 
 
-    // TODO 초기에는 사용자의 위치는 계속 업데이트 해 줄것 -> 지도 정보를 계속 업데이트 하여 정확도를 높이는 방식인듯 함.
     fun requestUserLocationUpdate(latLng: LatLng) {
 
         if (!isOnMapReadyCalled) return
 
         mapsUpdateCount++
+        userLatLng = latLng
 
-        userMarkerCircle?.remove()
-        drawMarkerCircle("사용자", latLng, liveHolderSeekBar.value?.times(1000.0) ?: 1000.0)
-
-        if (isButtonAddMarkerClicked) {
-
-            isButtonAddMarkerClicked = false
-            liveHolderIndicatorFlag.value = arrayOf("show", "마커 추가...")
-
-            myGoogleMap.setOnCameraIdleListener(clusterManager)
-
-            var response = emptyList<ParkDB>()
-            var mult = 0
-            var responseMap = HashMap<String, Any>()
-            viewModelScope.launch {
-                while (response.isEmpty()) {
-                    mult ++
-                    responseMap =
-                        liveHolderSeekBar.value?.let { resultDataBaseUseCase(latLng, it, mult) }!!
-                }
-                response = responseMap["response"] as List<ParkDB>
-                liveHolderSeekBar.value = responseMap["mult"] as Int
-
-                response.forEach {
-                    clusterManager.addItem(parsingItemUseCase(it))
-                }
-                clusterManager.cluster()
-                liveHolderIndicatorFlag.value = arrayOf("dismiss", "")
-            }
-        }
-
-        if (isButtonRemoveMarkerClicked) {
-
-            isButtonRemoveMarkerClicked = false
-            liveHolderIndicatorFlag.value = arrayOf("show", "마커삭제...")
-
-            clusterManager.removeItems(clusterManager.algorithm.items)
-            viewModelScope.launch {
-                clusterManager.cluster()
-                liveHolderIndicatorFlag.value = arrayOf("dismiss", "")
-            }
-        }
-
-        if (isButtonZoomInClicked) {
-            isButtonZoomInClicked = false
-            myGoogleMap.moveCamera(CameraUpdateFactory.zoomIn())
-        }
-
-        if (isButtonZoomOutClicked) {
-            isButtonZoomOutClicked = false
-            myGoogleMap.moveCamera(CameraUpdateFactory.zoomOut())
-        }
+        drawMarkerCircle("사용자", latLng, liveHolderSeekBar.value!!.times(1000.0))
 
         myGoogleMap.apply {
             userMarker?.remove()
             userMarker = addMarker(setUserLocationMarker(latLng))
         }
 
-        myGoogleMap.moveCamera(
-            CameraUpdateFactory.newLatLng(
-                LatLng(
-                    latLng.latitude,
-                    latLng.longitude
-                )
-            )
-        )
-
-        if (isButtonReturnClicked|| mapsUpdateCount <= 3) {
-            isButtonReturnClicked = false
+        if (mapsUpdateCount <= 2) {
             clusterManager.cluster()
             myGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng))
             myGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(Settings.GOOGLE_MAPS_ZOOM_LEVEL_DEFAULT))     // min:2f max:21f
 
             if (mapsUpdateCount == 2) {
-                liveHolderIndicatorFlag.value = arrayOf("dismiss", "")
+                setLoadingIndicator("dismiss", "")
             }
         }
     }
@@ -161,9 +89,13 @@ class MapsViewModel @Inject constructor(
         setMarkerClustering()
     }
 
-    // ---------------------------------------------------------------------------------------------
-    // -------------------------------------- private Methods --------------------------------------
-    // ---------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+// ---------------------------------------- private Methods ----------------------------------------
+// -------------------------------------------------------------------------------------------------
+
+    private fun setLoadingIndicator(command: String, text: String) {
+        liveHolderIndicatorFlag.value = arrayOf(command, text)
+    }
 
     private fun setUserLocationMarker(latLng: LatLng): MarkerOptions {
         val markerOptions = MarkerOptions()
@@ -171,7 +103,7 @@ class MapsViewModel @Inject constructor(
         markerOptions.title("내 위치")
         markerOptions.snippet("TODO 주소")
         markerOptions.draggable(true)
-        // markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
         return markerOptions
     }
 
@@ -181,11 +113,11 @@ class MapsViewModel @Inject constructor(
         myGoogleMap.setOnCameraIdleListener(clusterManager)
 
         clusterManager.setOnClusterItemClickListener {
-            markerCircleClusterItem?.remove()
+            parkMarkerCircle?.remove()
 
             // 각각의 마커정보에 대하여 DB 에서 제공하는 면적 정보를 가져와, 반지름으로 변환.
             ////TODO USECASE
-            markerCircleClusterItem = myGoogleMap.addCircle(CircleOptions().apply {
+            parkMarkerCircle = myGoogleMap.addCircle(CircleOptions().apply {
                 val latLng =
                     center(LatLng(it.position.latitude, it.position.longitude))
                 radius(sqrt(it.size / PI))
@@ -202,9 +134,15 @@ class MapsViewModel @Inject constructor(
                     )
                 )
             )
-/*            googleMap.animateCamera(CameraUpdateFactory.zoomTo(Settings.GOOGLE_MAPS__ZOOM_LEVEL_HIGH))
-            clusterManager.clusterMarkerCollection.markers.*/
             false
+        }
+
+        myGoogleMap.setOnMapClickListener {
+            parkMarkerCircle?.remove()
+        }
+
+        myGoogleMap.setOnMapLongClickListener {
+
         }
     }
 
@@ -217,12 +155,14 @@ class MapsViewModel @Inject constructor(
         // TODO 추후 커스터마이징
         when (request) {
             "사용자" -> {
+                userMarkerCircle?.remove()
+
                 val options = CircleOptions().apply {
                     center(latLng)
                     radius(scale)
                     strokeColor(Color.RED)
                 }
-                // markerCircleUserLocation = googleMap.addCircle(options)
+                userMarkerCircle = myGoogleMap.addCircle(options)
             }
             "공원" -> {
                 val options = CircleOptions().apply {
@@ -230,56 +170,135 @@ class MapsViewModel @Inject constructor(
                     radius(scale)
                     strokeColor(Color.RED)
                 }
-                //circleRadiusClickedItem = googleMap.addCircle(options)
+                userMarkerCircle = myGoogleMap.addCircle(options)
             }
         }
     }
 
-    // ---------------------------------------------------------------------------------------------
-    // -------------------------------------- 데이터 바인딩 관련 --------------------------------------
-    // ---------------------------------------------------------------------------------------------
+    private suspend fun addMarkers() {
 
+        setLoadingIndicator("show", "마커추가...")
+
+        if (clusterManager.algorithm.items.isNotEmpty()) {
+            clusterManager.removeItems(clusterManager.algorithm.items)
+        }
+
+        myGoogleMap.setOnCameraIdleListener(clusterManager)
+
+        var response = emptyList<ParkDB>()
+        var mult = 0
+        var responseMap = HashMap<String, Any>()
+
+        while (responseMap.isNullOrEmpty()) {
+            mult++
+            responseMap =
+                liveHolderSeekBar.value?.let {
+                    resultDataBaseUseCase(
+                        userLatLng,
+                        it,
+                        mult
+                    )
+                }!!
+        }
+
+        response = responseMap["response"] as List<ParkDB>
+        liveHolderSeekBar.value = responseMap["mult"] as Int
+
+        response.forEach {
+            clusterManager.addItem(parsingItemUseCase(it))
+        }
+        clusterManager.cluster()
+        setLoadingIndicator("dismiss", "")
+    }
+
+
+    private fun removeMarkers() {
+        setLoadingIndicator("show", "마커삭제...")
+
+        if (clusterManager.algorithm.items.isNotEmpty()) {
+            clusterManager.removeItems(clusterManager.algorithm.items)
+        }
+        clusterManager.cluster()
+        setLoadingIndicator("dismiss", "")
+    }
+
+// -------------------------------------------------------------------------------------------------
+// ----------------------------------------- DataBinding -------------------------------------------
+// -------------------------------------------------------------------------------------------------
+
+    // 버튼 클릭 핸들러
     fun setButtonEventHandler(view: View) {
         when (view.id) {
+
             R.id.buttonPrintMarkers -> {
-                isButtonAddMarkerClicked = true
+                viewModelScope.launch {
+                    addMarkers()
+                }
             }
 
             R.id.buttonRemoveMarkers -> {
-                clusterManager.removeItems(clusterManager.algorithm.items)
-                clusterManager.cluster()
-                isButtonRemoveMarkerClicked = true
+                removeMarkers()
             }
 
             R.id.buttonToReturn -> {
-                isButtonReturnClicked = true
+                try {
+                    myGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(userLatLng))
+                } catch (e: UninitializedPropertyAccessException) {
+                }
+                myGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(Settings.GOOGLE_MAPS_ZOOM_LEVEL_DEFAULT))
             }
 
             R.id.buttonZoomIn -> {
 
-                isButtonZoomInClicked = true
+                var currentZoom = myGoogleMap.cameraPosition.zoom + 1f
+
+                if (currentZoom >= myGoogleMap.maxZoomLevel)
+                    currentZoom = myGoogleMap.maxZoomLevel
                 clusterManager.cluster()
-                myGoogleMap.moveCamera(
-                    CameraUpdateFactory.newLatLng(
-                        LatLng(
-                            userLatLng.latitude,
-                            userLatLng.longitude
-                        )
-                    )
-                )
+                myGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(currentZoom))
             }
 
             R.id.buttonZoomOut -> {
-                isButtonZoomOutClicked = true
+                var currentZoom = myGoogleMap.cameraPosition.zoom - 1f
+
+                if (currentZoom <= myGoogleMap.minZoomLevel)
+                    currentZoom = myGoogleMap.minZoomLevel
+                clusterManager.cluster()
+                myGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(currentZoom))
             }
 
             R.id.buttonStartWorkout -> {
-                isButtonWorkoutClicked = true
+
             }
         }
     }
 
     fun onSeekBarChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
         liveHolderSeekBar.value = progress
+
+        try {
+            drawMarkerCircle("사용자", userLatLng, progress * 1000.0)
+        } catch (e: UninitializedPropertyAccessException) {
+
+        }
+
+        if (clusterManager.algorithm.items.isNotEmpty()) {
+            removeMarkers()
+            viewModelScope.launch {
+                addMarkers()
+            }
+        }
+    }
+
+    fun onTouchListener(view:View, event: MotionEvent): Boolean {
+        when (event.action) {
+            MotionEvent.ACTION_DOWN -> {
+                Log.e("actionDown", "actionDown")
+            }
+            MotionEvent.ACTION_UP -> {
+                Log.e("actionDown", "actionDown")
+            }
+        }
+        return true
     }
 }

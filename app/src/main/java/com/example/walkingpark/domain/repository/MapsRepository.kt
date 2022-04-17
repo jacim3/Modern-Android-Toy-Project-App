@@ -1,4 +1,4 @@
-package com.example.walkingpark.domain
+package com.example.walkingpark.domain.repository
 
 import com.example.walkingpark.data.source.room.ParkDB
 import com.example.walkingpark.domain.model.MarkerItem

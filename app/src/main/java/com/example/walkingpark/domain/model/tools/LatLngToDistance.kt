@@ -1,4 +1,4 @@
-package com.example.walkingpark.data.tools
+package com.example.walkingpark.domain.model.tools
 
 import kotlin.math.acos
 import kotlin.math.cos

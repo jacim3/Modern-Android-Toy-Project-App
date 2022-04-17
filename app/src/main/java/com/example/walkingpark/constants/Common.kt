@@ -12,12 +12,6 @@ object Common {
     const val DESC_TITLE_LOCATION_NOTIFICATION = "위치 추적"
     const val DESC_TEXT_LOCATION_NOTIFICATION = "사용자의 위치를 확인합니다."
 
-    // LoadingIndicator 의 텍스트
-    const val LOADING_INDICATOR_TEXT_DESC_LOADING_API = ""
-    const val LOADING_INDICATOR_TEXT_DESC_LOADING_MAPS = ""
-    const val LOADING_INDICATOR_TEXT_DESC_SEARCH_MAPS = ""
-    const val LOADING_INDICATOR_TEXT_DESC_= ""
-
     const val REQUEST_ACTION_UPDATE = "REQUEST_ACTION_UPDATE"
     const val REQUEST_ACTION_PAUSE = "REQUEST_ACTION_PAUSE"
     const val ACCEPT_ACTION_UPDATE = "ACCEPT_ACTION_UPDATE"
@@ -33,42 +27,40 @@ object Common {
     const val LOCATION_SETTINGS = 3
 
     const val BASE_URL_API_AIR = "https://apis.data.go.kr/B552584/ArpltnInforInqireSvc/"
+    const val REQUEST_PATH_AIR_API = "getMsrstnAcctoRltmMesureDnsty"
+
     const val BASE_URL_API_STATION = "https://apis.data.go.kr/B552584/MsrstnInfoInqireSvc/"
+    const val REQUEST_PATH_STATION_API = "getMsrstnList"
+
     const val BASE_URL_API_WEATHER = "https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/"
+    const val REQUEST_PATH_WEATHER_API = "getVilageFcst"
 
     const val LOADING_INDICATOR_DISMISS_TIME = 500
+
+    const val REST_API_DATE_UNIT_FORMAT =  "yyyyMMdd"
+    const val REST_API_TIME_UNIT_FORMAT =  "HHmm"
 }
 
 /**
 *   앱 설정값 관련 상수 설정 클래스
 **/
 object Settings {
-    const val LOCATION_UPDATE_INTERVAL: Long = 1000             // 위치 업데이트 간격
-    const val LOCATION_UPDATE_INTERVAL_FASTEST: Long = 1000     // 위치 업데이트 간격(빠른)
-    const val LOCATION_ADDRESS_SEARCH_COUNT = 5                 // 현재 위치 LatLng 에 대한 주소 검색 개수
-    const val LOCATION_SEARCH_RADIUS = 125.0                    // 위치 검색 반경. 다시 검색할때 해당 수치만큼 증가.
+    private const val SECOND: Long = 1000
+    private const val MINUTE: Long = SECOND * 60
+    private const val HOUR: Long = SECOND * 60
 
-    const val GOOGLE_MAPS_PARK_MARKERS_REFRESH_INTERVAL = 50000 // DB 를 통하여 데이터를 쿼리할 간격 -> 5분
+    private const val KILO_METER:Long = 1000
 
-    const val AIR_API_REFRESH_INTERVAL = 5*60*1000                  // 미세먼지 5분마다 refresh
-    const val STATION_API_REFRESH_INTERVAL = 100000              // 측정소 5분마다 refresh
-    const val WEATHER_API_REFRESH_INTERVAL = 100000              // 측정소 5분마다 refresh
+    const val LOCATION_UPDATE_INTERVAL: Long = SECOND * 2       // 위치 업데이트 간격
+    const val LOCATION_UPDATE_INTERVAL_FASTEST: Long = SECOND   // 위치 업데이트 간격(빠른)
+    const val LOCATION_ADDRESS_SEARCH_COUNT = 5                 // GeoCoding 을 통한 위치 텍스트 검색 갯수
 
-    // Google Maps 에서 적용할 레벨 0(min) ~ 21(max)
+    const val REST_API_REFRESH_INTERVAL = 5 * MINUTE
+
+    // Google Maps 에 임의로 정의한, Zoom 레벨 상수. 0(min) ~ 21(max)
     const val GOOGLE_MAPS_ZOOM_LEVEL_VERY_LOW = 20f
     const val GOOGLE_MAPS_ZOOM_LEVEL_LOW = 17f
     const val GOOGLE_MAPS_ZOOM_LEVEL_DEFAULT = 14f
     const val GOOGLE_MAPS_ZOOM_LEVEL_HIGH = 11f
     const val GOOGLE_MAPS_ZOOM_LEVEL_VERY_HIGH = 8f
-}
-
-/**
-*   비즈니스 로직 수행 관련 상수값 저장 클래스
-*
-**/
-object Logic {
-    const val TIMEOUT_COUNT = 10000         // 데이터를 요청할 시간
-    const val SEARCH_LAT_AREA = 0.0025       // 1도 = 대략 110.569km
-    const val SEARCH_LNG_AREA = 0.01        // 1도 = 대략 111.322km
-    const val SEARCH_AREA_KM = 1.0          // 현재 위치 기준
 }

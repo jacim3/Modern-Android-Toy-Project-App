@@ -15,22 +15,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!-- Fragment 에서 Map 을 띄우기 위해 MapView 필요-->
-        <com.google.android.gms.maps.MapView
-            android:id="@+id/mapFragment"
-            android:name="com.google.android.gms.maps.MapFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/buttonToReturn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
             android:layout_marginTop="16dp"
-            android:text="본래 위치"
             android:onClick="@{(view) -> mapsViewModel.setButtonEventHandler(view)}"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/buttonZoomOut" />
+            android:text="본래 위치"
+            app:layout_constraintEnd_toStartOf="@+id/buttonZoomIn"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/buttonStartWorkout"
@@ -91,15 +85,15 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/buttonChaseCamera">
+            app:layout_constraintTop_toBottomOf="@+id/buttonZoomOut">
 
             <SeekBar
                 android:id="@+id/seekBarSearchScale"
                 android:layout_width="790dp"
                 android:layout_height="match_parent"
                 android:max="10"
-                android:progress="@{mapsViewModel.liveHolderSeekBar}"
                 android:onProgressChanged="@{mapsViewModel.onSeekBarChanged}"
+                android:progress="@{mapsViewModel.liveHolderSeekBar}"
                 android:rotation="270"
                 android:translationX="-375dp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -107,6 +101,13 @@
                 app:layout_constraintTop_toTopOf="parent" />
         </FrameLayout>
 
+        <!-- Fragment 에서 Map 을 띄우기 위해 MapView 필요-->
+        <com.google.android.gms.maps.MapView
+            android:id="@+id/mapFragment"
+            android:name="com.google.android.gms.maps.MapFragment"
+            app:onTouchListener="@{mapsViewModel.onTouchListener}"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
