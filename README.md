@@ -12,9 +12,9 @@
 ### FusedLocationProvider 를 통한 GPS 를 통하여 위치정보를 읽어옴으로써, 아래의 DataSource 로 부터 데이터를 제공받아 처리합니다.  
 #### 1. Retrofit2 을 통하여 아래의 Api 통신을 수행하고 결과 리턴.
 #### 2. 사용자의 좌표 기반으로 RoomDatabase 의 Query를 통한 데이터 검색 후 이를 Google Map 에 출력. 
-- Dagger-Hilt 를 통한 의존성 주입 및 클린 아키텍쳐 패턴을 기반으로 작성한 코드를 리팩토링 하였습니다.
+- 기존의 작성한 코드를 Dagger-Hilt 를 통한 의존성 주입과 클린 아키텍쳐 패턴을 기반으로 리팩토링 하였습니다. 
 <img width="221" alt="화면 캡처 2022-04-18 140857" src="https://user-images.githubusercontent.com/60813834/163760069-fabe6390-475f-4412-af0a-7b134d2227da.png">
-- local.properties 파일 내 Google Api Key 및 Public Api Key 가 있어야 앱 실행이 가능합니다.
+- 앱 실행은 local.properties 파일 내 Google Api Key 및 Public Api Key 가 있어야 합니다. 
     
 ## 앞으로 해야할 일: 
 1. 앱의 디자인 및 운동기능 관련 UI 및 기능 설계
