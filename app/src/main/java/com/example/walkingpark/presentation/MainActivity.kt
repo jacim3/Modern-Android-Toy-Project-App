@@ -20,10 +20,7 @@ import com.example.walkingpark.presentation.viewmodels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 
-// TODO 사용자 상호작용에 따른 모든것은 Repository 에서 수행되어선 안된다.
-// TODO ViewModel 은 사용자 작업을 처리하고 UI 와 데이터를 모두 통합하는 역할을 수행
-// TODO Repository 는 어떤 요청에 따라 데이터를 반환, ViewModel 은 어떤 작업에 반응할지 결정.
-// TODO 앱에서 사용할 서비스 및 브로드캐스트 리시버 등록.
+// TODO 퍼미션을 체크하고, 위치정보 획득을 위한 서비스
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(
 ) {
@@ -33,8 +30,9 @@ class MainActivity : AppCompatActivity(
     private lateinit var locationReceiver: LocationReceiver
     private var locationService: LocationService? = null
 
+    // 서비스가 완료되었을 때, 수행되는 콜백
+    // TODO 여기서 서비스가 완료되었을 때,
     private val serviceConnection = object : ServiceConnection {
-
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
 
             // TODO 여기에서 서비스에 Callback 을 인자로 전달하여, 위치 업데이트 이벤트를 처리할 수 있다.
@@ -44,7 +42,6 @@ class MainActivity : AppCompatActivity(
         }
 
         override fun onServiceDisconnected(name: ComponentName) {
-
         }
     }
 
@@ -132,7 +129,7 @@ class MainActivity : AppCompatActivity(
                 context,
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
-        ) // 퍼미션이 허용되지 않음 -> 종료
+        )
         {
             return false
         }
@@ -147,36 +144,5 @@ class MainActivity : AppCompatActivity(
             serviceConnection,
             Context.BIND_AUTO_CREATE
         )
-    }
-
-    // TODO 서비스는 ViewModel 에서 실행하는것을 지양하므로, 액티비티에서 실행 !!!
-    // 위치정보를 받기 이전, 최초 서비스 시작 요청 메서드
-    private fun startParkMapsService(context: Context) {
-
-        val serviceConnection: ServiceConnection = object : ServiceConnection {
-            // 1. 서비스 연결 관련 콜백 등록
-            override fun onServiceConnected(
-                name: ComponentName,
-                service: IBinder
-            ) {
-                // 서비스와 연결되었을 때 호출되는 메서드
-                // 서비스 객체를 전역변수로 저장
-                //parkMapsService = viewModel.getParkMapsService(service)
-                //isParkMapsServiceRunning = true
-
-                // 서비스에서 작업이 완료됨에 따라, 서비스로부터 결과를 수신받을 리시버 등록
-
-            }
-
-            override fun onServiceDisconnected(name: ComponentName) {
-                // 서비스와 연결이 끊겼을 때 호출되는 메서드
-                //isParkMapsServiceRunning = false
-                Toast.makeText(
-                    context,
-                    "위치 서비스 연결 해제됨",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-        }
     }
 }

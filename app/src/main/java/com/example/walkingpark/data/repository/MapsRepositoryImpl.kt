@@ -108,6 +108,6 @@ class MapsRepositoryImpl @Inject constructor(
     // TODO 추후 기능 확장 예정
     // 읽어온 DB 리스트에서 튜플 하나에 대한 데이터를 Marker 데이터로 파싱하기 위한 메서드.
     override fun parsingDatabaseItem(it: ParkDB): MarkerItem {
-        return MarkerItemMapper.itemToMarker(it)
+        return MarkerItemMapper.itemToMapper(it)
     }
 }

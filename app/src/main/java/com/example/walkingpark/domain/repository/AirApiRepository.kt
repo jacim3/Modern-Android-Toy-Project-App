@@ -1,7 +1,6 @@
 package com.example.walkingpark.domain.repository
 
-import com.example.walkingpark.data.source.api.dto.AirDTO
-import com.example.walkingpark.data.source.api.dto.WeatherDTO
+import com.example.walkingpark.domain.model.AirDTO
 import retrofit2.Response
 
 

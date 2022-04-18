@@ -65,6 +65,7 @@ class HomeFragment : Fragment() {
             }
         }
 
+        // 모든 데이터를 성공적으로 읽어오면 다이얼로그 종료
         homeViewModel.userLiveHolderLoadedStatus.observe(viewLifecycleOwner){
             if (it["station"] == "success" && it["air"] == "success" && it["weather"] == "success")
                 loadingIndicator.dismissIndicator()

@@ -1,7 +1,7 @@
 package com.example.walkingpark.domain.usecase.api.station.child
 
 import com.example.walkingpark.domain.repository.StationApiRepository
-import com.example.walkingpark.data.source.api.dto.StationDTO
+import com.example.walkingpark.domain.model.StationDTO
 import com.google.android.gms.maps.model.LatLng
 import javax.inject.Inject
 /**

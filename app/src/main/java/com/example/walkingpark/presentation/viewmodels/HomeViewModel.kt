@@ -3,16 +3,13 @@ package com.example.walkingpark.presentation.viewmodels
 import android.app.Application
 import android.location.Address
 import android.location.Geocoder
-import android.util.Log
-import androidx.databinding.ObservableField
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.walkingpark.constants.Settings
-import com.example.walkingpark.data.source.api.dto.AirDTO
-import com.example.walkingpark.data.source.api.dto.StationDTO
-import com.example.walkingpark.data.source.api.dto.WeatherDTO
+import com.example.walkingpark.domain.model.AirDTO
+import com.example.walkingpark.domain.model.StationDTO
+import com.example.walkingpark.domain.model.WeatherDTO
 import com.example.walkingpark.domain.usecase.api.air.parent.ResultAirUseCase
 import com.example.walkingpark.domain.usecase.api.station.parent.ResultStationUseCase
 import com.example.walkingpark.domain.usecase.api.weather.parent.ResultWeatherUseCase
@@ -49,7 +46,6 @@ class HomeViewModel @Inject constructor(
     }
 
     suspend fun startStationApi(latLng: LatLng) {
-
         viewModelScope.launch {
             val response = stationUseCase(getGeocoding(latLng), latLng)
             response?.let {

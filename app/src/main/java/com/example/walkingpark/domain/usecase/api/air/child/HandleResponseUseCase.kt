@@ -1,6 +1,6 @@
 package com.example.walkingpark.domain.usecase.api.air.child
 
-import com.example.walkingpark.data.source.api.dto.AirDTO
+import com.example.walkingpark.domain.model.AirDTO
 import com.example.walkingpark.domain.repository.AirApiRepository
 import retrofit2.Response
 import javax.inject.Inject

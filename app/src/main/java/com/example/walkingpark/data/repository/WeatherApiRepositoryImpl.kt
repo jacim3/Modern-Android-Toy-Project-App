@@ -7,11 +7,10 @@ import com.example.walkingpark.data.source.api.PublicApiService
 import com.example.walkingpark.domain.model.tools.LatLngToGridXy
 import com.example.walkingpark.di.module.PublicDataApiModule
 import com.example.walkingpark.domain.repository.WeatherApiRepository
-import com.example.walkingpark.data.source.api.dto.WeatherDTO
+import com.example.walkingpark.domain.model.WeatherDTO
 import com.google.android.gms.maps.model.LatLng
 import retrofit2.Response
 import java.lang.Exception
-import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject

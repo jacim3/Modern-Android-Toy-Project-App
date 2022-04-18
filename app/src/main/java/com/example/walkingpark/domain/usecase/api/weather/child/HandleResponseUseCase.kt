@@ -1,6 +1,6 @@
 package com.example.walkingpark.domain.usecase.api.weather.child
 
-import com.example.walkingpark.data.source.api.dto.WeatherDTO
+import com.example.walkingpark.domain.model.WeatherDTO
 import com.example.walkingpark.domain.repository.WeatherApiRepository
 import retrofit2.Response
 import javax.inject.Inject

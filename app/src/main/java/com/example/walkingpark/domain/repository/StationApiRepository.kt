@@ -1,7 +1,7 @@
 package com.example.walkingpark.domain.repository
 
 import android.location.Address
-import com.example.walkingpark.data.source.api.dto.StationDTO
+import com.example.walkingpark.domain.model.StationDTO
 import com.google.android.gms.maps.model.LatLng
 import retrofit2.Response
 

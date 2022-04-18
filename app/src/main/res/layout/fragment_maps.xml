@@ -15,6 +15,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+
+        <!-- Fragment 에서 Map 을 띄우기 위해 MapView 필요-->
+        <com.google.android.gms.maps.MapView
+            android:id="@+id/mapFragment"
+            android:name="com.google.android.gms.maps.MapFragment"
+            app:onTouchListener="@{mapsViewModel.onTouchListener}"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/buttonToReturn"
             android:layout_width="wrap_content"
@@ -101,13 +110,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
         </FrameLayout>
 
-        <!-- Fragment 에서 Map 을 띄우기 위해 MapView 필요-->
-        <com.google.android.gms.maps.MapView
-            android:id="@+id/mapFragment"
-            android:name="com.google.android.gms.maps.MapFragment"
-            app:onTouchListener="@{mapsViewModel.onTouchListener}"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

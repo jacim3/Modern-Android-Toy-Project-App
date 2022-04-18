@@ -5,7 +5,7 @@ import com.example.walkingpark.domain.model.MarkerItem
 
 object MarkerItemMapper {
 
-    fun itemToMarker(it: ParkDB) : MarkerItem{
+    fun itemToMapper(it: ParkDB) : MarkerItem{
 //        val parkAddress = it.addressDoro ?: it.addressJibun
 //        val phoneNumber = it.phoneNumber ?: "전화번호 없음"
 //        val parkSize = it.parkSize ?: 0.0

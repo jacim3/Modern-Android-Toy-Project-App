@@ -3,7 +3,7 @@ package com.example.walkingpark.data.repository
 import com.example.walkingpark.data.source.api.PublicApiService
 import com.example.walkingpark.di.module.PublicDataApiModule
 import com.example.walkingpark.domain.repository.AirApiRepository
-import com.example.walkingpark.data.source.api.dto.AirDTO
+import com.example.walkingpark.domain.model.AirDTO
 import retrofit2.Response
 import java.lang.Exception
 import javax.inject.Inject
@@ -17,17 +17,16 @@ class AirApiRepositoryImpl @Inject constructor(
 ): AirApiRepository {
 
     override suspend fun startAirApi(query: Map<String, String>): Response<AirDTO> {
-
         return  airApi.getAirDataByStationName(apiKey, query)
     }
 
     override fun extractQuery(stationName: String): Map<String, String> {
-        val queryMap = HashMap<String, String>().apply {
-            this["returnType"] = "json"
-            this["stationName"] = stationName
-            this["dataTerm"] = "DAILY"
-        }
-        return queryMap
+
+        return mapOf(
+            Pair("returnType", "json"),
+            Pair("stationName", stationName),
+            Pair("dataTerm", "daily")
+        )
     }
 
     override fun handleResponse(response: Response<AirDTO>): List<AirDTO.Response.Body.Items>? {
