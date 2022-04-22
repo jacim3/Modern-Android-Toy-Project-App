@@ -94,8 +94,6 @@ class MapsRepositoryImpl @Inject constructor(
             query["endLongitude"]!!,
         )
 
-        Log.e("query2 : " , response.toString())
-
         val returnMap = HashMap<String, Any>().apply {
             this["mult"] = query["adjustValue"]!!.toInt()  // 검색 범위 (mult * 1000m) 의 mult 값
             this["response"] = response                    // 보통의 DB 응답 결과

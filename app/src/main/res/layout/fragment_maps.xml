@@ -20,7 +20,6 @@
         <com.google.android.gms.maps.MapView
             android:id="@+id/mapFragment"
             android:name="com.google.android.gms.maps.MapFragment"
-            app:onTouchListener="@{mapsViewModel.onTouchListener}"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 

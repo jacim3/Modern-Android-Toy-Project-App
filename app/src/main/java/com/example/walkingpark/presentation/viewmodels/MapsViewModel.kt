@@ -35,7 +35,6 @@ class MapsViewModel @Inject constructor(
     private val resultDataBaseUseCase: ResultDataBaseUseCase
 ) : AndroidViewModel(application) {
 
-    lateinit var onTouchListener : View.OnTouchListener
     val liveHolderParkData = MutableLiveData<List<ParkDB>>()
     val liveHolderSeekBar = MutableLiveData<Int>().apply {
         this.postValue(3)
@@ -116,7 +115,6 @@ class MapsViewModel @Inject constructor(
             parkMarkerCircle?.remove()
 
             // 각각의 마커정보에 대하여 DB 에서 제공하는 면적 정보를 가져와, 반지름으로 변환.
-            ////TODO USECASE
             parkMarkerCircle = myGoogleMap.addCircle(CircleOptions().apply {
                 val latLng =
                     center(LatLng(it.position.latitude, it.position.longitude))
@@ -186,7 +184,7 @@ class MapsViewModel @Inject constructor(
         myGoogleMap.setOnCameraIdleListener(clusterManager)
 
         var response = emptyList<ParkDB>()
-        var mult = 0
+        var mult = -1
         var responseMap = HashMap<String, Any>()
 
         while (responseMap.isNullOrEmpty()) {
@@ -200,6 +198,8 @@ class MapsViewModel @Inject constructor(
                     )
                 }!!
         }
+
+        Log.e("asdfasdfasdf", responseMap["mult"].toString())
 
         response = responseMap["response"] as List<ParkDB>
         liveHolderSeekBar.value = responseMap["mult"] as Int
@@ -288,17 +288,5 @@ class MapsViewModel @Inject constructor(
                 addMarkers()
             }
         }
-    }
-
-    fun onTouchListener(view:View, event: MotionEvent): Boolean {
-        when (event.action) {
-            MotionEvent.ACTION_DOWN -> {
-                Log.e("actionDown", "actionDown")
-            }
-            MotionEvent.ACTION_UP -> {
-                Log.e("actionDown", "actionDown")
-            }
-        }
-        return true
     }
 }

@@ -29,7 +29,7 @@ class StationApiRepositoryImpl @Inject constructor(
         return stationApi.getStationDataByName(publicApiKey, query)
     }
 
-    override fun extractQuery(addresses: List<Address>): HashMap<String, String> {
+    override fun extractQuery(addresses: List<Address>): Map<String, String> {
 
         val addressMap = HashMap<Char, String>()
         addresses.map {
@@ -42,10 +42,10 @@ class StationApiRepositoryImpl @Inject constructor(
                 }
             }
         }
-        val queryMap = HashMap<String, String>()
+/*        val queryMap = HashMap<String, String>()
         queryMap["returnType"] = "json"
-        queryMap["addr"] =  addressMap[ADDRESS.SI.text]!!.split("시")[0]
-        return queryMap
+        queryMap["addr"] =  addressMap[ADDRESS.SI.text]!!.split("시")[0]*/
+        return mapOf(Pair("returnType", "json"), Pair("addr", addressMap[ADDRESS.SI.text]!!.split("시")[0]))
     }
 
     override fun handleResponse(response: Response<StationDTO>): List<StationDTO.Response.Body.Items>? {
