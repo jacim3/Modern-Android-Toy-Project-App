@@ -6,28 +6,30 @@ import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Location
 import android.os.*
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
-import androidx.lifecycle.MutableLiveData
 import com.example.walkingpark.R
 import com.example.walkingpark.constants.Common
 import com.example.walkingpark.constants.Settings
+import com.example.walkingpark.data.model.entity.LocationObject
 import com.example.walkingpark.presentation.MainActivity
 import com.google.android.gms.location.*
-import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.tasks.CancellationToken
 import com.google.android.gms.tasks.CancellationTokenSource
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.*
+import io.reactivex.BackpressureStrategy
+import io.reactivex.Flowable
+import io.reactivex.subjects.PublishSubject
 
 /**
-* 바인드된 서비스로서, 위치데이터를 제공하는 데이터소스로서 정의.
-* 최초 bind 이후, mainViewModel 로 부터 locationCallGBack 를 넘겨받으므로, 이러한 의존성을 제거하는 것이
-* 추후 과제 -> mainViewModel 에서 LocationCallback 수행을 위하여.
-**/
+ * 바인드된 서비스로서, 위치데이터를 제공하는 데이터소스로서 정의.
+ * 최초 bind 이후, mainViewModel 로 부터 locationCallGBack 를 넘겨받으므로, 이러한 의존성을 제거하는 것이
+ * 추후 과제 -> mainViewModel 에서 LocationCallback 수행을 위하여.
+ **/
 
 @AndroidEntryPoint
 class LocationService : LifecycleService() {
@@ -39,7 +41,8 @@ class LocationService : LifecycleService() {
     private lateinit var locationCallback: LocationCallback
     private lateinit var serviceHandler: Handler
 
-    var userAddressMap = HashMap<Char,String?>()
+    private val locationSubject = PublishSubject.create<LocationObject>()
+    private lateinit var locationFlowable:Flowable<LocationObject>
 
     override fun onBind(intent: Intent): IBinder {
         super.onBind(intent)
@@ -47,19 +50,48 @@ class LocationService : LifecycleService() {
         return binder
     }
 
+    override fun onCreate() {
+        super.onCreate()
+
+        locationFlowable = locationSubject.toFlowable(BackpressureStrategy.BUFFER)
+            .doOnSubscribe { startLocationUpdate(this) }
+            .doOnCancel { stopLocationUpdate() }
+
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+
+        // smallestDisplacement = SMALLEST_DISPLACEMENT_100_METERS // 100 meters
+        locationRequest = LocationRequest.create().apply {
+            interval = Settings.LOCATION_UPDATE_INTERVAL
+            fastestInterval = Settings.LOCATION_UPDATE_INTERVAL_FASTEST
+            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        }
+        locationCallback =
+            object : LocationCallback() {
+                override fun onLocationResult(result: LocationResult) {
+                    super.onLocationResult(result)
+                    result.locations.forEach(::setLocation)
+                }
+            }
+    }
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
+        // LocationRequest 및 Callback 등록에 따른 연산은 여기 (서비스) 에서 수행
+        // 리시버로 부터 받은 요청에 따라 작업 수행
         when (intent?.getStringExtra("intent-filter")) {
+            // 서비스 최초 실행(초기화) 요청
             Common.REQUEST_LOCATION_INIT -> {
                 startLocationInit(this)
                 sendBroadcast(Intent().apply { action = Common.REQUEST_LOCATION_UPDATE_START })
             }
 
+            // 서비스 업데이트 요청
             Common.REQUEST_LOCATION_UPDATE_START -> {
-                startLocationUpdate(this)
-                sendBroadcast(Intent().apply { action })
+                //startLocationUpdate(this)
+                //sendBroadcast(Intent().apply { action })
             }
 
+            // 서비스 종료 요청
             Common.REQUEST_LOCATION_UPDATE_CANCEL -> {
 
             }
@@ -70,56 +102,6 @@ class LocationService : LifecycleService() {
             3. START_REDELIVER_INTENT = Service 가 재시작될 때 이전에 전달했던 intent 전달
         */
         return super.onStartCommand(intent, flags, START_NOT_STICKY)
-    }
-
-    override fun onCreate() {
-        super.onCreate()
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
-
-        // smallestDisplacement = SMALLEST_DISPLACEMENT_100_METERS // 100 meters
-        locationRequest = LocationRequest.create().apply {
-            interval = Settings.LOCATION_UPDATE_INTERVAL
-            fastestInterval = Settings.LOCATION_UPDATE_INTERVAL_FASTEST
-            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-        }
-         locationCallback =
-            object : LocationCallback() {
-                override fun onLocationResult(result: LocationResult) {
-                    super.onLocationResult(result)
-                    userLocation.postValue(LatLng(result.lastLocation.latitude, result.lastLocation.longitude))
-                }
-            }
-
-/*        locationCallback =
-            object : LocationCallback() {
-                override fun onLocationResult(result: LocationResult) {
-                    super.onLocationResult(result)
-
-                    val coder = Geocoder(this@LocationService, Locale.getDefault())
-
-                    // TODO Stream 의 ForEach 와 ForLoop 는 다르며, ForEach 의 리소스 낭비가 심하다.
-                    // TODO MutableLiveData 에서는 Null 이 발생할 경우 예외처리가 발생 -> NullCheck 가 엄격한것 같음.
-                    // -> Filter 를 통하여 제한한다 하여도 루프를 모두 수행.
-                    val location =
-                        coder.getFromLocation(
-                            result.lastLocation.latitude,
-                            result.lastLocation.longitude,
-                            Settings.LOCATION_ADDRESS_SEARCH_COUNT
-                        )
-
-                    userLocation.postValue(LatLng(result.lastLocation.latitude, result.lastLocation.longitude))
-                    userAddressMap = locationServiceInteractor.getAddressFromLocation(location)!!
-                    Log.e("asdfasdfasfasd", userAddressMap.toString())
-                }
-
-                override fun onLocationAvailability(response: LocationAvailability) {
-                    super.onLocationAvailability(response)
-                }
-            }*/
-
-        userLocation.observe(this){
-
-        }
     }
 
     @SuppressLint("MissingPermission")
@@ -151,6 +133,7 @@ class LocationService : LifecycleService() {
         }
     }
 
+
     fun getLocationCallback(locationCallback: LocationCallback) {
         this.locationCallback = locationCallback
     }
@@ -181,9 +164,21 @@ class LocationService : LifecycleService() {
         }
     }
 
-    private fun stopLocationUpdate(){
+    private fun stopLocationUpdate() {
         fusedLocationProviderClient.removeLocationUpdates(locationCallback)
     }
+
+    private fun setLocation(location: Location) {
+        locationSubject.onNext(
+            LocationObject(
+                location.latitude,
+                location.longitude,
+                location.time
+            )
+        )
+    }
+
+    fun getLocationFlowable() = locationFlowable
 
     // 포그라운드 서비스에 필요한 UI 인 Notification 설정 메서드.
     private fun setForegroundNotification(context: Context): Notification {
@@ -217,11 +212,6 @@ class LocationService : LifecycleService() {
         }
         return locationTrackNotification.build()
     }
-
-    companion object{
-        val userLocation =  MutableLiveData<LatLng?>()
-    }
-
 
     inner class LocalBinder : Binder() {
         internal val service: LocationService

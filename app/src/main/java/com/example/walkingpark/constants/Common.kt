@@ -1,5 +1,8 @@
 package com.example.walkingpark.constants
 
+import android.annotation.SuppressLint
+import java.text.SimpleDateFormat
+
 
 /**
 *   RequestCode 를 위한 구분이나, DI 를 위한 모듈에 사용되며, 비즈니스 로직에는 사용하지 않는 상수 값 정의 클래스
@@ -39,6 +42,11 @@ object Common {
 
     const val REST_API_DATE_UNIT_FORMAT =  "yyyyMMdd"
     const val REST_API_TIME_UNIT_FORMAT =  "HHmm"
+
+    @SuppressLint("SimpleDateFormat")
+    val dateFormat = SimpleDateFormat(REST_API_DATE_UNIT_FORMAT)
+    @SuppressLint("SimpleDateFormat")
+    val timeFormat = SimpleDateFormat(REST_API_TIME_UNIT_FORMAT)
 }
 
 /**

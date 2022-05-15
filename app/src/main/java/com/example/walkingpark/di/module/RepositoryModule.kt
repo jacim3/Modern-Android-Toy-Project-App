@@ -1,14 +1,5 @@
 package com.example.walkingpark.di.module
 
-import com.example.walkingpark.data.repository.AirApiRepositoryImpl
-import com.example.walkingpark.data.repository.MapsRepositoryImpl
-import com.example.walkingpark.data.repository.StationApiRepositoryImpl
-import com.example.walkingpark.data.repository.WeatherApiRepositoryImpl
-import com.example.walkingpark.domain.repository.AirApiRepository
-import com.example.walkingpark.domain.repository.MapsRepository
-import com.example.walkingpark.domain.repository.StationApiRepository
-import com.example.walkingpark.domain.repository.WeatherApiRepository
-import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
@@ -17,7 +8,7 @@ import dagger.hilt.components.SingletonComponent
 @InstallIn(SingletonComponent::class)
 abstract class RepositoryModule {
 
-    @Binds
+/*    @Binds
     abstract fun bindsAirRepository(impl: AirApiRepositoryImpl): AirApiRepository
 
     @Binds
@@ -27,5 +18,6 @@ abstract class RepositoryModule {
     abstract fun bindsWeatherRepository (impl: WeatherApiRepositoryImpl) : WeatherApiRepository
 
     @Binds
-    abstract fun bindsMapsRepository(impl: MapsRepositoryImpl) : MapsRepository
+    abstract fun bindsMapsRepository(impl: MapsRepositoryImpl) : MapsRepository*/
+
 }

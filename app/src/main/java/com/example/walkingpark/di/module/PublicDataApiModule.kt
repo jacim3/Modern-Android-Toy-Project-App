@@ -1,8 +1,8 @@
 package com.example.walkingpark.di.module
 
 import com.example.walkingpark.constants.Common
-import com.example.walkingpark.data.source.api.PublicApiService
-import com.example.walkingpark.data.source.api.UnsafeOkHttpClient
+import com.example.walkingpark.data.api.PublicApiService
+import com.example.walkingpark.data.api.UnsafeOkHttpClient
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -10,6 +10,7 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Qualifier
 
@@ -36,7 +37,7 @@ object PublicDataApiModule {
                 .baseUrl(Common.BASE_URL_API_AIR)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(UnsafeOkHttpClient.unsafeOkHttpClient().build())
-                //  .client(okHttpClient)
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build()
         }
 
@@ -55,6 +56,7 @@ object PublicDataApiModule {
                 .baseUrl(Common.BASE_URL_API_STATION)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(UnsafeOkHttpClient.unsafeOkHttpClient().build())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 //.client(okHttpClient)
                 .build()
         }
@@ -75,6 +77,7 @@ object PublicDataApiModule {
                 .baseUrl(Common.BASE_URL_API_WEATHER)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(UnsafeOkHttpClient.unsafeOkHttpClient().build())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 //     .client(okHttpClient)
                 .build()
         }

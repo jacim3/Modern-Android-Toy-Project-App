@@ -3,7 +3,8 @@ package com.example.walkingpark.presentation
 import android.Manifest
 import android.content.*
 import android.content.pm.PackageManager
-import android.os.*
+import android.os.Bundle
+import android.os.IBinder
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -11,14 +12,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
 import com.example.walkingpark.R
-import com.example.walkingpark.presentation.receiver.LocationReceiver
-import com.example.walkingpark.presentation.view.LoadingIndicator
 import com.example.walkingpark.constants.Common
 import com.example.walkingpark.databinding.ActivityMainBinding
+import com.example.walkingpark.presentation.receiver.LocationReceiver
 import com.example.walkingpark.presentation.service.LocationService
 import com.example.walkingpark.presentation.viewmodels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Job
 
 // TODO 퍼미션을 체크하고, 위치정보 획득을 위한 서비스
 @AndroidEntryPoint
@@ -31,17 +30,22 @@ class MainActivity : AppCompatActivity(
     private var locationService: LocationService? = null
 
     // 서비스가 완료되었을 때, 수행되는 콜백
-    // TODO 여기서 서비스가 완료되었을 때,
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
 
-            // TODO 여기에서 서비스에 Callback 을 인자로 전달하여, 위치 업데이트 이벤트를 처리할 수 있다.
             val binder = service as LocationService.LocalBinder
             locationService = binder.service
             // locationService?.getLocationCallback(viewModel.locationCallback)
+
+            // LocationService 의 Flowable 을 ViewModel 로 전달.
+            locationService?.let {
+                viewModel.locationObservable.value = it.getLocationFlowable()
+                viewModel.locationObservableHandler()
+            }
         }
 
         override fun onServiceDisconnected(name: ComponentName) {
+
         }
     }
 
@@ -66,7 +70,6 @@ class MainActivity : AppCompatActivity(
             // viewModel.loadingIndicator = LoadingIndicator(this, "RestApi 데이터 읽어오는중....")
             val check = permissionCheck(this)
             if (check) {
-                //viewModel.loadingIndicator!!.startLoadingIndicator()
                 // 퍼미션이 허용되었으므로 서비스 실행
                 val requestIntent = Intent()
                 requestIntent.action = Common.REQUEST_LOCATION_INIT
@@ -129,8 +132,7 @@ class MainActivity : AppCompatActivity(
                 context,
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
-        )
-        {
+        ) {
             return false
         }
         return true
@@ -138,11 +140,13 @@ class MainActivity : AppCompatActivity(
 
     override fun onStart() {
         super.onStart()
-
-        this.bindService(
-            Intent(this, LocationService::class.java),
-            serviceConnection,
-            Context.BIND_AUTO_CREATE
-        )
+        Intent(this, LocationService::class.java).apply {
+            startService(this)
+            bindService(
+                this,
+                serviceConnection,
+                Context.BIND_AUTO_CREATE
+            )
+        }
     }
 }

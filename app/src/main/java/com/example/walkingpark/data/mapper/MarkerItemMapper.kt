@@ -1,7 +1,7 @@
 package com.example.walkingpark.data.mapper
 
-import com.example.walkingpark.data.source.room.ParkDB
-import com.example.walkingpark.domain.model.MarkerItem
+import com.example.walkingpark.data.room.ParkDB
+import com.example.walkingpark.data.model.MarkerItem
 
 object MarkerItemMapper {
 

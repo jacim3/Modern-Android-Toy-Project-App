@@ -3,25 +3,23 @@ package com.example.walkingpark.presentation.viewmodels
 import android.app.Application
 import android.graphics.Color
 import android.util.Log
-import android.view.MotionEvent
 import android.view.View
-import android.view.View.OnTouchListener
 import android.widget.SeekBar
-import androidx.databinding.BindingAdapter
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.walkingpark.R
 import com.example.walkingpark.constants.Settings
-import com.example.walkingpark.data.source.room.ParkDB
-import com.example.walkingpark.domain.model.MarkerItem
-import com.example.walkingpark.domain.usecase.maps.db.normal.ParsingItemUseCase
-import com.example.walkingpark.domain.usecase.maps.db.parent.ResultDataBaseUseCase
+import com.example.walkingpark.data.model.MarkerItem
+import com.example.walkingpark.data.model.entity.LocationEntity
+import com.example.walkingpark.data.repository.MapsRepository
+import com.example.walkingpark.data.room.ParkDB
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.*
 import com.google.maps.android.clustering.ClusterManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.PI
@@ -31,8 +29,7 @@ import kotlin.math.sqrt
 @HiltViewModel
 class MapsViewModel @Inject constructor(
     application: Application,
-    private val parsingItemUseCase: ParsingItemUseCase,
-    private val resultDataBaseUseCase: ResultDataBaseUseCase
+    private val mapsRepository: MapsRepository,
 ) : AndroidViewModel(application) {
 
     val liveHolderParkData = MutableLiveData<List<ParkDB>>()
@@ -55,7 +52,7 @@ class MapsViewModel @Inject constructor(
     private var isOnMapReadyCalled = false
 
     lateinit var clusterManager: ClusterManager<MarkerItem>
-
+    var mult = 0
 
     fun requestUserLocationUpdate(latLng: LatLng) {
 
@@ -173,7 +170,7 @@ class MapsViewModel @Inject constructor(
         }
     }
 
-    private suspend fun addMarkers() {
+    private fun addMarkers() {
 
         setLoadingIndicator("show", "마커추가...")
 
@@ -183,32 +180,39 @@ class MapsViewModel @Inject constructor(
 
         myGoogleMap.setOnCameraIdleListener(clusterManager)
 
-        var response = emptyList<ParkDB>()
-        var mult = -1
-        var responseMap = HashMap<String, Any>()
-
-        while (responseMap.isNullOrEmpty()) {
-            mult++
-            responseMap =
-                liveHolderSeekBar.value?.let {
-                    resultDataBaseUseCase(
-                        userLatLng,
-                        it,
-                        mult
-                    )
-                }!!
+        val disposable = liveHolderSeekBar.value?.let { seekBar ->
+            mapsRepository.searchLocation(
+                LocationEntity(userLatLng.latitude, userLatLng.longitude),
+                seekBar,
+                mult
+            )
         }
+            ?.subscribeBy(
+                onSuccess = { response ->
+                    // 결과를 받아오지 못하였으므로 보정값을 높여, 재 시도.
+                    if (response.isEmpty()) {
+                        mapsRepository.searchLocation(
+                            LocationEntity(userLatLng.latitude, userLatLng.longitude),
+                            liveHolderSeekBar.value!!,
+                            ++mult
+                        )
+                    }
+                    // 데이터 획득 성공.
+                    else {
+                        mult = 0
 
-        Log.e("asdfasdfasdf", responseMap["mult"].toString())
-
-        response = responseMap["response"] as List<ParkDB>
-        liveHolderSeekBar.value = responseMap["mult"] as Int
-
-        response.forEach {
-            clusterManager.addItem(parsingItemUseCase(it))
-        }
-        clusterManager.cluster()
-        setLoadingIndicator("dismiss", "")
+                        liveHolderSeekBar.value = mapsRepository.getSeekBarMult().toInt()
+                        response.forEach {
+                            clusterManager.addItem(mapsRepository.parsingDatabaseItem(it))
+                        }
+                        clusterManager.cluster()
+                        setLoadingIndicator("dismiss", "")
+                    }
+                },
+                onError = {
+                    Log.e("DatabaseError", "DB 읽기 실패")
+                },
+            )
     }
 
 

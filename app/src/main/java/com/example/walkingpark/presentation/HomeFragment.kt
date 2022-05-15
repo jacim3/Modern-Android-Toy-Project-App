@@ -9,16 +9,13 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.example.walkingpark.databinding.FragmentHomeBinding
-import com.example.walkingpark.presentation.service.LocationService
 import com.example.walkingpark.presentation.view.LoadingIndicator
 import com.example.walkingpark.presentation.viewmodels.HomeViewModel
 import com.example.walkingpark.presentation.viewmodels.MainViewModel
-import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
@@ -30,9 +27,10 @@ class HomeFragment : Fragment() {
 */
 
     private val homeViewModel: HomeViewModel by viewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
+
     private var binding: FragmentHomeBinding? = null
     private lateinit var loadingIndicator: LoadingIndicator
-    private var isUiInitialized = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -49,26 +47,21 @@ class HomeFragment : Fragment() {
 
         loadingIndicator = LoadingIndicator(requireContext(), "RestApi 통신중...")
         loadingIndicator.startLoadingIndicator()
-        LocationService.userLocation.observe(viewLifecycleOwner) {
-            if (!isUiInitialized) {
-                isUiInitialized = true
-                CoroutineScope(Dispatchers.Default).launch {
-                    it?.let { it1 ->
-                        homeViewModel.startStationApi(it1)
-                    }
-                }
-                CoroutineScope(Dispatchers.Default).launch {
-                    it?.let { it1 ->
-                        homeViewModel.startWeatherApi(it1)
-                    }
-                }
-            }
+
+        // 사용자 위치업데이트 관찰 수행시 수행.
+        mainViewModel.userLocation.observe(viewLifecycleOwner) {
+                homeViewModel.startStationApi(it)
+                homeViewModel.startWeatherApi(it)
         }
 
-        // 모든 데이터를 성공적으로 읽어오면 다이얼로그 종료
-        homeViewModel.userLiveHolderLoadedStatus.observe(viewLifecycleOwner){
-            if (it["station"] == "success" && it["air"] == "success" && it["weather"] == "success")
-                loadingIndicator.dismissIndicator()
+        homeViewModel.userResponseCheck.observe(viewLifecycleOwner) {
+
+            if (it.station && !it.air) {
+                homeViewModel.userLiveHolderStation.value?.stationName?.let { name ->
+                    homeViewModel.startAirApi(name)
+                    loadingIndicator.dismissIndicator()
+                }
+            }
         }
     }
 

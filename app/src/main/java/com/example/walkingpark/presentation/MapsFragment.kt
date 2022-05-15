@@ -19,6 +19,7 @@ import com.example.walkingpark.presentation.viewmodels.MainViewModel
 import com.example.walkingpark.presentation.viewmodels.MapsViewModel
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.AndroidEntryPoint
 
 /*
@@ -31,7 +32,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MapsFragment : Fragment(), OnMapReadyCallback {
 
-    // private val mainViewModel: MainViewModel by activityViewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
     private val mapsViewModel: MapsViewModel by viewModels()
     private var binding: FragmentMapsBinding? = null
     private lateinit var loadingIndicator: LoadingIndicator
@@ -54,8 +55,10 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         loadingIndicator = LoadingIndicator(requireContext(), "지도 초기화중...")
         loadingIndicator.startLoadingIndicator()
 
-        LocationService.userLocation.observe(viewLifecycleOwner) {
-            if (it != null) mapsViewModel.requestUserLocationUpdate(it)
+        mainViewModel.userLocation.observe(viewLifecycleOwner) {
+            it?.let {
+                mapsViewModel.requestUserLocationUpdate(LatLng(it.latitude, it.longitude))
+            }
         }
 
         // LoadingIndicator 관련

@@ -18,7 +18,6 @@ class LocationReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, result: Intent) {
 
         when (result.action) {
-            // 서비스에
             Common.REQUEST_LOCATION_INIT -> {
                 // 1. 최초 위치 업데이트 초기화
                 //'setLocationInit(context)
@@ -31,6 +30,7 @@ class LocationReceiver : BroadcastReceiver() {
                 else
                     context.startService(intent)
             }
+
             Common.REQUEST_LOCATION_UPDATE_START -> {
                 val intent = Intent(context, LocationService::class.java)
                 intent.putExtra("intent-filter", Common.REQUEST_LOCATION_UPDATE_START)

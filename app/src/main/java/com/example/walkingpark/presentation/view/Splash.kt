@@ -8,12 +8,10 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.example.walkingpark.presentation.MainActivity
 import com.example.walkingpark.R
-import com.example.walkingpark.data.source.room.AppDatabase
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
 import java.lang.Exception
-import javax.inject.Inject
 
 
 @AndroidEntryPoint
