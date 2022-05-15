@@ -1,17 +1,21 @@
 package com.example.walkingpark.di.module
 
+import android.content.Context
+import android.location.Geocoder
 import com.example.walkingpark.constants.Common
 import com.example.walkingpark.data.api.PublicApiService
 import com.example.walkingpark.data.api.UnsafeOkHttpClient
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.*
 import javax.inject.Qualifier
 
 

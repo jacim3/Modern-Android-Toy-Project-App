@@ -1,15 +1,13 @@
 package com.example.walkingpark.data.repository
 
 import android.graphics.PointF
-import com.example.walkingpark.data.mapper.MarkerItemMapper
+import com.example.walkingpark.data.model.mapper.MarkerItemMapper
 import com.example.walkingpark.data.room.ParkDB
 import com.example.walkingpark.data.tools.LatLngPoints
 import com.example.walkingpark.data.model.MarkerItem
 import com.example.walkingpark.data.model.entity.LocationEntity
 import com.example.walkingpark.data.model.entity.LocationSearchEntity
 import com.example.walkingpark.data.source.RoomDataSource
-import io.reactivex.Flowable
-import io.reactivex.Single
 import javax.inject.Inject
 import javax.inject.Singleton
 

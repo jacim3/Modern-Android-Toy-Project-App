@@ -25,12 +25,6 @@ import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.subjects.PublishSubject
 
-/**
- * 바인드된 서비스로서, 위치데이터를 제공하는 데이터소스로서 정의.
- * 최초 bind 이후, mainViewModel 로 부터 locationCallGBack 를 넘겨받으므로, 이러한 의존성을 제거하는 것이
- * 추후 과제 -> mainViewModel 에서 LocationCallback 수행을 위하여.
- **/
-
 @AndroidEntryPoint
 class LocationService : LifecycleService() {
 
@@ -132,7 +126,6 @@ class LocationService : LifecycleService() {
             }
         }
     }
-
 
     fun getLocationCallback(locationCallback: LocationCallback) {
         this.locationCallback = locationCallback

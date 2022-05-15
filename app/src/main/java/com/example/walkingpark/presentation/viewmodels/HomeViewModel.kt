@@ -1,32 +1,33 @@
 package com.example.walkingpark.presentation.viewmodels
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.location.Address
 import android.location.Geocoder
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import androidx.paging.PagedList
+import androidx.paging.PagingData
+import androidx.paging.rxjava2.cachedIn
 import com.example.walkingpark.constants.Settings
-import com.example.walkingpark.data.model.dto.AirDTO
-import com.example.walkingpark.data.model.dto.StationDTO
-import com.example.walkingpark.data.model.dto.WeatherDTO
+import com.example.walkingpark.data.model.dto.AirResponse
+import com.example.walkingpark.data.model.dto.StationResponse
+import com.example.walkingpark.data.model.dto.WeatherResponse
 import com.example.walkingpark.data.model.entity.LocationEntity
 import com.example.walkingpark.data.model.ResponseCheck
+import com.example.walkingpark.data.model.entity.paging.Weathers
 import com.example.walkingpark.data.repository.AirApiRepository
+import com.example.walkingpark.data.repository.GeocodingRepository
 import com.example.walkingpark.data.repository.StationApiRepository
 import com.example.walkingpark.data.repository.WeatherApiRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.*
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.observers.DisposableObserver
 import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
-import org.reactivestreams.Subscriber
-import org.reactivestreams.Subscription
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.stream.Collectors
@@ -43,11 +44,12 @@ class HomeViewModel @Inject constructor(
     private val weatherRepository: WeatherApiRepository,
     private val airRepository: AirApiRepository,
     private val stationRepository: StationApiRepository,
+    private val geocodingRepository: GeocodingRepository
 ) : AndroidViewModel(application) {
 
-    val userLiveHolderStation = MutableLiveData<StationDTO.Response.Body.Items?>()
-    val userLiveHolderAir = MutableLiveData<List<AirDTO.Response.Body.Items>?>()
-    val userLiveHolderWeather = MutableLiveData<List<WeatherDTO.Response.Body.Items.Item>>()
+    val userLiveHolderStation = MutableLiveData<StationResponse.Response.Body.Items?>()
+    val userLiveHolderAir = MutableLiveData<List<AirResponse.Response.Body.Items>?>()
+    val userLiveHolderWeather = MutableLiveData<List<WeatherResponse.Response.Body.Items.Item>>()
 
     var isAirLoaded = MutableLiveData<Boolean>()
     var isStationLoaded = MutableLiveData<Boolean>()
@@ -65,43 +67,54 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun startStationApi(entity: LocationEntity) {
-        viewModelScope.launch {
-            stationRepository.startStationApi(getGeocoding(entity))
-                .retryWhen { error ->
-                    error.zipWith(
-                        Flowable.range(1, 3)
-                    ) { _, t2 -> t2 }.flatMap {
-                        Flowable.timer(it.toLong(), TimeUnit.SECONDS)
-                    }
-                }
-                .subscribeBy(
-                    onSuccess = { response ->
-                        userLiveHolderStation.postValue(
-                            getNearestLocation(response.response.body.items, entity)
-                        )
-                        isStationLoaded.postValue(true)
-                    },
-                    onError = {
-                        it.printStackTrace()
-                    }
-                )
+    fun startGeocodingBeforeStationApi(entity: LocationEntity) {
 
-/*            response?.let {
-                userLiveHolderStation.postValue(it)
-                startAirApi(it.stationName)
-                val tmpMap = userLiveHolderLoadedStatus.value
-                tmpMap!!["station"] = "success"
-                userLiveHolderLoadedStatus.postValue(tmpMap)
-            }*/
+        if (isStationLoaded.value == null || isStationLoaded.value == true) {
+            return
         }
+
+        geocodingRepository.getAddressSet(entity)
+            .retry(5)
+            .subscribe(
+                {
+                    startStationApi(entity, it)
+                },
+                {
+                    it.printStackTrace()
+                }
+            )
+    }
+
+    @SuppressLint("CheckResult")
+    private fun startStationApi(entity: LocationEntity, addresses: List<String>) {
+
+        stationRepository.startStationApi(addresses)
+            .retryWhen { error ->
+                error.zipWith(
+                    Flowable.range(1, 3)
+                ) { _, t2 -> t2 }.flatMap {
+                    Flowable.timer(it.toLong(), TimeUnit.SECONDS)
+                }
+            }
+            .subscribeBy(
+                onSuccess = { response ->
+                    userLiveHolderStation.postValue(
+                        getNearestLocation(response.response.body.items, entity)
+                    )
+                    isStationLoaded.postValue(true)
+                },
+                onError = {
+                    it.printStackTrace()
+                }
+            )
+
     }
 
     // 측정소 결과 리스트 중 사용자와 가장 가까운 위치 결과 받아내기.
     private fun getNearestLocation(
-        items: List<StationDTO.Response.Body.Items>,
+        items: List<StationResponse.Response.Body.Items>,
         entity: LocationEntity
-    ): StationDTO.Response.Body.Items? {
+    ): StationResponse.Response.Body.Items? {
 
         return items.stream().sorted { p0, p1 ->
             (abs(p0.dmX - entity.latitude) + abs(p0.dmY - entity.longitude))
@@ -111,18 +124,9 @@ class HomeViewModel @Inject constructor(
         }.collect(Collectors.toList())[0]
     }
 
-    private fun getGeocoding(entity: LocationEntity): List<Address> {
-        val coder = Geocoder(getApplication(), Locale.getDefault())
-        return coder.getFromLocation(
-            entity.latitude,
-            entity.longitude,
-            Settings.LOCATION_ADDRESS_SEARCH_COUNT
-        )
-    }
-
     fun startAirApi(stationName: String) {
         viewModelScope.launch {
-            airRepository.getAirApi(stationName)
+            airRepository.startAirApi(stationName)
                 .retryWhen { error ->
                     error.zipWith(
                         Flowable.range(1, 3)
@@ -134,27 +138,25 @@ class HomeViewModel @Inject constructor(
                     onSuccess = { response ->
                         userLiveHolderAir.postValue(response.response.body.items)
                         isAirLoaded.postValue(true)
+                        Log.e("asdfadsfafds", response.toString())
                     },
                     onError = {
                         it.printStackTrace()
                     }
                 )
 
-/*            response.let {
-                userLiveHolderAir.postValue(it)
-                val tmpMap = userLiveHolderLoadedStatus.value
-                tmpMap!!["air"] = "success"
-                userLiveHolderLoadedStatus.postValue(tmpMap)
-            }*/
         }
     }
 
-    fun startWeatherApi(entity: LocationEntity) {
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun startWeatherApi(entity: LocationEntity): Flowable<PagingData<Weathers.Weather>> {
 
-        val compositeDisposable = CompositeDisposable()
+        // val compositeDisposable = CompositeDisposable()
 
-        val observable: Flowable<PagedList> = weatherRepository.startApi(entity)
-
+        return weatherRepository
+            .startWeatherApi(entity)
+            .observeOn(AndroidSchedulers.mainThread())
+            .cachedIn(viewModelScope)
 
 
 /*            weatherRepository.startApi(entity)
@@ -190,24 +192,6 @@ class HomeViewModel @Inject constructor(
 
 
     }
-
-/*    private fun combineResponses(
-        station: MutableLiveData<StationDTO.Response.Body.Items?>?,
-        air: MutableLiveData<List<AirDTO.Response.Body.Items>?>?,
-        weather: MutableLiveData<List<WeatherDTO.Response.Body.Items.Item>>?
-    ): ResponseSet {
-        return ResponseSet(null, null, null).apply {
-            station?.let {
-                this.station = it
-            }
-            air?.let {
-                this.air = it
-            }
-            weather?.let {
-                this.weather = it
-            }
-        }
-    }*/
 
     private fun combineResponses(
         station: MutableLiveData<Boolean>?,

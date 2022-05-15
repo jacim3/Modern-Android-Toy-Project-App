@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName
 *   공공데이터 - 미세먼지 API Retrofit2 통신결과의 직렬화를 위한 DTO 객체.
 **/
 
-data class AirDTO(
+data class AirResponse(
 
     @SerializedName("response") val response: Response
 ) {

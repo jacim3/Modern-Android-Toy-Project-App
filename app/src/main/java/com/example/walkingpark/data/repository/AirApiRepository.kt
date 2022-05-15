@@ -9,7 +9,7 @@ class AirApiRepository @Inject constructor(
     private val apiDataSource: ApiDataSource
 ){
 
-    fun getAirApi(stationName:String) = apiDataSource.getAirApi(getAirQuery(stationName))
+    fun startAirApi(stationName:String) = apiDataSource.getAirApi(getAirQuery(stationName))
 
     private fun getAirQuery(stationName: String) = mapOf(
         Pair("returnType", "json"),

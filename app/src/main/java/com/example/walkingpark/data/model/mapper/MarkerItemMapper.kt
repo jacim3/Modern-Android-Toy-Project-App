@@ -1,4 +1,4 @@
-package com.example.walkingpark.data.mapper
+package com.example.walkingpark.data.model.mapper
 
 import com.example.walkingpark.data.room.ParkDB
 import com.example.walkingpark.data.model.MarkerItem

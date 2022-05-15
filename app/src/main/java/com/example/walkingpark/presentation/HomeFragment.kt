@@ -50,18 +50,17 @@ class HomeFragment : Fragment() {
 
         // 사용자 위치업데이트 관찰 수행시 수행.
         mainViewModel.userLocation.observe(viewLifecycleOwner) {
-                homeViewModel.startStationApi(it)
-                homeViewModel.startWeatherApi(it)
+                homeViewModel.startGeocodingBeforeStationApi(it)
         }
 
         homeViewModel.userResponseCheck.observe(viewLifecycleOwner) {
 
-            if (it.station && !it.air) {
+            if (it.station && !it.air)
                 homeViewModel.userLiveHolderStation.value?.stationName?.let { name ->
                     homeViewModel.startAirApi(name)
-                    loadingIndicator.dismissIndicator()
                 }
-            }
+
+            if (it.station && it.air && it.weather) loadingIndicator.dismissIndicator()
         }
     }
 

@@ -1,10 +1,18 @@
 package com.example.walkingpark.data.repository
 
 import android.annotation.SuppressLint
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.rxjava2.flowable
 import com.example.walkingpark.constants.Common
 import com.example.walkingpark.data.model.entity.LocationEntity
+import com.example.walkingpark.data.model.entity.paging.Weathers
+import com.example.walkingpark.data.model.mapper.WeatherMapper
 import com.example.walkingpark.data.source.ApiDataSource
+import com.example.walkingpark.data.source.WeatherPagingSource
 import com.example.walkingpark.data.tools.LatLngToGridXy
+import io.reactivex.Flowable
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -17,7 +25,27 @@ class WeatherApiRepository @Inject constructor(
 
     // TODO 공공데이터포털은 서버에 에러가 생기지 않는 이상, 데이터를 받아오게 되면 resultCode : 200 을 반환한다.
 
-    fun startApi(entity: LocationEntity) = apiDataSource.getWeatherApi(getQuery(entity))
+    //fun startWeatherApi(entity: LocationEntity) = WeatherPagingSource(apiDataSource.getWeatherApi(getQuery(entity)), getQuery(entity))
+
+    fun startWeatherApi(entity: LocationEntity): Flowable<PagingData<Weathers.Weather>> {
+        return WeatherPagingSource(
+            apiDataSource.provideApiKey(),
+            apiDataSource.provideWeatherService(),
+            getQuery(entity),
+            WeatherMapper()
+        ).run {
+            Pager(
+                config = PagingConfig(
+                    pageSize = 20,
+                    enablePlaceholders = false,
+                    maxSize = 600,
+                    prefetchDistance = 5,
+                    initialLoadSize = 40
+                ),
+                pagingSourceFactory = { this }
+            ).flowable
+        }
+    }
 
 
     private fun getQuery(entity: LocationEntity) =
@@ -54,7 +82,7 @@ class WeatherApiRepository @Inject constructor(
             set(Calendar.MINUTE, 0)
             set(Calendar.HOUR, -1)
             // 1일전 23시로 돌리기
-            if ( this.get(Calendar.HOUR) < 2) {
+            if (this.get(Calendar.HOUR) < 2) {
                 set(Calendar.HOUR, 23)
                 add(Calendar.DATE, -1)
             }

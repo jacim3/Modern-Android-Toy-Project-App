@@ -11,27 +11,23 @@ class StationApiRepository @Inject constructor(
     private val apiDataSource: ApiDataSource
 ) {
 
-    fun startStationApi(addressSet:List<Address>) = apiDataSource.getStationApi(getQuery(addressSet))
+    fun startStationApi(addresses:List<String>) = apiDataSource.getStationApi(getQuery(addresses))
 
-    private fun getQuery(addresses: List<Address>): Map<String, String> {
+    private fun getQuery(addresses: List<String>): Map<String, String> {
 
         val addressMap = HashMap<Char, String>()
-        getAddressSet(addresses).stream().forEach {
-
+        addresses.stream().forEach {
             for (enum in ADDRESS.values()) {
                 if (it[it.lastIndex] == enum.text && addressMap[enum.text] == null) {
                     addressMap[enum.text] = it
                 }
             }
         }
-        return getStationQuery(addressMap)
+        return getQuery(addressMap)
     }
 
-    private fun getAddressSet(addresses: List<Address>) = addresses.map {
-        it.getAddressLine(0).toString().split(" ")
-    }.flatten().distinct()
 
-    private fun getStationQuery(addressMap: HashMap<Char, String>) = mapOf(
+    private fun getQuery(addressMap: HashMap<Char, String>) = mapOf(
         Pair("returnType", "json"),
         Pair("addr", addressMap[ADDRESS.SI.text]!!.split("시")[0])
     )

@@ -1,7 +1,7 @@
-package com.example.walkingpark.data.mapper
+package com.example.walkingpark.data.model.mapper
 
 import com.example.walkingpark.constants.WEATHER
-import com.example.walkingpark.data.model.dto.WeatherDTO
+import com.example.walkingpark.data.model.dto.WeatherResponse
 import java.util.*
 
 object WeatherItemMapper {
@@ -32,7 +32,7 @@ object WeatherItemMapper {
 */
 
     // TODO 현재 시각을 기준으로 1차 필터링 이후, 해당 Mapper 를 호출해야 함.
-    fun responseToMapper(response: List<WeatherDTO.Response.Body.Items.Item>): HashMap<String, String?> {
+    fun responseToMapper(response: List<WeatherResponse.Response.Body.Items.Item>): HashMap<String, String?> {
         val result = HashMap<String, String?>().apply {
             for (i in WEATHER.values()) {
                 this[i.code] = "none"

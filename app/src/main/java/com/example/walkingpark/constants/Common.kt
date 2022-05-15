@@ -1,6 +1,7 @@
 package com.example.walkingpark.constants
 
 import android.annotation.SuppressLint
+import com.example.walkingpark.BuildConfig
 import java.text.SimpleDateFormat
 
 
@@ -30,13 +31,14 @@ object Common {
     const val LOCATION_SETTINGS = 3
 
     const val BASE_URL_API_AIR = "https://apis.data.go.kr/B552584/ArpltnInforInqireSvc/"
-    const val REQUEST_PATH_AIR_API = "getMsrstnAcctoRltmMesureDnsty"
-
     const val BASE_URL_API_STATION = "https://apis.data.go.kr/B552584/MsrstnInfoInqireSvc/"
-    const val REQUEST_PATH_STATION_API = "getMsrstnList"
-
     const val BASE_URL_API_WEATHER = "https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/"
+
+    const val REQUEST_PATH_AIR_API = "getMsrstnAcctoRltmMesureDnsty"
+    const val REQUEST_PATH_STATION_API = "getMsrstnList"
     const val REQUEST_PATH_WEATHER_API = "getVilageFcst"
+
+    const val REQUEST_PATH_API_KEY = "?serviceKey=${BuildConfig.PUBLIC_API_KEY}"
 
     const val LOADING_INDICATOR_DISMISS_TIME = 500
 
