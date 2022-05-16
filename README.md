@@ -4,7 +4,7 @@
 ## 구성 :
 - 앱 실행을 위해서는 local.properties 파일 내 올바른 Google Maps Api Key 및 Public Data Api Key 필요.
 - Dagger-Hilt 를 통한 의존성 주입 설정
-- 앱 권장 아키텍쳐 패턴 및 Repository 패턴에서의 데이터 비즈니스 로직 설정.
+- 앱 권장 아키텍쳐 패턴 및 Repository 패턴에서의 데이터 비즈니스 로직 작성.
 - 주요 DataSource인 LocationService, RestApi, Room 에 ReactiveX 적용.
 
 
