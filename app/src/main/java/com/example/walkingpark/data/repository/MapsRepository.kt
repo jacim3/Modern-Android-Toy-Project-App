@@ -1,6 +1,7 @@
 package com.example.walkingpark.data.repository
 
 import android.graphics.PointF
+import android.util.Log
 import com.example.walkingpark.data.model.mapper.MarkerItemMapper
 import com.example.walkingpark.data.room.ParkDB
 import com.example.walkingpark.data.tools.LatLngPoints
@@ -41,68 +42,23 @@ class MapsRepository @Inject constructor(
         cursorValue: Int,
         mult: Int
     ): LocationSearchEntity {
-        val latLngPoints = LatLngPoints()
-
-        val center = PointF(entity.latitude.toFloat(), entity.longitude.toFloat())
-        val adjustValue = mult + cursorValue
-
-        val searchRange = adjustValue * 1000.0     // 검색범위 (M -> KM 변환)
-        val p1: PointF = latLngPoints.calculateDerivedPosition(
-            center,
-            searchRange,
-            0.0
-        )
-        val p2: PointF = latLngPoints.calculateDerivedPosition(
-            center,
-            searchRange,
-            90.0
-        )
-        val p3: PointF = latLngPoints.calculateDerivedPosition(
-            center,
-            searchRange,
-            180.0
-        )
-        val p4: PointF = latLngPoints.calculateDerivedPosition(
-            center,
-            searchRange,
-            270.0
-        )
-
-        var lat1 = p3.x
-        var lat2 = p1.x
-        var lng1 = p4.y
-        var lng2 = p2.y
-
-        // 범위 설정 문제로 인한 무한루프 방지.
-        if (lat1 > lat2) {
-            val tmp = lat1
-            lat1 = lat2
-            lat2 = tmp
+        return Array(4) { i -> i * 90.0 }.map {
+            LatLngPoints().calculateDerivedPosition(
+                PointF(entity.latitude.toFloat(), entity.longitude.toFloat()),
+                mult + cursorValue * 1000.0,
+                it
+            ).run {
+                if (it == 0.0|| it == 180.0) this.x else this.y
+            }
+        }.toList().sorted().run {
+            LocationSearchEntity(
+                startLatitude = this[0].toDouble(),
+                endLatitude = this[1].toDouble(),
+                startLongitude = this[2].toDouble(),
+                endLongitude = this[3].toDouble(),
+                adjustValue = (mult + cursorValue).toDouble()
+            )
         }
-
-        if (lng1 > lng2) {
-            val tmp = lng1
-            lng1 = lng2
-            lng2 = tmp
-        }
-
-        return setDataToEntity(lat1, lat2, lng1, lng2, adjustValue)
-    }
-
-    private fun setDataToEntity(
-        lat1: Float,
-        lat2: Float,
-        lng1: Float,
-        lng2: Float,
-        adjustValue: Int
-    ): LocationSearchEntity {
-        return LocationSearchEntity(
-            startLatitude = lat1.toDouble(),
-            endLatitude = lat2.toDouble(),
-            startLongitude = lng1.toDouble(),
-            endLongitude = lng2.toDouble(),
-            adjustValue = adjustValue.toDouble()
-        )
     }
 
     // 읽어온 DB 리스트에서 튜플 하나에 대한 데이터를 Marker 데이터로 파싱하기 위한 메서드.

@@ -5,7 +5,7 @@ import com.example.walkingpark.data.model.entity.paging.Weathers
 
 class StationMapper {
 
-    fun transform(response: WeatherResponse.Response.Body) : Weathers {
+/*    fun transform(response: WeatherResponse.Response.Body) : Weathers {
         return with(response) {
             Weathers(
                 total = totalCount,
@@ -24,5 +24,5 @@ class StationMapper {
                 }
             )
         }
-    }
+    }*/
 }
