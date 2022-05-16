@@ -22,21 +22,15 @@
 ### - Google Maps
 <img width="230" alt="화면 캡처 2022-04-18 142822" src="https://user-images.githubusercontent.com/60813834/163760648-acfe9591-4014-4463-89b3-62a6577d4d56.gif">
 
-    
-## 앞으로 해야할 일: 
-1. 앱의 디자인 및 운동기능 관련 UI 및 기능 설계
-2. 비즈니스 로직의 고도화
-3. 클린 아키텍쳐에 대한 보다 깊은 스터디
 
-## 현재 적용중인 컴포넌트
-1. Foreground Service 
-2. Broadcast Receiver
-
-## 현재 적용중인 라이브러리 및 AAC 컴포넌트
+## 적용 Android 라이브러리 
+- RxKotlin
 - Dagger-hilt
-- Retrofit2
-- Coroutine
-- Google Maps Api
-- Room
-- ViewModel
 - LiveData
+- Room
+- Google Maps Api
+- Geocoding Api
+
+## 적용 써드파트 라이브러리
+- Retrofit2
+    
