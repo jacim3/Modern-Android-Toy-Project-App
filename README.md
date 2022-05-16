@@ -24,6 +24,6 @@
 - Google Maps Api
 - Geocoding Api
 
-## 써드파트 라이브러리
+## Third Party 라이브러리
 - Retrofit2
     
