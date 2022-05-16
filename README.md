@@ -16,7 +16,7 @@
 <img width="230" alt="화면 캡처 2022-04-18 142822" src="https://user-images.githubusercontent.com/60813834/163760648-acfe9591-4014-4463-89b3-62a6577d4d56.gif">
 
 
-## 적용 Android 라이브러리 
+## Android 라이브러리 
 - RxKotlin
 - Dagger-hilt
 - LiveData
@@ -24,6 +24,6 @@
 - Google Maps Api
 - Geocoding Api
 
-## 적용 써드파트 라이브러리
+## 써드파트 라이브러리
 - Retrofit2
     
