@@ -1,23 +1,18 @@
 package com.example.walkingpark.data.repository
 
 import android.annotation.SuppressLint
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.rxjava2.flowable
 import com.example.walkingpark.constants.Common
+import com.example.walkingpark.data.model.dto.WeatherResponse
 import com.example.walkingpark.data.model.entity.LocationEntity
-import com.example.walkingpark.data.model.entity.paging.Weathers
-import com.example.walkingpark.data.model.mapper.WeatherMapper
 import com.example.walkingpark.data.source.ApiDataSource
-import com.example.walkingpark.data.source.WeatherPagingSource
 import com.example.walkingpark.data.tools.LatLngToGridXy
-import io.reactivex.Flowable
+import io.reactivex.Single
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
 
+const val WEATHER_PAGING_COUNT = 250
 @Singleton
 class WeatherApiRepository @Inject constructor(
     private val apiDataSource: ApiDataSource
@@ -25,42 +20,48 @@ class WeatherApiRepository @Inject constructor(
 
     // TODO 공공데이터포털은 서버에 에러가 생기지 않는 이상, 데이터를 받아오게 되면 resultCode : 200 을 반환한다.
 
-    //fun startWeatherApi(entity: LocationEntity) = WeatherPagingSource(apiDataSource.getWeatherApi(getQuery(entity)), getQuery(entity))
-
-    fun startWeatherApi(entity: LocationEntity): Flowable<PagingData<Weathers.Weather>> {
-        return WeatherPagingSource(
-            apiDataSource.provideApiKey(),
-            apiDataSource.provideWeatherService(),
-            getQuery(entity),
-            WeatherMapper()
-        ).run {
-            Pager(
-                config = PagingConfig(
-                    pageSize = 20,
-                    enablePlaceholders = false,
-                    maxSize = 600,
-                    prefetchDistance = 5,
-                    initialLoadSize = 40
-                ),
-                pagingSourceFactory = { this }
-            ).flowable
-        }
-    }
+    fun startWeatherApi(entity: LocationEntity, pageNo:Int): Single<WeatherResponse> = apiDataSource.getWeatherApi(getQuery(entity, pageNo))
 
 
-    private fun getQuery(entity: LocationEntity) =
-        dataToQuery(getTime(getCalendar()), LatLngToGridXy(entity.latitude, entity.longitude))
+
+    // TODO PAGER -> 아직 불필요
+
+    /*   fun startWeatherApi(entity: LocationEntity): Flowable<PagingData<Weathers.Weather>> {
+           return WeatherPagingSource(
+               apiDataSource.provideApiKey(),
+               apiDataSource.provideWeatherService(),
+               getQuery(entity),
+               WeatherMapper()
+           ).run {
+               Pager(
+                   config = PagingConfig(
+                       pageSize = 20,
+                       enablePlaceholders = false,
+                       maxSize = 600,
+                       prefetchDistance = 5,
+                       initialLoadSize = 40
+                   ),
+                   pagingSourceFactory = { this }
+               ).flowable
+           }
+       }*/
+
+
+    private fun getQuery(entity: LocationEntity, pageNo:Int) =
+        dataToQuery(getTime(getCalendar()), LatLngToGridXy(entity.latitude, entity.longitude), pageNo)
 
 
     private fun dataToQuery(
         timeMap: Map<String, String>,
-        grid: LatLngToGridXy
+        grid: LatLngToGridXy,
+        pageNo: Int
     ): Map<String, String> {
         return mapOf(
             Pair("dataType", "json"),
+            Pair("pageNo", pageNo.toString()),
             Pair("base_date", timeMap["date"].toString()),
             Pair("base_time", timeMap["time"].toString()),
-            Pair("numOfRows", "1000"),
+            Pair("numOfRows", WEATHER_PAGING_COUNT.toString()),
             Pair("nx", grid.locX.toString()),
             Pair("ny", grid.locY.toString())
         )

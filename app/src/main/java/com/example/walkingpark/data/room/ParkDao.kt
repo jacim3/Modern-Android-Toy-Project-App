@@ -2,7 +2,6 @@ package com.example.walkingpark.data.room
 
 import androidx.room.Dao
 import androidx.room.Query
-import io.reactivex.Flowable
 import io.reactivex.Single
 
 @Dao

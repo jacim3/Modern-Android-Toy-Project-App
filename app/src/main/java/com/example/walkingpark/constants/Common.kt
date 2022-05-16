@@ -1,7 +1,6 @@
 package com.example.walkingpark.constants
 
 import android.annotation.SuppressLint
-import com.example.walkingpark.BuildConfig
 import java.text.SimpleDateFormat
 
 
@@ -38,17 +37,20 @@ object Common {
     const val REQUEST_PATH_STATION_API = "getMsrstnList"
     const val REQUEST_PATH_WEATHER_API = "getVilageFcst"
 
-    const val REQUEST_PATH_API_KEY = "?serviceKey=${BuildConfig.PUBLIC_API_KEY}"
-
     const val LOADING_INDICATOR_DISMISS_TIME = 500
 
-    const val REST_API_DATE_UNIT_FORMAT =  "yyyyMMdd"
-    const val REST_API_TIME_UNIT_FORMAT =  "HHmm"
+    private const val REST_API_DATE_UNIT_FORMAT =  "yyyyMMdd"
+    private const val REST_API_TIME_UNIT_FORMAT =  "HHmm"
 
     @SuppressLint("SimpleDateFormat")
     val dateFormat = SimpleDateFormat(REST_API_DATE_UNIT_FORMAT)
     @SuppressLint("SimpleDateFormat")
     val timeFormat = SimpleDateFormat(REST_API_TIME_UNIT_FORMAT)
+
+    // 응답 관련
+    const val RESPONSE_RECEIVE_SUCCESS = 0
+    const val RESPONSE_RECEIVE_FAILURE = 1
+    const val RESPONSE_RECEIVE_PROCESSING = 2
 }
 
 /**

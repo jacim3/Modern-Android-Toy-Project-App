@@ -11,6 +11,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.rxjava2.cachedIn
+import com.example.walkingpark.constants.Common
 import com.example.walkingpark.constants.Settings
 import com.example.walkingpark.data.model.dto.AirResponse
 import com.example.walkingpark.data.model.dto.StationResponse
@@ -25,6 +26,7 @@ import com.example.walkingpark.data.repository.WeatherApiRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.*
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -49,31 +51,28 @@ class HomeViewModel @Inject constructor(
 
     val userLiveHolderStation = MutableLiveData<StationResponse.Response.Body.Items?>()
     val userLiveHolderAir = MutableLiveData<List<AirResponse.Response.Body.Items>?>()
-    val userLiveHolderWeather = MutableLiveData<List<WeatherResponse.Response.Body.Items.Item>>()
+    val userLiveHolderWeather = MutableLiveData<Array<WeatherResponse>>()
 
-    var isAirLoaded = MutableLiveData<Boolean>()
-    var isStationLoaded = MutableLiveData<Boolean>()
-    var isWeatherLoaded = MutableLiveData<Boolean>()
+    var isAirLoaded = MutableLiveData<Int>()
+    var isStationLoaded = MutableLiveData<Int>()
+    var isWeatherLoaded = MutableLiveData<Int>()
 
-    val userResponseCheck = MediatorLiveData<ResponseCheck>().apply {
-        this.addSource(isAirLoaded) {
-            this.value = combineResponses(isStationLoaded, isAirLoaded, isWeatherLoaded)
-        }
-        this.addSource(isStationLoaded) {
-            this.value = combineResponses(isStationLoaded, isAirLoaded, isWeatherLoaded)
-        }
-        this.addSource(isWeatherLoaded) {
-            this.value = combineResponses(isStationLoaded, isAirLoaded, isWeatherLoaded)
-        }
-    }
-
-    fun startGeocodingBeforeStationApi(entity: LocationEntity) {
-
-        if (isStationLoaded.value == null || isStationLoaded.value == true) {
-            return
+    val userResponseCheck = MediatorLiveData<ResponseCheck>()
+        .apply {
+            this.addSource(isAirLoaded) {
+                this.value = combineResponses(isStationLoaded, isAirLoaded, isWeatherLoaded)
+            }
+            this.addSource(isStationLoaded) {
+                this.value = combineResponses(isStationLoaded, isAirLoaded, isWeatherLoaded)
+            }
+            this.addSource(isWeatherLoaded) {
+                this.value = combineResponses(isStationLoaded, isAirLoaded, isWeatherLoaded)
+            }
         }
 
-        geocodingRepository.getAddressSet(entity)
+    fun startGeocodingBeforeStationApi(entity: LocationEntity): io.reactivex.rxjava3.disposables.Disposable {
+
+        return geocodingRepository.getAddressSet(entity)
             .retry(5)
             .subscribe(
                 {
@@ -85,10 +84,10 @@ class HomeViewModel @Inject constructor(
             )
     }
 
-    @SuppressLint("CheckResult")
-    private fun startStationApi(entity: LocationEntity, addresses: List<String>) {
 
-        stationRepository.startStationApi(addresses)
+    private fun startStationApi(entity: LocationEntity, addresses: List<String>): Disposable {
+
+        return stationRepository.startStationApi(addresses)
             .retryWhen { error ->
                 error.zipWith(
                     Flowable.range(1, 3)
@@ -99,12 +98,16 @@ class HomeViewModel @Inject constructor(
             .subscribeBy(
                 onSuccess = { response ->
                     userLiveHolderStation.postValue(
-                        getNearestLocation(response.response.body.items, entity)
+                        getNearestLocation(
+                            response.response.body.items,
+                            entity
+                        )
                     )
-                    isStationLoaded.postValue(true)
+                    isStationLoaded.postValue(Common.RESPONSE_RECEIVE_SUCCESS)
                 },
                 onError = {
                     it.printStackTrace()
+                    isStationLoaded.postValue(Common.RESPONSE_RECEIVE_FAILURE)
                 }
             )
 
@@ -124,9 +127,8 @@ class HomeViewModel @Inject constructor(
         }.collect(Collectors.toList())[0]
     }
 
-    fun startAirApi(stationName: String) {
-        viewModelScope.launch {
-            airRepository.startAirApi(stationName)
+    fun startAirApi(stationName: String): Disposable {
+            return airRepository.startAirApi(stationName)
                 .retryWhen { error ->
                     error.zipWith(
                         Flowable.range(1, 3)
@@ -137,28 +139,47 @@ class HomeViewModel @Inject constructor(
                 .subscribeBy(
                     onSuccess = { response ->
                         userLiveHolderAir.postValue(response.response.body.items)
-                        isAirLoaded.postValue(true)
-                        Log.e("asdfadsfafds", response.toString())
+                        isAirLoaded.postValue(Common.RESPONSE_RECEIVE_SUCCESS)
+                        Log.e("AirResponse", "Success")
                     },
                     onError = {
                         it.printStackTrace()
+                        isAirLoaded.postValue(Common.RESPONSE_RECEIVE_FAILURE)
+                        Log.e("AirResponse", "Failure")
                     }
                 )
-
-        }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    fun startWeatherApi(entity: LocationEntity): Flowable<PagingData<Weathers.Weather>> {
+    fun startWeatherApi(entity: LocationEntity): Disposable {
 
-        // val compositeDisposable = CompositeDisposable()
+        return Single.zip(
+            weatherRepository.startWeatherApi(entity, 1),
+            weatherRepository.startWeatherApi(entity, 2),
+            weatherRepository.startWeatherApi(entity, 3),
+            weatherRepository.startWeatherApi(entity, 4),
+        ) { emit1, emit2, emit3, emit4 ->
+            arrayOf(emit1, emit2, emit3, emit4)
+        }.retryWhen { error ->
+            error.zipWith(
+                Flowable.range(1, 3)
+            ) { _, t2 -> t2 }.flatMap {
+                Flowable.timer(it.toLong(), TimeUnit.SECONDS)
+            }
+        }.subscribeBy(
+            onSuccess = {
+                isWeatherLoaded.postValue(Common.RESPONSE_RECEIVE_SUCCESS)
+                Log.e("WeatherResponse", "Success")
 
-        return weatherRepository
-            .startWeatherApi(entity)
-            .observeOn(AndroidSchedulers.mainThread())
-            .cachedIn(viewModelScope)
+            },
+            onError = {
+                isWeatherLoaded.postValue(Common.RESPONSE_RECEIVE_FAILURE)
+                it.printStackTrace()
+                Log.e("WeatherResponse", "Failure")
 
+            }
+        )
 
+        // .cachedIn(viewModelScope)
 /*            weatherRepository.startApi(entity)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -194,11 +215,15 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun combineResponses(
-        station: MutableLiveData<Boolean>?,
-        air: MutableLiveData<Boolean>?,
-        weather: MutableLiveData<Boolean>?
+        station: MutableLiveData<Int>?,
+        air: MutableLiveData<Int>?,
+        weather: MutableLiveData<Int>?
     ): ResponseCheck {
-        return ResponseCheck(air = false, station = false, weather = false).apply {
+        return ResponseCheck(
+            air = Common.RESPONSE_RECEIVE_FAILURE,
+            station = Common.RESPONSE_RECEIVE_FAILURE,
+            weather = Common.RESPONSE_RECEIVE_FAILURE
+        ).apply {
             station?.value?.let {
                 this.station = it
             }

@@ -1,7 +1,6 @@
 package com.example.walkingpark.data.repository
 
 import android.graphics.PointF
-import android.util.Log
 import com.example.walkingpark.data.model.mapper.MarkerItemMapper
 import com.example.walkingpark.data.room.ParkDB
 import com.example.walkingpark.data.tools.LatLngPoints
@@ -24,11 +23,13 @@ class MapsRepository @Inject constructor(
 
     private var seekBarMult = 0.0
     fun searchLocation(entity: LocationEntity, cursorValue: Int, mult: Int) =
-        getDatabaseQuery(entity, cursorValue, mult).apply {
-            seekBarMult = this.adjustValue
-        }.run {
-            roomDataSource.searchDatabase(this)
-        }
+        getDatabaseQuery(entity, cursorValue, mult)
+            .apply {
+                seekBarMult = this.adjustValue
+            }.run {
+                roomDataSource.searchDatabase(this)
+            }
+
 
     fun getSeekBarMult() = seekBarMult
 
@@ -48,7 +49,7 @@ class MapsRepository @Inject constructor(
                 mult + cursorValue * 1000.0,
                 it
             ).run {
-                if (it == 0.0|| it == 180.0) this.x else this.y
+                if (it == 0.0 || it == 180.0) this.x else this.y
             }
         }.toList().sorted().run {
             LocationSearchEntity(
@@ -60,6 +61,7 @@ class MapsRepository @Inject constructor(
             )
         }
     }
+
 
     // 읽어온 DB 리스트에서 튜플 하나에 대한 데이터를 Marker 데이터로 파싱하기 위한 메서드.
     fun parsingDatabaseItem(it: ParkDB): MarkerItem {

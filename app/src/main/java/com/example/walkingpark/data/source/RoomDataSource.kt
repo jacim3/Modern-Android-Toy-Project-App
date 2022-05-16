@@ -3,8 +3,6 @@ package com.example.walkingpark.data.source
 import com.example.walkingpark.data.model.entity.LocationSearchEntity
 import com.example.walkingpark.data.room.AppDatabase
 import com.example.walkingpark.data.room.ParkDB
-import io.reactivex.Flowable
-import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers

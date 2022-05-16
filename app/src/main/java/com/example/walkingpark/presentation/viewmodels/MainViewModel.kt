@@ -18,7 +18,6 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor() : ViewModel() {
 
-
     val userLocation = MutableLiveData<LocationEntity>()
     val locationObservable = MutableLiveData<Flowable<LocationObject>>()
     val userLocationHistory = HashMap<Long, LocationEntity>()  // 사용자 경로 기록
@@ -34,5 +33,6 @@ class MainViewModel @Inject constructor() : ViewModel() {
                     userLocationHistory[loc.time] = this
                 }
             }
+
     }
 }

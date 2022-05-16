@@ -1,7 +1,8 @@
 package com.example.walkingpark.data.model
+import com.example.walkingpark.constants.Common
 
 data class ResponseCheck(
-    var air:Boolean = false,
-    var station:Boolean = false,
-    var weather:Boolean = false
+    var air:Int = Common.RESPONSE_RECEIVE_FAILURE,
+    var station:Int = Common.RESPONSE_RECEIVE_FAILURE,
+    var weather:Int = Common.RESPONSE_RECEIVE_FAILURE
 )

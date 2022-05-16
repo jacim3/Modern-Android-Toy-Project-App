@@ -26,7 +26,6 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:gravity="center"
-            android:text="@{homeViewModel.userLiveHolderWeather.toString()}"
             app:layout_constraintHeight_percent="0.33"
             app:layout_constraintTop_toTopOf="parent" />
 

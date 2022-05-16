@@ -8,11 +8,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import com.example.walkingpark.constants.Common
 import com.example.walkingpark.databinding.FragmentHomeBinding
 import com.example.walkingpark.presentation.view.LoadingIndicator
 import com.example.walkingpark.presentation.viewmodels.HomeViewModel
 import com.example.walkingpark.presentation.viewmodels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -31,7 +33,9 @@ class HomeFragment : Fragment() {
 
     private var binding: FragmentHomeBinding? = null
     private lateinit var loadingIndicator: LoadingIndicator
-
+    private lateinit var a: Disposable
+    private lateinit var b: io.reactivex.rxjava3.disposables.Disposable
+    private lateinit var c: Disposable
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -50,17 +54,42 @@ class HomeFragment : Fragment() {
 
         // 사용자 위치업데이트 관찰 수행시 수행.
         mainViewModel.userLocation.observe(viewLifecycleOwner) {
-                homeViewModel.startGeocodingBeforeStationApi(it)
+
+            homeViewModel.isWeatherLoaded.apply {
+                if (this.value != Common.RESPONSE_RECEIVE_PROCESSING &&
+                    this.value != Common.RESPONSE_RECEIVE_SUCCESS
+                ) {
+                    this.postValue(Common.RESPONSE_RECEIVE_PROCESSING)
+                    a = homeViewModel.startWeatherApi(it)
+                }
+            }
+
+            homeViewModel.isStationLoaded.apply {
+                if (this.value != Common.RESPONSE_RECEIVE_PROCESSING &&
+                    this.value != Common.RESPONSE_RECEIVE_SUCCESS
+                ) {
+                    this.postValue(Common.RESPONSE_RECEIVE_PROCESSING)
+                    b = homeViewModel.startGeocodingBeforeStationApi(it)
+                }
+            }
         }
 
         homeViewModel.userResponseCheck.observe(viewLifecycleOwner) {
 
-            if (it.station && !it.air)
+            if (it.station == Common.RESPONSE_RECEIVE_SUCCESS &&
+                    it.air != Common.RESPONSE_RECEIVE_PROCESSING &&
+                    it.air != Common.RESPONSE_RECEIVE_SUCCESS) {
                 homeViewModel.userLiveHolderStation.value?.stationName?.let { name ->
+                    homeViewModel.isAirLoaded.postValue(Common.RESPONSE_RECEIVE_PROCESSING)
                     homeViewModel.startAirApi(name)
                 }
+            }
 
-            if (it.station && it.air && it.weather) loadingIndicator.dismissIndicator()
+            if (it.air == Common.RESPONSE_RECEIVE_SUCCESS &&
+                it.weather == Common.RESPONSE_RECEIVE_SUCCESS
+            ) {
+                loadingIndicator.dismissIndicator()
+            }
         }
     }
 

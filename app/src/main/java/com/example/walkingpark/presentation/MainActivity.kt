@@ -35,8 +35,6 @@ class MainActivity : AppCompatActivity(
 
             val binder = service as LocationService.LocalBinder
             locationService = binder.service
-            // locationService?.getLocationCallback(viewModel.locationCallback)
-
             // LocationService 의 Flowable 을 ViewModel 로 전달.
             locationService?.let {
                 viewModel.locationObservable.value = it.getLocationFlowable()
