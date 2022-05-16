@@ -4,7 +4,7 @@
 ## 구성 :
 - 앱 실행을 위해서는 local.properties 파일 내 올바른 Google Maps Api Key 및 Public Data Api Key 필요.
 - Dagger-Hilt 를 통한 의존성 주입 설정
-- 앱 권장 아키텍쳐 패턴 및 Repository 패턴에서의 데이터 비즈니스 로직 설정.
+- 앱 권장 아키텍쳐 패턴 및 Repository 패턴에서의 데이터 비즈니스 로직 작성.
 - 주요 DataSource인 LocationService, RestApi, Room 에 ReactiveX 적용.
 
 
@@ -16,7 +16,7 @@
 <img width="230" alt="화면 캡처 2022-04-18 142822" src="https://user-images.githubusercontent.com/60813834/163760648-acfe9591-4014-4463-89b3-62a6577d4d56.gif">
 
 
-## 적용 Android 라이브러리 
+## AndroidX 라이브러리 
 - RxKotlin
 - Dagger-hilt
 - LiveData
@@ -24,6 +24,6 @@
 - Google Maps Api
 - Geocoding Api
 
-## 적용 써드파트 라이브러리
+## Third Party 라이브러리
 - Retrofit2
     
