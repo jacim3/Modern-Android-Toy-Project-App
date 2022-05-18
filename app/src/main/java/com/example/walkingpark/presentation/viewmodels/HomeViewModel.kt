@@ -1,44 +1,39 @@
 package com.example.walkingpark.presentation.viewmodels
 
-import android.annotation.SuppressLint
 import android.app.Application
-import android.location.Address
-import android.location.Geocoder
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
-import androidx.paging.PagingData
-import androidx.paging.rxjava2.cachedIn
 import com.example.walkingpark.constants.Common
-import com.example.walkingpark.constants.Settings
 import com.example.walkingpark.data.model.dto.AirResponse
 import com.example.walkingpark.data.model.dto.StationResponse
 import com.example.walkingpark.data.model.dto.WeatherResponse
 import com.example.walkingpark.data.model.entity.LocationEntity
 import com.example.walkingpark.data.model.ResponseCheck
-import com.example.walkingpark.data.model.entity.paging.Weathers
 import com.example.walkingpark.data.repository.AirApiRepository
 import com.example.walkingpark.data.repository.GeocodingRepository
 import com.example.walkingpark.data.repository.StationApiRepository
 import com.example.walkingpark.data.repository.WeatherApiRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.*
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
+import java.sql.Timestamp
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.stream.Collectors
+import java.util.stream.Stream
 import javax.inject.Inject
 import kotlin.math.abs
 
 /*
     TODO 현재는 UI 관련 비즈니스 로직을 작성하지 않았으므로 사용하지 않음.
 */
+
+const val REST_API_RETRY_COUNT = 3
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -51,7 +46,7 @@ class HomeViewModel @Inject constructor(
 
     val userLiveHolderStation = MutableLiveData<StationResponse.Response.Body.Items?>()
     val userLiveHolderAir = MutableLiveData<List<AirResponse.Response.Body.Items>?>()
-    val userLiveHolderWeather = MutableLiveData<Array<WeatherResponse>>()
+    val userLiveHolderWeather = MutableLiveData<Array<WeatherResponse.Response.Body.Items.Item>>()
 
     var isAirLoaded = MutableLiveData<Int>()
     var isStationLoaded = MutableLiveData<Int>()
@@ -73,7 +68,13 @@ class HomeViewModel @Inject constructor(
     fun startGeocodingBeforeStationApi(entity: LocationEntity): io.reactivex.rxjava3.disposables.Disposable {
 
         return geocodingRepository.getAddressSet(entity)
-            .retry(5)
+            .retryWhen { error ->
+                error.zipWith(
+                    Flowable.range(1, REST_API_RETRY_COUNT)
+                ) { _, t2 -> t2 }.flatMap {
+                    Flowable.timer(it.toLong(), TimeUnit.SECONDS)
+                }
+            }
             .subscribe(
                 {
                     startStationApi(entity, it)
@@ -84,17 +85,17 @@ class HomeViewModel @Inject constructor(
             )
     }
 
-
     private fun startStationApi(entity: LocationEntity, addresses: List<String>): Disposable {
 
         return stationRepository.startStationApi(addresses)
             .retryWhen { error ->
                 error.zipWith(
-                    Flowable.range(1, 3)
+                    Flowable.range(1, REST_API_RETRY_COUNT)
                 ) { _, t2 -> t2 }.flatMap {
                     Flowable.timer(it.toLong(), TimeUnit.SECONDS)
                 }
             }
+
             .subscribeBy(
                 onSuccess = { response ->
                     userLiveHolderStation.postValue(
@@ -103,11 +104,11 @@ class HomeViewModel @Inject constructor(
                             entity
                         )
                     )
-                    isStationLoaded.postValue(Common.RESPONSE_RECEIVE_SUCCESS)
+                    isStationLoaded.postValue(Common.RESPONSE_SUCCESS)
                 },
                 onError = {
                     it.printStackTrace()
-                    isStationLoaded.postValue(Common.RESPONSE_RECEIVE_FAILURE)
+                    isStationLoaded.postValue(Common.RESPONSE_FAILURE)
                 }
             )
 
@@ -128,90 +129,58 @@ class HomeViewModel @Inject constructor(
     }
 
     fun startAirApi(stationName: String): Disposable {
-            return airRepository.startAirApi(stationName)
-                .retryWhen { error ->
-                    error.zipWith(
-                        Flowable.range(1, 3)
-                    ) { _, t2 -> t2 }.flatMap {
-                        Flowable.timer(it.toLong(), TimeUnit.SECONDS)
-                    }
+        return airRepository.startAirApi(stationName)
+            .retryWhen { error ->
+                error.zipWith(
+                    Flowable.range(1, REST_API_RETRY_COUNT)
+                ) { _, t2 -> t2 }.flatMap {
+                    Flowable.timer(it.toLong(), TimeUnit.SECONDS)
                 }
-                .subscribeBy(
-                    onSuccess = { response ->
-                        userLiveHolderAir.postValue(response.response.body.items)
-                        isAirLoaded.postValue(Common.RESPONSE_RECEIVE_SUCCESS)
-                        Log.e("AirResponse", "Success")
-                    },
-                    onError = {
-                        it.printStackTrace()
-                        isAirLoaded.postValue(Common.RESPONSE_RECEIVE_FAILURE)
-                        Log.e("AirResponse", "Failure")
-                    }
-                )
+            }
+            .subscribeBy(
+                onSuccess = { response ->
+                    userLiveHolderAir.postValue(response.response.body.items)
+                    isAirLoaded.postValue(Common.RESPONSE_SUCCESS)
+                    Log.e("AirResponse", "Success")
+                },
+                onError = {
+                    it.printStackTrace()
+                    isAirLoaded.postValue(Common.RESPONSE_FAILURE)
+                    Log.e("AirResponse", "Failure")
+                }
+            )
     }
 
+    // TODO 에러 핸들링
     fun startWeatherApi(entity: LocationEntity): Disposable {
-
+        // 날씨 Api 의 결과는 총 800개가 넘으므로, 이를 250개씩 4페이지에 걸쳐 분할하여 받음.
         return Single.zip(
             weatherRepository.startWeatherApi(entity, 1),
             weatherRepository.startWeatherApi(entity, 2),
             weatherRepository.startWeatherApi(entity, 3),
             weatherRepository.startWeatherApi(entity, 4),
         ) { emit1, emit2, emit3, emit4 ->
-            arrayOf(emit1, emit2, emit3, emit4)
-        }.retryWhen { error ->
-            error.zipWith(
-                Flowable.range(1, 3)
-            ) { _, t2 -> t2 }.flatMap {
-                Flowable.timer(it.toLong(), TimeUnit.SECONDS)
-            }
+
+            emit1.response.body.items.item + emit2.response.body.items.item +
+                    emit3.response.body.items.item + emit4.response.body.items.item
+
+        }.retry { count, error ->
+            Timestamp(Calendar.getInstance().apply {
+                add(Calendar.HOUR, count * -1)
+            }.timeInMillis).time
+
+            count < 3
         }.subscribeBy(
             onSuccess = {
-                isWeatherLoaded.postValue(Common.RESPONSE_RECEIVE_SUCCESS)
+                isWeatherLoaded.postValue(Common.RESPONSE_SUCCESS)
                 Log.e("WeatherResponse", "Success")
-
             },
             onError = {
-                isWeatherLoaded.postValue(Common.RESPONSE_RECEIVE_FAILURE)
+                isWeatherLoaded.postValue(Common.RESPONSE_FAILURE)
                 it.printStackTrace()
                 Log.e("WeatherResponse", "Failure")
-
             }
         )
-
-        // .cachedIn(viewModelScope)
-/*            weatherRepository.startApi(entity)
-                .subscribeOn(Schedulers.computation())
-                .observeOn(AndroidSchedulers.mainThread())
-                .retryWhen { error ->
-                    error.zipWith(
-                        Flowable.range(1, 3)
-                    ) { _, t2 -> t2 }.flatMap {
-                        Flowable.timer(it.toLong(), TimeUnit.SECONDS)
-                    }
-                }
-                .subscribeBy(
-                    onSuccess = { response ->
-                        val concertList:
-                                Single<PagedList< List<WeatherDTO.Response.Body.Items.Item>>>
-
-                        userLiveHolderWeather.value = response.response.body.items.item
-                        isWeatherLoaded.postValue(true)
-                    },
-                    onError = {
-
-                    },
-                )*/
-
-
-/*            response?.let {
-                userLiveHolderWeather.value = it
-                val tmpMap = userLiveHolderLoadedStatus.value
-                tmpMap!!["weather"] = "success"
-                userLiveHolderLoadedStatus.postValue(tmpMap)
-            }*/
-
-
     }
 
     private fun combineResponses(
@@ -220,9 +189,9 @@ class HomeViewModel @Inject constructor(
         weather: MutableLiveData<Int>?
     ): ResponseCheck {
         return ResponseCheck(
-            air = Common.RESPONSE_RECEIVE_FAILURE,
-            station = Common.RESPONSE_RECEIVE_FAILURE,
-            weather = Common.RESPONSE_RECEIVE_FAILURE
+            air = Common.RESPONSE_FAILURE,
+            station = Common.RESPONSE_FAILURE,
+            weather = Common.RESPONSE_FAILURE
         ).apply {
             station?.value?.let {
                 this.station = it
@@ -234,6 +203,10 @@ class HomeViewModel @Inject constructor(
                 this.weather = it
             }
         }
+    }
+
+    private fun mpChart(){
+
     }
 }
 

@@ -47,10 +47,10 @@ object Common {
     @SuppressLint("SimpleDateFormat")
     val timeFormat = SimpleDateFormat(REST_API_TIME_UNIT_FORMAT)
 
-    // 응답 관련
-    const val RESPONSE_RECEIVE_SUCCESS = 0
-    const val RESPONSE_RECEIVE_FAILURE = 1
-    const val RESPONSE_RECEIVE_PROCESSING = 2
+    // RestApi 응답 관련
+    const val RESPONSE_SUCCESS = 0
+    const val RESPONSE_FAILURE = 1
+    const val RESPONSE_PROCEEDING = 2
 }
 
 /**

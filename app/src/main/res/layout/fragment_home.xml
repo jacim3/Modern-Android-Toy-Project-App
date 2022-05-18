@@ -13,40 +13,17 @@
         tools:context=".presentation.HomeFragment">
 
 
-<!--        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/textViewAddress"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />-->
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/textViewWeather"
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/lineChartWeather"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:gravity="center"
-            app:layout_constraintHeight_percent="0.33"
+            android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/textViewStation"
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/lineChartAir"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:gravity="center"
-            android:text="@{homeViewModel.userLiveHolderStation.toString()}"
-            app:layout_constraintHeight_percent="0.33"
-            app:layout_constraintTop_toBottomOf="@+id/textViewWeather" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/textViewAir"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:gravity="center"
-            android:text="@{homeViewModel.userLiveHolderAir.toString()}"
-            app:layout_constraintHeight_percent="0.33"
-            app:layout_constraintTop_toBottomOf="@+id/textViewStation" />
-
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/lineChartWeather" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
