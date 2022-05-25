@@ -1,5 +1,6 @@
 package com.example.walkingpark.data.source
 
+import android.util.Log
 import com.example.walkingpark.data.model.dto.AirResponse
 import com.example.walkingpark.data.model.dto.StationResponse
 import com.example.walkingpark.data.api.PublicApiService
@@ -27,6 +28,7 @@ class ApiDataSource @Inject constructor(
     fun provideWeatherService(): PublicApiService = weatherApi
 
     fun getWeatherApi(query:Map<String, String>): Single<WeatherResponse> {
+        Log.e("asdfasdfsad", query.toString())
         return weatherApi.getWeatherByGridXY(apiKey, query).subscribeOn(Schedulers.computation())
             .observeOn(AndroidSchedulers.mainThread())
     }

@@ -19,13 +19,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.*
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
-import java.sql.Timestamp
-import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.stream.Collectors
-import java.util.stream.Stream
 import javax.inject.Inject
 import kotlin.math.abs
 
@@ -46,7 +41,7 @@ class HomeViewModel @Inject constructor(
 
     val userLiveHolderStation = MutableLiveData<StationResponse.Response.Body.Items?>()
     val userLiveHolderAir = MutableLiveData<List<AirResponse.Response.Body.Items>?>()
-    val userLiveHolderWeather = MutableLiveData<Array<WeatherResponse.Response.Body.Items.Item>>()
+    val userLiveHolderWeather = MutableLiveData<Map<String, Map<String, Map<String, String>>>>()
 
     var isAirLoaded = MutableLiveData<Int>()
     var isStationLoaded = MutableLiveData<Int>()
@@ -151,8 +146,17 @@ class HomeViewModel @Inject constructor(
             )
     }
 
-    // TODO 에러 핸들링
+    // TODO 통신 실패 시, 현재 시간을 기준으로 검색시간을 변경하여 재시도 하도록
+    // TODO ResultCode 에 따른 에러핸들링 필요.
     fun startWeatherApi(entity: LocationEntity): Disposable {
+
+/*        .retry { count, error ->
+            Timestamp(Calendar.getInstance().apply {
+                add(Calendar.HOUR, count * -1)
+            }.timeInMillis).time
+            count < 3
+        }*/
+
         // 날씨 Api 의 결과는 총 800개가 넘으므로, 이를 250개씩 4페이지에 걸쳐 분할하여 받음.
         return Single.zip(
             weatherRepository.startWeatherApi(entity, 1),
@@ -160,19 +164,11 @@ class HomeViewModel @Inject constructor(
             weatherRepository.startWeatherApi(entity, 3),
             weatherRepository.startWeatherApi(entity, 4),
         ) { emit1, emit2, emit3, emit4 ->
-
-            emit1.response.body.items.item + emit2.response.body.items.item +
-                    emit3.response.body.items.item + emit4.response.body.items.item
-
-        }.retry { count, error ->
-            Timestamp(Calendar.getInstance().apply {
-                add(Calendar.HOUR, count * -1)
-            }.timeInMillis).time
-
-            count < 3
+            weatherResponseToMap(weatherResponseCheckAndMerge(listOf(emit1, emit2, emit3, emit4)))
         }.subscribeBy(
             onSuccess = {
                 isWeatherLoaded.postValue(Common.RESPONSE_SUCCESS)
+                userLiveHolderWeather.postValue(it)
                 Log.e("WeatherResponse", "Success")
             },
             onError = {
@@ -183,32 +179,61 @@ class HomeViewModel @Inject constructor(
         )
     }
 
-    private fun combineResponses(
-        station: MutableLiveData<Int>?,
-        air: MutableLiveData<Int>?,
-        weather: MutableLiveData<Int>?
-    ): ResponseCheck {
-        return ResponseCheck(
-            air = Common.RESPONSE_FAILURE,
-            station = Common.RESPONSE_FAILURE,
-            weather = Common.RESPONSE_FAILURE
-        ).apply {
-            station?.value?.let {
-                this.station = it
+    // resultCode 0 은 응답 성공을 의미. 응답에 성공한 객체만 합쳐서 출력.
+    private fun weatherResponseCheckAndMerge(responses: List<WeatherResponse>): List<WeatherResponse.Response.Body.Items.Item> {
+        return listOf<WeatherResponse.Response.Body.Items.Item>().toMutableList()
+            .apply {
+                responses.forEach {
+                    if (it.response.header.resultCode == 0)
+                        this += it.response.body.items.item
+                }
             }
-            air?.value?.let {
-                this.air = it
-            }
-            weather?.value?.let {
-                this.weather = it
-            }
-        }
+
     }
 
-    private fun mpChart(){
+    // Chart 데이터로 제공하기 위한 Map 객체 출력
+    private fun weatherResponseToMap(responses: List<WeatherResponse.Response.Body.Items.Item>):
+            Map<String, Map<String, Map<String, String>>> {
+
+        return responses
+            .groupBy {
+                it.fcstDate
+            }.mapValues { outer ->
+                outer.value.groupBy {
+                    it.fcstTime
+                }.mapValues { inner ->
+                    inner.value.associate {
+                        it.category to it.fcstValue
+                    }
+                }
+            }
 
     }
 }
+
+
+private fun combineResponses(
+    station: MutableLiveData<Int>?,
+    air: MutableLiveData<Int>?,
+    weather: MutableLiveData<Int>?
+): ResponseCheck {
+    return ResponseCheck(
+        air = Common.RESPONSE_FAILURE,
+        station = Common.RESPONSE_FAILURE,
+        weather = Common.RESPONSE_FAILURE
+    ).apply {
+        station?.value?.let {
+            this.station = it
+        }
+        air?.value?.let {
+            this.air = it
+        }
+        weather?.value?.let {
+            this.weather = it
+        }
+    }
+}
+
 
 // -------------------------------------------------------------------------------------------------
 // ----------------------------------------- DataBinding -------------------------------------------
