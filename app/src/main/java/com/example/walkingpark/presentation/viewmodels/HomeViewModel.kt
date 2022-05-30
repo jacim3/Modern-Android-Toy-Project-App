@@ -2,6 +2,7 @@ package com.example.walkingpark.presentation.viewmodels
 
 import android.app.Application
 import android.util.Log
+import android.view.View
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
@@ -11,6 +12,7 @@ import com.example.walkingpark.data.model.dto.StationResponse
 import com.example.walkingpark.data.model.dto.WeatherResponse
 import com.example.walkingpark.data.model.entity.LocationEntity
 import com.example.walkingpark.data.model.ResponseCheck
+import com.example.walkingpark.data.model.dto.WeatherDTO
 import com.example.walkingpark.data.repository.AirApiRepository
 import com.example.walkingpark.data.repository.GeocodingRepository
 import com.example.walkingpark.data.repository.StationApiRepository
@@ -41,6 +43,9 @@ class HomeViewModel @Inject constructor(
 
     val userLiveHolderStation = MutableLiveData<StationResponse.Response.Body.Items?>()
     val userLiveHolderAir = MutableLiveData<List<AirResponse.Response.Body.Items>?>()
+
+    val userLiveHolderWeatherTemp =
+        MutableLiveData<List<WeatherResponse.Response.Body.Items.Item>>()
     val userLiveHolderWeather = MutableLiveData<Map<String, Map<String, Map<String, String>>>>()
 
     var isAirLoaded = MutableLiveData<Int>()
@@ -61,7 +66,6 @@ class HomeViewModel @Inject constructor(
         }
 
     fun startGeocodingBeforeStationApi(entity: LocationEntity): io.reactivex.rxjava3.disposables.Disposable {
-
         return geocodingRepository.getAddressSet(entity)
             .retryWhen { error ->
                 error.zipWith(
@@ -164,6 +168,8 @@ class HomeViewModel @Inject constructor(
             weatherRepository.startWeatherApi(entity, 3),
             weatherRepository.startWeatherApi(entity, 4),
         ) { emit1, emit2, emit3, emit4 ->
+            // 응답결과 -> Map 자료구조 변환
+            userLiveHolderWeatherTemp.postValue(emit1.response.body.items.item + emit2.response.body.items.item + emit3.response.body.items.item + emit4.response.body.items.item)
             weatherResponseToMap(weatherResponseCheckAndMerge(listOf(emit1, emit2, emit3, emit4)))
         }.subscribeBy(
             onSuccess = {
@@ -209,32 +215,37 @@ class HomeViewModel @Inject constructor(
             }
 
     }
-}
 
 
-private fun combineResponses(
-    station: MutableLiveData<Int>?,
-    air: MutableLiveData<Int>?,
-    weather: MutableLiveData<Int>?
-): ResponseCheck {
-    return ResponseCheck(
-        air = Common.RESPONSE_FAILURE,
-        station = Common.RESPONSE_FAILURE,
-        weather = Common.RESPONSE_FAILURE
-    ).apply {
-        station?.value?.let {
-            this.station = it
-        }
-        air?.value?.let {
-            this.air = it
-        }
-        weather?.value?.let {
-            this.weather = it
+    private fun combineResponses(
+        station: MutableLiveData<Int>?,
+        air: MutableLiveData<Int>?,
+        weather: MutableLiveData<Int>?
+    ): ResponseCheck {
+        return ResponseCheck(
+            air = Common.RESPONSE_FAILURE,
+            station = Common.RESPONSE_FAILURE,
+            weather = Common.RESPONSE_FAILURE
+        ).apply {
+            station?.value?.let {
+                this.station = it
+            }
+            air?.value?.let {
+                this.air = it
+            }
+            weather?.value?.let {
+                this.weather = it
+            }
         }
     }
-}
-
 
 // -------------------------------------------------------------------------------------------------
 // ----------------------------------------- DataBinding -------------------------------------------
 // -------------------------------------------------------------------------------------------------
+
+
+}
+
+
+
+

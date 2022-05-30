@@ -25,14 +25,14 @@ class MainViewModel @Inject constructor() : ViewModel() {
     // 리액티브 Handler
     @SuppressLint("CheckResult")
     fun locationObservableHandler(){
-        locationObservable.value
-            ?.subscribeOn(Schedulers.computation())
-            ?.observeOn(AndroidSchedulers.mainThread())
-            ?.subscribe { loc ->
+        locationObservable.value?.let {
+            it.subscribeOn(Schedulers.computation())
+            it.observeOn(AndroidSchedulers.mainThread())
+            it.subscribe { loc ->
                 userLocation.value = LocationEntity(loc.latitude, loc.longitude).apply {
                     userLocationHistory[loc.time] = this
                 }
             }
-
+        }
     }
 }
