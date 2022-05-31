@@ -1,6 +1,6 @@
 package com.example.walkingpark.data.model.mapper
 
-import com.example.walkingpark.data.model.dto.WeatherResponse
+import com.example.walkingpark.data.model.dto.response.WeatherResponse
 import com.example.walkingpark.data.model.entity.paging.Weathers
 
 class WeatherMapper {

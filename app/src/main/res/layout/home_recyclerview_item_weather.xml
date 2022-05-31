@@ -21,11 +21,19 @@
         android:src="@drawable/ic_launcher_background"/>
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/textViewValue"
+        android:id="@+id/textViewTemperature"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="32dp"
+        android:text="19"/>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/textViewRainChance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="8dp"
         android:text="19"/>
 
 </androidx.appcompat.widget.LinearLayoutCompat>

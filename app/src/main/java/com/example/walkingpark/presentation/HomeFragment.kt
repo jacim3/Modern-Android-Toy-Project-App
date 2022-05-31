@@ -125,14 +125,24 @@ class HomeFragment : Fragment() {
         windAdapter = TabAdapterWind()
 
         binding?.let {
-            it.recyclerViewHumidity.apply {
+            it.recyclerViewWeather.apply {
                 this.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
                 adapter = weatherAdapter
+            }
+
+            it.recyclerViewHumidity.apply {
+                this.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+                adapter = humidityAdapter
+            }
+
+            it.recyclerViewWind.apply {
+                this.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+                adapter = windAdapter
             }
         }
 
         homeViewModel.userLiveHolderWeather.observe(viewLifecycleOwner) {
-            weatherAdapter.data = it
+            weatherAdapter.setAdapterData(it)
         }
 
         homeViewModel.userLiveHolderAir.observe(viewLifecycleOwner) {

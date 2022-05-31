@@ -51,6 +51,9 @@ object Common {
     const val RESPONSE_SUCCESS = 0
     const val RESPONSE_FAILURE = 1
     const val RESPONSE_PROCEEDING = 2
+
+
+    const val NO_DATA = "noData"
 }
 
 /**

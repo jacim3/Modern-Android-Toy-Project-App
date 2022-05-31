@@ -1,10 +1,10 @@
 package com.example.walkingpark.data.source
 
 import android.util.Log
-import com.example.walkingpark.data.model.dto.AirResponse
-import com.example.walkingpark.data.model.dto.StationResponse
+import com.example.walkingpark.data.model.dto.response.AirResponse
+import com.example.walkingpark.data.model.dto.response.StationResponse
 import com.example.walkingpark.data.api.PublicApiService
-import com.example.walkingpark.data.model.dto.WeatherResponse
+import com.example.walkingpark.data.model.dto.response.WeatherResponse
 import com.example.walkingpark.di.module.PublicDataApiModule
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers

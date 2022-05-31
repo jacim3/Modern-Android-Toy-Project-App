@@ -2,7 +2,7 @@ package com.example.walkingpark.data.repository
 
 import android.annotation.SuppressLint
 import com.example.walkingpark.constants.Common
-import com.example.walkingpark.data.model.dto.WeatherResponse
+import com.example.walkingpark.data.model.dto.response.WeatherResponse
 import com.example.walkingpark.data.model.entity.LocationEntity
 import com.example.walkingpark.data.source.ApiDataSource
 import com.example.walkingpark.data.tools.LatLngToGridXy

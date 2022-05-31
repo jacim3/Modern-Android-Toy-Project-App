@@ -1,9 +1,9 @@
 package com.example.walkingpark.data.model
 
 import androidx.lifecycle.MutableLiveData
-import com.example.walkingpark.data.model.dto.AirResponse
-import com.example.walkingpark.data.model.dto.StationResponse
-import com.example.walkingpark.data.model.dto.WeatherResponse
+import com.example.walkingpark.data.model.dto.response.AirResponse
+import com.example.walkingpark.data.model.dto.response.StationResponse
+import com.example.walkingpark.data.model.dto.response.WeatherResponse
 
 data class ResponseSet(
 

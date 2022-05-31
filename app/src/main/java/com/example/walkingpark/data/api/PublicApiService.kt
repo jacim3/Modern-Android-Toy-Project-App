@@ -1,9 +1,9 @@
 package com.example.walkingpark.data.api
 
 import com.example.walkingpark.constants.Common
-import com.example.walkingpark.data.model.dto.AirResponse
-import com.example.walkingpark.data.model.dto.StationResponse
-import com.example.walkingpark.data.model.dto.WeatherResponse
+import com.example.walkingpark.data.model.dto.response.AirResponse
+import com.example.walkingpark.data.model.dto.response.StationResponse
+import com.example.walkingpark.data.model.dto.response.WeatherResponse
 import io.reactivex.Single
 import retrofit2.http.GET
 import retrofit2.http.Query

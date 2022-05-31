@@ -2,14 +2,14 @@ package com.example.walkingpark.presentation.viewmodels
 
 import android.app.Application
 import android.util.Log
-import android.view.View
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.walkingpark.constants.Common
-import com.example.walkingpark.data.model.dto.AirResponse
-import com.example.walkingpark.data.model.dto.StationResponse
-import com.example.walkingpark.data.model.dto.WeatherResponse
+import com.example.walkingpark.constants.WEATHER
+import com.example.walkingpark.data.model.dto.response.AirResponse
+import com.example.walkingpark.data.model.dto.response.StationResponse
+import com.example.walkingpark.data.model.dto.response.WeatherResponse
 import com.example.walkingpark.data.model.entity.LocationEntity
 import com.example.walkingpark.data.model.ResponseCheck
 import com.example.walkingpark.data.model.dto.WeatherDTO
@@ -43,10 +43,7 @@ class HomeViewModel @Inject constructor(
 
     val userLiveHolderStation = MutableLiveData<StationResponse.Response.Body.Items?>()
     val userLiveHolderAir = MutableLiveData<List<AirResponse.Response.Body.Items>?>()
-
-    val userLiveHolderWeatherTemp =
-        MutableLiveData<List<WeatherResponse.Response.Body.Items.Item>>()
-    val userLiveHolderWeather = MutableLiveData<Map<String, Map<String, Map<String, String>>>>()
+    val userLiveHolderWeather = MutableLiveData<List<WeatherDTO>>()
 
     var isAirLoaded = MutableLiveData<Int>()
     var isStationLoaded = MutableLiveData<Int>()
@@ -169,8 +166,7 @@ class HomeViewModel @Inject constructor(
             weatherRepository.startWeatherApi(entity, 4),
         ) { emit1, emit2, emit3, emit4 ->
             // 응답결과 -> Map 자료구조 변환
-            userLiveHolderWeatherTemp.postValue(emit1.response.body.items.item + emit2.response.body.items.item + emit3.response.body.items.item + emit4.response.body.items.item)
-            weatherResponseToMap(weatherResponseCheckAndMerge(listOf(emit1, emit2, emit3, emit4)))
+            weatherMapToList(weatherResponseToMap(weatherResponseCheckAndMerge(listOf(emit1, emit2, emit3, emit4))))
         }.subscribeBy(
             onSuccess = {
                 isWeatherLoaded.postValue(Common.RESPONSE_SUCCESS)
@@ -197,7 +193,8 @@ class HomeViewModel @Inject constructor(
 
     }
 
-    // Chart 데이터로 제공하기 위한 Map 객체 출력
+    // TODO Api 에서 보내주는 데이터는 category 로 구분하여 분할하여 보내주므로, 이를 같은 날짜+시간에 따라
+    // TODO map 객체로 통합.
     private fun weatherResponseToMap(responses: List<WeatherResponse.Response.Body.Items.Item>):
             Map<String, Map<String, Map<String, String>>> {
 
@@ -214,6 +211,33 @@ class HomeViewModel @Inject constructor(
                 }
             }
 
+    }
+
+    // TODO 위에서 통합한 map 객체를 recyclerView 에서 사용하기 위한 리스트로 변환
+    private fun weatherMapToList(map : Map<String, Map<String, Map<String, String>>>): List<WeatherDTO> {
+        return emptyList<WeatherDTO>().toMutableList().apply {
+            map.forEach { outer ->
+                outer.value.forEach {
+                    this.add(
+                        WeatherDTO(
+                        date = outer.key,
+                        time = it.key,
+                        temperature = it.value[WEATHER.TEMPERATURE.code] ?: Common.NO_DATA,
+                        temperatureMax = it.value[WEATHER.TEMPERATURE_HIGH.code] ?: Common.NO_DATA,
+                        temperatureMin = it.value[WEATHER.TEMPERATURE_LOW.code] ?: Common.NO_DATA,
+                        humidity = it.value[WEATHER.HUMIDITY.code] ?: Common.NO_DATA,
+                        rainChance = it.value[WEATHER.RAIN_CHANCE.code] ?: Common.NO_DATA,
+                        rainType = it.value[WEATHER.RAIN_TYPE.code] ?: Common.NO_DATA,
+                        snow = it.value[WEATHER.SNOW.code] ?: Common.NO_DATA,
+                        windSpeed = it.value[WEATHER.WIND_SPEED.code] ?: Common.NO_DATA,
+                        windEW = it.value[WEATHER.WIND_SPEED_EW.code] ?: Common.NO_DATA,
+                        windNS = it.value[WEATHER.WIND_SPEED_NS.code] ?: Common.NO_DATA,
+                        sky = it.value[WEATHER.SKY.code] ?: Common.NO_DATA,
+                        )
+                    )
+                }
+            }
+        }
     }
 
 

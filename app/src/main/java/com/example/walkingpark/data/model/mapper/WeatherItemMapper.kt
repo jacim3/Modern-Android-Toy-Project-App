@@ -1,7 +1,7 @@
 package com.example.walkingpark.data.model.mapper
 
 import com.example.walkingpark.constants.WEATHER
-import com.example.walkingpark.data.model.dto.WeatherResponse
+import com.example.walkingpark.data.model.dto.response.WeatherResponse
 import java.util.*
 
 object WeatherItemMapper {
