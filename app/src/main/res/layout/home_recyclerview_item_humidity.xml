@@ -6,14 +6,14 @@
     android:orientation="vertical">
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/textViewTime"
+        android:id="@+id/textViewHumidityTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="지금"/>
 
     <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/imageViewIcon"
+        android:id="@+id/imageViewHumidityIcon"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_marginTop="8dp"
@@ -21,7 +21,7 @@
         android:src="@drawable/ic_launcher_background"/>
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/textViewValue"
+        android:id="@+id/textViewHumidityValue"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"

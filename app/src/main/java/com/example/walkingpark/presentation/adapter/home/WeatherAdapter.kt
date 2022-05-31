@@ -1,6 +1,5 @@
 package com.example.walkingpark.presentation.adapter.home
 
-import android.icu.util.LocaleData
 import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
@@ -12,21 +11,19 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.walkingpark.R
 import com.example.walkingpark.constants.Common
 import com.example.walkingpark.data.model.dto.WeatherDTO
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
 
-class TabAdapterWeather() : RecyclerView.Adapter<TabAdapterWeather.WeatherViewHolder>() {
+class WeatherAdapter() : RecyclerView.Adapter<WeatherAdapter.WeatherViewHolder>() {
 
     var data = emptyList<WeatherDTO>()
 
     class WeatherViewHolder constructor(itemView: View, val seperator: View) :
         RecyclerView.ViewHolder(itemView) {
-        val imageViewIcon: AppCompatImageView = itemView.findViewById(R.id.imageViewIcon)
-        val textViewTime: AppCompatTextView = itemView.findViewById(R.id.textViewTime)
-        val textViewTemperature: AppCompatTextView = itemView.findViewById(R.id.textViewTemperature)
-        val textViewRainChance: AppCompatTextView = itemView.findViewById(R.id.textViewRainChance)
+        val imageViewIcon: AppCompatImageView = itemView.findViewById(R.id.imageViewWeatherIcon)
+        val textViewTime: AppCompatTextView = itemView.findViewById(R.id.textViewWeatherTime)
+        val textViewTemperature: AppCompatTextView = itemView.findViewById(R.id.textViewWeatherTemperature)
+        val textViewRainChance: AppCompatTextView = itemView.findViewById(R.id.textViewWeatherRainChance)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WeatherViewHolder {

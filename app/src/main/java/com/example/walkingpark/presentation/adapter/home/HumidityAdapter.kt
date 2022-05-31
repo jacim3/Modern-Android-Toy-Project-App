@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
-import androidx.appcompat.view.menu.ActionMenuItemView
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.RecyclerView
@@ -14,36 +13,35 @@ import com.example.walkingpark.data.model.dto.WeatherDTO
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-class TabAdapterWind: RecyclerView.Adapter<TabAdapterWind.WindViewHolder>() {
+class HumidityAdapter : RecyclerView.Adapter<HumidityAdapter.HumidityViewHolder>(){
 
     var data = emptyList<WeatherDTO>()
 
-    class WindViewHolder constructor(itemView: View, val seperator:View) : RecyclerView.ViewHolder(itemView) {
-        val imageViewIcon: AppCompatImageView = itemView.findViewById(R.id.imageViewIcon)
-        val textViewTime: AppCompatTextView = itemView.findViewById(R.id.textViewTime)
-        val textViewDirection:AppCompatTextView = itemView.findViewById(R.id.textViewDirection)
-        val textViewValue:AppCompatTextView = itemView.findViewById(R.id.textViewValue)
+    class HumidityViewHolder constructor(itemView: View, val seperator:View) : RecyclerView.ViewHolder(itemView) {
+        val imageViewIcon:AppCompatImageView = itemView.findViewById(R.id.imageViewHumidityIcon)
+        val textViewTime:AppCompatTextView = itemView.findViewById(R.id.textViewHumidityTime)
+        val textViewValue:AppCompatTextView = itemView.findViewById(R.id.textViewHumidityValue)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WindViewHolder {
-        return WindViewHolder(
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HumidityViewHolder {
+        return HumidityViewHolder(
             LayoutInflater.from(parent.context)
-                .inflate(R.layout.home_recyclerview_item_weather, parent, false),
+                .inflate(R.layout.home_recyclerview_item_humidity, parent, false),
             LayoutInflater.from(parent.context)
                 .inflate(R.layout.home_recyclerview_item_seperator, parent, false)
         )
     }
 
-    override fun onBindViewHolder(holder: WindViewHolder, position: Int) {
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun onBindViewHolder(holder: HumidityViewHolder, position: Int) {
         val item = data[position]
         val date = item.date
         val time = item.time
-        val ns = item.windNS
-        val ew = item.windEW
+        val dateTime = getLocalDateTime(item.date+item.time)
+
 
         holder.textViewTime.text = time
-        // holder.textViewDirection.text =
-        holder.textViewValue.text = item.windSpeed
+        holder.textViewValue.text = item.humidity
     }
 
     override fun getItemCount(): Int {

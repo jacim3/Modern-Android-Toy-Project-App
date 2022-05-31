@@ -4,9 +4,12 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/circleindicator_dot.xml" value="0.1515" />
+        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_launcher_background.xml" value="0.192" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_weather_cloud.xml" value="0.207" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_weather_fog.xml" value="0.239" />
+        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_weather_humidity.xml" value="0.233" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_weather_moon.xml" value="0.127" />
+        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_weather_rain.xml" value="0.233" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_weather_sun.xml" value="0.1075" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ui_loading_indicator_background.xml" value="0.1475" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/layout/activity_main.xml" value="0.22" />

@@ -1,7 +1,5 @@
 package com.example.walkingpark.data.model.dto
 
-import com.example.walkingpark.presentation.adapter.home.TabAdapterHumidity
-
 data class WeatherDTO(
     val date: String,
     val time: String,

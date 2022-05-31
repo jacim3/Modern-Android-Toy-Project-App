@@ -5,14 +5,17 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.walkingpark.R
 import com.example.walkingpark.constants.Common
 import com.example.walkingpark.constants.WEATHER
+import com.example.walkingpark.data.model.ResponseCheck
+import com.example.walkingpark.data.model.dto.SimpleAir
+import com.example.walkingpark.data.model.dto.SimpleWeather
+import com.example.walkingpark.data.model.dto.WeatherDTO
 import com.example.walkingpark.data.model.dto.response.AirResponse
 import com.example.walkingpark.data.model.dto.response.StationResponse
 import com.example.walkingpark.data.model.dto.response.WeatherResponse
 import com.example.walkingpark.data.model.entity.LocationEntity
-import com.example.walkingpark.data.model.ResponseCheck
-import com.example.walkingpark.data.model.dto.WeatherDTO
 import com.example.walkingpark.data.repository.AirApiRepository
 import com.example.walkingpark.data.repository.GeocodingRepository
 import com.example.walkingpark.data.repository.StationApiRepository
@@ -25,6 +28,7 @@ import java.util.concurrent.TimeUnit
 import java.util.stream.Collectors
 import javax.inject.Inject
 import kotlin.math.abs
+
 
 /*
     TODO 현재는 UI 관련 비즈니스 로직을 작성하지 않았으므로 사용하지 않음.
@@ -44,6 +48,9 @@ class HomeViewModel @Inject constructor(
     val userLiveHolderStation = MutableLiveData<StationResponse.Response.Body.Items?>()
     val userLiveHolderAir = MutableLiveData<List<AirResponse.Response.Body.Items>?>()
     val userLiveHolderWeather = MutableLiveData<List<WeatherDTO>>()
+
+    val userSimplePanelAir = MutableLiveData<SimpleAir>()
+    val userSimplePanelWeather = MutableLiveData<SimpleWeather>()
 
     var isAirLoaded = MutableLiveData<Int>()
     var isStationLoaded = MutableLiveData<Int>()
@@ -79,6 +86,7 @@ class HomeViewModel @Inject constructor(
                     it.printStackTrace()
                 }
             )
+
     }
 
     private fun startStationApi(entity: LocationEntity, addresses: List<String>): Disposable {
@@ -91,7 +99,6 @@ class HomeViewModel @Inject constructor(
                     Flowable.timer(it.toLong(), TimeUnit.SECONDS)
                 }
             }
-
             .subscribeBy(
                 onSuccess = { response ->
                     userLiveHolderStation.postValue(
@@ -110,7 +117,7 @@ class HomeViewModel @Inject constructor(
 
     }
 
-    // 측정소 결과 리스트 중 사용자와 가장 가까운 위치 결과 받아내기.
+    // 여러 측정소 리스트 중 사용자와 가장 가까운 위치 가져오기.
     private fun getNearestLocation(
         items: List<StationResponse.Response.Body.Items>,
         entity: LocationEntity
@@ -124,6 +131,7 @@ class HomeViewModel @Inject constructor(
         }.collect(Collectors.toList())[0]
     }
 
+    // TODO PM25(초미세먼지) 관련 값을 항상 NULL 로 받아오는 문제 발견. -> 다른곳에는 문제 없음
     fun startAirApi(stationName: String): Disposable {
         return airRepository.startAirApi(stationName)
             .retryWhen { error ->
@@ -138,6 +146,64 @@ class HomeViewModel @Inject constructor(
                     userLiveHolderAir.postValue(response.response.body.items)
                     isAirLoaded.postValue(Common.RESPONSE_SUCCESS)
                     Log.e("AirResponse", "Success")
+
+                    // response 에 의해 받는 리스트 중 맨 처음 항목이 항상 최신
+                    val latestResponse = response.response.body.items[0]
+                    Log.e(
+                        "received Air Data",
+                        "${latestResponse.pm10Grade} ${latestResponse.pm25Grade} ${latestResponse.dataTime} ${latestResponse.pm10Value} ${latestResponse.pm25Value}"
+                    )
+
+                    userSimplePanelAir.postValue(
+                        SimpleAir(
+                            stationName = stationName,
+                            dust = latestResponse.pm10Value ?: Common.NO_DATA,
+                            smallDust = latestResponse.pm25Value ?: Common.NO_DATA,
+                            dustStatus =
+                            latestResponse.pm10Grade.run {
+                                try {
+                                    when (this.toInt()) {
+                                        1 -> "좋음"
+                                        2 -> "보통"
+                                        3 -> "나쁨"
+                                        4 -> "매우나쁨"
+                                        else -> "정보없음"
+                                    }
+                                } catch (e: NumberFormatException) {
+                                    "정보없음"
+                                }
+                            },
+                            smallDustStatus =
+                            latestResponse.pm25Grade.run {
+                                try {
+                                    when (this.toInt()) {
+                                        1 -> "좋음"
+                                        2 -> "보통"
+                                        3 -> "나쁨"
+                                        4 -> "매우나쁨"
+                                        else -> "정보없음"
+                                    }
+                                } catch (e: NumberFormatException) {
+                                    "정보없음"
+                                }
+                            },
+                            dateTime = latestResponse.dataTime ?: Common.NO_DATA,
+                            icon =
+                            latestResponse.pm10Grade.run {
+                                try {
+                                    when (this.toInt()) {
+                                        1 -> R.drawable.ic_air_status_good
+                                        2 -> R.drawable.ic_air_status_normal
+                                        3 -> R.drawable.ic_air_status_bad
+                                        4 -> R.drawable.ic_air_status_very_bad
+                                        else -> R.drawable.ic_air_status_normal
+                                    }
+                                } catch (e: NumberFormatException) {
+                                    R.drawable.ic_air_status_very_bad
+                                }
+                            }
+                        )
+                    )
                 },
                 onError = {
                     it.printStackTrace()
@@ -145,6 +211,7 @@ class HomeViewModel @Inject constructor(
                     Log.e("AirResponse", "Failure")
                 }
             )
+
     }
 
     // TODO 통신 실패 시, 현재 시간을 기준으로 검색시간을 변경하여 재시도 하도록
@@ -158,7 +225,7 @@ class HomeViewModel @Inject constructor(
             count < 3
         }*/
 
-        // 날씨 Api 의 결과는 총 800개가 넘으므로, 이를 250개씩 4페이지에 걸쳐 분할하여 받음.
+        // 날씨 Api 의 결과는 총 800개가 넘으므로, 이를 약 250개씩 4페이지에 걸쳐 분할하여 받음.
         return Single.zip(
             weatherRepository.startWeatherApi(entity, 1),
             weatherRepository.startWeatherApi(entity, 2),
@@ -166,11 +233,23 @@ class HomeViewModel @Inject constructor(
             weatherRepository.startWeatherApi(entity, 4),
         ) { emit1, emit2, emit3, emit4 ->
             // 응답결과 -> Map 자료구조 변환
-            weatherMapToList(weatherResponseToMap(weatherResponseCheckAndMerge(listOf(emit1, emit2, emit3, emit4))))
+            weatherMapToList(
+                weatherResponseToMap(
+                    weatherResponseCheckAndMerge(
+                        listOf(
+                            emit1,
+                            emit2,
+                            emit3,
+                            emit4
+                        )
+                    )
+                )
+            )
         }.subscribeBy(
             onSuccess = {
                 isWeatherLoaded.postValue(Common.RESPONSE_SUCCESS)
                 userLiveHolderWeather.postValue(it)
+                userSimplePanelWeather.postValue(parsingSimpleWeather(it[0]))
                 Log.e("WeatherResponse", "Success")
             },
             onError = {
@@ -180,6 +259,53 @@ class HomeViewModel @Inject constructor(
             }
         )
     }
+
+    private fun parsingSimpleWeather(data: WeatherDTO) =
+        SimpleWeather(
+            date = data.date ?: Common.NO_DATA,
+            time = data.time ?: Common.NO_DATA,
+            windValue = data.windSpeed.run {
+                try {
+                    when {
+                        this.toInt() < 4 -> {
+                            "고요함"
+                        }
+                        this.toInt() in 4..8 -> {
+                            "보통"
+                        }
+                        this.toInt() in 9..13 -> {
+                            "강함"
+                        }
+                        this.toInt() >= 14 -> {
+                            "매우강함"
+                        }
+                        else -> {
+                            "정보헚음"
+                        }
+                    }
+                } catch (e: NumberFormatException) {
+                    "정보없음"
+                }
+            },
+            windIcon = R.drawable.ic_weather_wind_up,
+            humidityValue = data.humidity ?: "정보없음",
+            humidityIcon = R.drawable.ic_weather_humidity,
+            rainChanceValue = data.rainChance ?: "0",
+            rainChanceIcon = data.rainType.run {
+                try {
+                    when (this.toInt()) {
+                        0 -> R.drawable.ic_weather_rain     // 없음
+                        1 -> R.drawable.ic_weather_rain     // 비
+                        2 -> R.drawable.ic_weather_rain     // 비/눈
+                        3 -> R.drawable.ic_weather_rain     // 눈
+                        4 -> R.drawable.ic_weather_rain     // 소나기
+                        else -> R.drawable.ic_weather_rain
+                    }
+                } catch (e: NumberFormatException) {
+                    R.drawable.ic_weather_rain
+                }
+            }
+        )
 
     // resultCode 0 은 응답 성공을 의미. 응답에 성공한 객체만 합쳐서 출력.
     private fun weatherResponseCheckAndMerge(responses: List<WeatherResponse>): List<WeatherResponse.Response.Body.Items.Item> {
@@ -193,11 +319,10 @@ class HomeViewModel @Inject constructor(
 
     }
 
-    // TODO Api 에서 보내주는 데이터는 category 로 구분하여 분할하여 보내주므로, 이를 같은 날짜+시간에 따라
-    // TODO map 객체로 통합.
+    // Api 에서 데이터를 category 로 구분하여 분할하여 보내주므로, 이를 효율적으로 이용하기 위하여
+    // outerKey : Date, innerKey : Time, innerValue : Values 의 3 Level Map 으로 변환
     private fun weatherResponseToMap(responses: List<WeatherResponse.Response.Body.Items.Item>):
             Map<String, Map<String, Map<String, String>>> {
-
         return responses
             .groupBy {
                 it.fcstDate
@@ -213,33 +338,34 @@ class HomeViewModel @Inject constructor(
 
     }
 
-    // TODO 위에서 통합한 map 객체를 recyclerView 에서 사용하기 위한 리스트로 변환
-    private fun weatherMapToList(map : Map<String, Map<String, Map<String, String>>>): List<WeatherDTO> {
+    // 위에서 통합한 3-Level map 객체를 recyclerView 에서 사용하기 위한 List<WeatherDTO> 변환
+    private fun weatherMapToList(map: Map<String, Map<String, Map<String, String>>>): List<WeatherDTO> {
         return emptyList<WeatherDTO>().toMutableList().apply {
             map.forEach { outer ->
                 outer.value.forEach {
                     this.add(
                         WeatherDTO(
-                        date = outer.key,
-                        time = it.key,
-                        temperature = it.value[WEATHER.TEMPERATURE.code] ?: Common.NO_DATA,
-                        temperatureMax = it.value[WEATHER.TEMPERATURE_HIGH.code] ?: Common.NO_DATA,
-                        temperatureMin = it.value[WEATHER.TEMPERATURE_LOW.code] ?: Common.NO_DATA,
-                        humidity = it.value[WEATHER.HUMIDITY.code] ?: Common.NO_DATA,
-                        rainChance = it.value[WEATHER.RAIN_CHANCE.code] ?: Common.NO_DATA,
-                        rainType = it.value[WEATHER.RAIN_TYPE.code] ?: Common.NO_DATA,
-                        snow = it.value[WEATHER.SNOW.code] ?: Common.NO_DATA,
-                        windSpeed = it.value[WEATHER.WIND_SPEED.code] ?: Common.NO_DATA,
-                        windEW = it.value[WEATHER.WIND_SPEED_EW.code] ?: Common.NO_DATA,
-                        windNS = it.value[WEATHER.WIND_SPEED_NS.code] ?: Common.NO_DATA,
-                        sky = it.value[WEATHER.SKY.code] ?: Common.NO_DATA,
+                            date = outer.key,
+                            time = it.key,
+                            temperature = it.value[WEATHER.TEMPERATURE.code] ?: Common.NO_DATA,
+                            temperatureMax = it.value[WEATHER.TEMPERATURE_HIGH.code]
+                                ?: Common.NO_DATA,
+                            temperatureMin = it.value[WEATHER.TEMPERATURE_LOW.code]
+                                ?: Common.NO_DATA,
+                            humidity = it.value[WEATHER.HUMIDITY.code] ?: Common.NO_DATA,
+                            rainChance = it.value[WEATHER.RAIN_CHANCE.code] ?: Common.NO_DATA,
+                            rainType = it.value[WEATHER.RAIN_TYPE.code] ?: Common.NO_DATA,
+                            snow = it.value[WEATHER.SNOW.code] ?: Common.NO_DATA,
+                            windSpeed = it.value[WEATHER.WIND_SPEED.code] ?: Common.NO_DATA,
+                            windEW = it.value[WEATHER.WIND_SPEED_EW.code] ?: Common.NO_DATA,
+                            windNS = it.value[WEATHER.WIND_SPEED_NS.code] ?: Common.NO_DATA,
+                            sky = it.value[WEATHER.SKY.code] ?: Common.NO_DATA,
                         )
                     )
                 }
             }
         }
     }
-
 
     private fun combineResponses(
         station: MutableLiveData<Int>?,
@@ -266,8 +392,6 @@ class HomeViewModel @Inject constructor(
 // -------------------------------------------------------------------------------------------------
 // ----------------------------------------- DataBinding -------------------------------------------
 // -------------------------------------------------------------------------------------------------
-
-
 }
 
 

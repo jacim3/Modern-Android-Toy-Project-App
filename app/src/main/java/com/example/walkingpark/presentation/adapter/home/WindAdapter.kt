@@ -13,31 +13,38 @@ import com.example.walkingpark.data.model.dto.WeatherDTO
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-class TabAdapterHumidity : RecyclerView.Adapter<TabAdapterHumidity.HumidityViewHolder>(){
+class WindAdapter: RecyclerView.Adapter<WindAdapter.WindViewHolder>() {
 
     var data = emptyList<WeatherDTO>()
 
-    class HumidityViewHolder constructor(itemView: View, val seperator:View) : RecyclerView.ViewHolder(itemView) {
-        val imageViewIcon:AppCompatImageView = itemView.findViewById(R.id.imageViewIcon)
-        val textViewTime:AppCompatTextView = itemView.findViewById(R.id.textViewTime)
-        val textViewValue:AppCompatTextView = itemView.findViewById(R.id.textViewValue)
+    class WindViewHolder constructor(itemView: View, val seperator:View) : RecyclerView.ViewHolder(itemView) {
+        val imageViewIcon: AppCompatImageView = itemView.findViewById(R.id.imageViewWindIcon)
+        val textViewTime: AppCompatTextView = itemView.findViewById(R.id.textViewWindTime)
+        val textViewDirection:AppCompatTextView = itemView.findViewById(R.id.textViewWindDirection)
+        val textViewValue:AppCompatTextView = itemView.findViewById(R.id.textViewWindValue)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HumidityViewHolder {
-        return HumidityViewHolder(
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WindViewHolder {
+        return WindViewHolder(
             LayoutInflater.from(parent.context)
-                .inflate(R.layout.home_recyclerview_item_humidity, parent, false),
+                .inflate(R.layout.home_recyclerview_item_wind, parent, false),
             LayoutInflater.from(parent.context)
                 .inflate(R.layout.home_recyclerview_item_seperator, parent, false)
         )
     }
 
-    override fun onBindViewHolder(holder: HumidityViewHolder, position: Int) {
+
+    // TODO 제공된 남북/ 동서 풍속을 기준으로 풍향 및 풍속을 계산하여야 함.
+    override fun onBindViewHolder(holder: WindViewHolder, position: Int) {
         val item = data[position]
         val date = item.date
         val time = item.time
+        val ns = item.windNS
+        val ew = item.windEW
+
         holder.textViewTime.text = time
-        holder.textViewValue.text = item.humidity
+        // holder.textViewDirection.text =
+        holder.textViewValue.text = item.windSpeed
     }
 
     override fun getItemCount(): Int {
