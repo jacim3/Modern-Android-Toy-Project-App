@@ -62,3 +62,15 @@ enum class AIR(val code: String, val desc:String) {
     FLAG_PM10("pm10Flag", "미세먼지 PM10 플래그"),
     FLAG_PM25("pm25Flag", "마세먼지 PM2.5 플래그"),*/
 }
+
+
+enum class WindDirection(val DEGREE:Float, val text:String) {
+    N(0f, "북"),
+    NE( 45f, "북동"),
+    E(90f, "동"),
+    SE(135f, "남동"),
+    S(180f, "남"),
+    SW(225f, "남서"),
+    W(270f, "서"),
+    NW(315f, "북서"),
+}

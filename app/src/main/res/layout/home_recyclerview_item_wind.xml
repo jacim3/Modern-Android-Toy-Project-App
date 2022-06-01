@@ -3,37 +3,62 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="horizontal">
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/textViewWindTime"
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/windSeperator"
+        android:layout_width="match_parent"
+        android:layout_height="130dp"
+        android:visibility="gone"
+        android:gravity="center">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:text="|\n|\n|\n|"/>
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/windItem"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="지금"/>
+        android:layout_height="130dp"
+        android:orientation="vertical">
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/imageViewWindIcon"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_marginTop="8dp"
-        android:layout_gravity="center"
-        android:src="@drawable/ic_launcher_background"/>
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/textViewWindTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="지금"/>
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/textViewWindDirection"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="32dp"
-        android:text="19"/>
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/imageViewWindIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginTop="8dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_weather_wind_arrow"/>
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/textViewWindValue"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="8dp"
-        android:text="19"/>
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/textViewWindDirection"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="32dp"
+            android:text="19"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/textViewWindValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="8dp"
+            android:text="19"/>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
 </androidx.appcompat.widget.LinearLayoutCompat>

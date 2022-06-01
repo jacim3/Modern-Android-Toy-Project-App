@@ -14,7 +14,7 @@ import java.util.*
 import javax.inject.Inject
 
 
-// TODO 브로드캐스트 리시버 관련 로직 삭제 및 위치서비스 관련 로직을 프래그먼트로 이동.
+// TODO Location Tracker Logic
 @HiltViewModel
 class MainViewModel @Inject constructor() : ViewModel() {
 
