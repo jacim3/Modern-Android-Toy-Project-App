@@ -1,4 +1,4 @@
-package com.example.walkingpark.presentation
+package com.example.walkingpark.ui
 
 import android.Manifest
 import android.content.*
@@ -14,9 +14,9 @@ import androidx.databinding.DataBindingUtil
 import com.example.walkingpark.R
 import com.example.walkingpark.constants.Common
 import com.example.walkingpark.databinding.ActivityMainBinding
-import com.example.walkingpark.presentation.receiver.LocationReceiver
-import com.example.walkingpark.presentation.service.LocationService
-import com.example.walkingpark.presentation.viewmodels.MainViewModel
+import com.example.walkingpark.ui.receiver.LocationReceiver
+import com.example.walkingpark.ui.service.LocationService
+import com.example.walkingpark.ui.viewmodels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 // TODO 퍼미션을 체크하고, 위치정보 획득을 위한 서비스

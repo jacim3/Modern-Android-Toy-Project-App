@@ -28,8 +28,8 @@ class StationApiRepository @Inject constructor(
 
 
     private fun getQuery(addressMap: HashMap<Char, String>) = mapOf(
-        Pair("returnType", "json"),
-        Pair("addr", addressMap[ADDRESS.SI.text]!!.split("시")[0])
+        "returnType" to "json",
+        "addr" to addressMap[ADDRESS.SI.text]!!.split("시")[0]
     )
 
 }

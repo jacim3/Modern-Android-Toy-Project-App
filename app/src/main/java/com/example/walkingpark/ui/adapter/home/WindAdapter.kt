@@ -1,25 +1,25 @@
-package com.example.walkingpark.presentation.adapter.home
+package com.example.walkingpark.ui.adapter.home
 
 import android.annotation.SuppressLint
-import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.walkingpark.R
 import com.example.walkingpark.constants.WindDirection
-import com.example.walkingpark.data.model.dto.WeatherDTO
+import com.example.walkingpark.data.model.dto.simple_panel.SimplePanel5
+import com.example.walkingpark.ui.viewmodels.getCalendarFromItem
+import com.example.walkingpark.ui.viewmodels.returnAmPmAfterCheck
 import java.lang.NumberFormatException
 import java.util.*
 import kotlin.math.ceil
 
 class WindAdapter : RecyclerView.Adapter<WindAdapter.WindViewHolder>() {
 
-    var data = emptyList<WeatherDTO?>()
+    var data = emptyList<SimplePanel5?>()
     private var prevDate: Calendar = Calendar.getInstance().apply {
         set(1990, 1, 1)
     }
@@ -42,7 +42,6 @@ class WindAdapter : RecyclerView.Adapter<WindAdapter.WindViewHolder>() {
     }
 
     @SuppressLint("SetTextI18n")
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onBindViewHolder(holder: WindViewHolder, position: Int) {
         val item = data[position]
 
@@ -82,7 +81,10 @@ class WindAdapter : RecyclerView.Adapter<WindAdapter.WindViewHolder>() {
                 }
             }
 
-            holder.textViewTime.text = "${dateTime.get(Calendar.HOUR)}시"
+            holder.textViewTime.text = if (position == 0) " 지금 " else returnAmPmAfterCheck(
+                dateTime.get(Calendar.HOUR_OF_DAY),
+                dateTime.get(Calendar.HOUR)
+            )
 
             when {
                 // 북 : N
@@ -109,7 +111,11 @@ class WindAdapter : RecyclerView.Adapter<WindAdapter.WindViewHolder>() {
                 // 북서 : NW
                 ns > 0f && ew < 0f -> setViewItems(holder, value, WindDirection.NW)
             }
-            prevDate.set(dateTime.get(Calendar.YEAR), dateTime.get(Calendar.MONTH), dateTime.get(Calendar.DAY_OF_MONTH))
+            prevDate.set(
+                dateTime.get(Calendar.YEAR),
+                dateTime.get(Calendar.MONTH),
+                dateTime.get(Calendar.DAY_OF_MONTH)
+            )
         } else {
             holder.container.visibility = View.GONE
             holder.seperator.visibility = View.VISIBLE
@@ -128,7 +134,7 @@ class WindAdapter : RecyclerView.Adapter<WindAdapter.WindViewHolder>() {
         return data.size
     }
 
-    fun setAdapterData(data: List<WeatherDTO?>) {
+    fun setAdapterData(data: List<SimplePanel5?>) {
         this.data = data
         notifyDataSetChanged()
     }

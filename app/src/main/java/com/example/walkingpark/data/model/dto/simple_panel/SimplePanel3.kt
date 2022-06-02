@@ -1,6 +1,6 @@
-package com.example.walkingpark.data.model.dto
+package com.example.walkingpark.data.model.dto.simple_panel
 
-data class SimpleWeather (
+data class SimplePanel3 (
     val windIcon:Int,
     val windValue:String,
     val humidityIcon:Int,

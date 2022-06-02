@@ -1,4 +1,4 @@
-package com.example.walkingpark.presentation.view
+package com.example.walkingpark.ui.view
 
 import android.app.AlertDialog
 import android.content.Context

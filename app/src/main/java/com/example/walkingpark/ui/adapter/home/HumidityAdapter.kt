@@ -1,24 +1,24 @@
-package com.example.walkingpark.presentation.adapter.home
+package com.example.walkingpark.ui.adapter.home
 
 import android.annotation.SuppressLint
-import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.walkingpark.R
-import com.example.walkingpark.data.model.dto.WeatherDTO
-import com.example.walkingpark.presentation.GetScrollItemListener
+import com.example.walkingpark.data.model.dto.simple_panel.SimplePanel5
+import com.example.walkingpark.ui.GetScrollItemListener
+import com.example.walkingpark.ui.viewmodels.getCalendarFromItem
+import com.example.walkingpark.ui.viewmodels.returnAmPmAfterCheck
 import java.lang.NumberFormatException
 import java.util.*
 
 class HumidityAdapter(val listener: GetScrollItemListener) : RecyclerView.Adapter<HumidityAdapter.HumidityViewHolder>() {
 
-    var data = emptyList<WeatherDTO?>()
+    var data = emptyList<SimplePanel5?>()
     private var prevDate: Calendar = Calendar.getInstance().apply {
         set(1990, 1, 1)
     }
@@ -41,7 +41,6 @@ class HumidityAdapter(val listener: GetScrollItemListener) : RecyclerView.Adapte
     }
 
     @SuppressLint("SetTextI18n")
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onBindViewHolder(holder: HumidityViewHolder, position: Int) {
         val item = data[position]
 
@@ -74,7 +73,8 @@ class HumidityAdapter(val listener: GetScrollItemListener) : RecyclerView.Adapte
                     else -> R.drawable.ic_weather_humidity_0
                 }
             )
-            holder.textViewTime.text = time
+            holder.textViewTime.text =
+                if (position == 0) " 지금 " else returnAmPmAfterCheck(dateTime.get(Calendar.HOUR_OF_DAY),dateTime.get(Calendar.HOUR))
             holder.textViewValue.text = item.humidity + "%"
             listener.getItem(holder.absoluteAdapterPosition, "$date $time")
             // prevDate.set(dateTime.year, dateTime.monthValue, dateTime.dayOfMonth)
@@ -82,14 +82,13 @@ class HumidityAdapter(val listener: GetScrollItemListener) : RecyclerView.Adapte
             holder.container.visibility = View.GONE
             holder.seperator.visibility = View.VISIBLE
         }
-
     }
 
     override fun getItemCount(): Int {
         return data.size
     }
 
-    fun setAdapterData(data: List<WeatherDTO?>) {
+    fun setAdapterData(data: List<SimplePanel5?>) {
         this.data = data
         notifyDataSetChanged()
     }

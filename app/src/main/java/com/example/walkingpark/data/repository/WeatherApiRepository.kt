@@ -13,6 +13,7 @@ import javax.inject.Singleton
 
 
 const val WEATHER_PAGING_COUNT = 250
+
 @Singleton
 class WeatherApiRepository @Inject constructor(
     private val apiDataSource: ApiDataSource
@@ -20,8 +21,11 @@ class WeatherApiRepository @Inject constructor(
 
     // TODO 공공데이터포털은 서버에 에러가 생기지 않는 이상, 데이터를 받아오게 되면 resultCode : 200 을 반환한다.
 
-    fun startWeatherApi(entity: LocationEntity, pageNo:Int): Single<WeatherResponse> = apiDataSource.getWeatherApi(getQuery(entity, pageNo))
-
+    fun startWeatherApi(
+        entity: LocationEntity,
+        pageNo: Int,
+        cal: Calendar
+    ): Single<WeatherResponse> = apiDataSource.getWeatherApi(getQuery(entity, pageNo, cal))
 
 
     // TODO PAGER -> 아직 불필요
@@ -47,8 +51,12 @@ class WeatherApiRepository @Inject constructor(
        }*/
 
 
-    private fun getQuery(entity: LocationEntity, pageNo:Int) =
-        dataToQuery(getTime(getCalendar()), LatLngToGridXy(entity.latitude, entity.longitude), pageNo)
+    private fun getQuery(entity: LocationEntity, pageNo: Int, cal: Calendar) =
+        dataToQuery(
+            getTime(cal),
+            LatLngToGridXy(entity.latitude, entity.longitude),
+            pageNo
+        )
 
 
     private fun dataToQuery(
@@ -57,13 +65,13 @@ class WeatherApiRepository @Inject constructor(
         pageNo: Int
     ): Map<String, String> {
         return mapOf(
-            Pair("dataType", "json"),
-            Pair("pageNo", pageNo.toString()),
-            Pair("base_date", timeMap["date"].toString()),
-            Pair("base_time", timeMap["time"].toString()),
-            Pair("numOfRows", WEATHER_PAGING_COUNT.toString()),
-            Pair("nx", grid.locX.toString()),
-            Pair("ny", grid.locY.toString())
+            "dataType" to "json",
+            "pageNo" to pageNo.toString(),
+            "base_date" to timeMap["date"].toString(),
+            "base_time" to timeMap["time"].toString(),
+            "numOfRows" to WEATHER_PAGING_COUNT.toString(),
+            "nx" to grid.locX.toString(),
+            "ny" to grid.locY.toString()
         )
     }
 
@@ -72,13 +80,12 @@ class WeatherApiRepository @Inject constructor(
     @SuppressLint("SimpleDateFormat")
     private fun getTime(cal: Calendar): Map<String, String> {
         return mapOf(
-            Pair("date", Common.dateFormat.format(cal.time)),
-            Pair("time", Common.timeFormat.format(cal.time))
+            "date" to Common.dateFormat.format(cal.time),
+            "time" to Common.timeFormat.format(cal.time)
         )
     }
 
-
-    private fun getCalendar(): Calendar {
+/*    private fun getCalendar(): Calendar {
         return Calendar.getInstance().apply {
             set(Calendar.MINUTE, 0)
             set(Calendar.HOUR, -1)
@@ -88,5 +95,5 @@ class WeatherApiRepository @Inject constructor(
                 add(Calendar.DATE, -1)
             }
         }
-    }
+    }*/
 }

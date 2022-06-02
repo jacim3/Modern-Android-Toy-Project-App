@@ -1,4 +1,4 @@
-package com.example.walkingpark.presentation.viewmodels
+package com.example.walkingpark.ui.viewmodels
 
 import android.app.Application
 import android.graphics.Color

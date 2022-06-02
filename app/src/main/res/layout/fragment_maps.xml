@@ -7,7 +7,7 @@
 
         <variable
             name="mapsViewModel"
-            type="com.example.walkingpark.presentation.viewmodels.MapsViewModel" />
+            type="com.example.walkingpark.ui.viewmodels.MapsViewModel" />
     </data>
 
 

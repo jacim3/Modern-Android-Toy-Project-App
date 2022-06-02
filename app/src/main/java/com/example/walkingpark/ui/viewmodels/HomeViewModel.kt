@@ -1,9 +1,7 @@
-package com.example.walkingpark.presentation.viewmodels
+package com.example.walkingpark.ui.viewmodels
 
 import android.app.Application
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
@@ -11,21 +9,19 @@ import com.example.walkingpark.R
 import com.example.walkingpark.constants.Common
 import com.example.walkingpark.constants.WEATHER
 import com.example.walkingpark.data.model.ResponseCheck
-import com.example.walkingpark.data.model.dto.SimpleAir
-import com.example.walkingpark.data.model.dto.SimpleWeather
-import com.example.walkingpark.data.model.dto.WeatherDTO
 import com.example.walkingpark.data.model.dto.response.AirResponse
 import com.example.walkingpark.data.model.dto.response.StationResponse
 import com.example.walkingpark.data.model.dto.response.WeatherResponse
+import com.example.walkingpark.data.model.dto.simple_panel.*
 import com.example.walkingpark.data.model.entity.LocationEntity
 import com.example.walkingpark.data.repository.AirApiRepository
 import com.example.walkingpark.data.repository.GeocodingRepository
 import com.example.walkingpark.data.repository.StationApiRepository
 import com.example.walkingpark.data.repository.WeatherApiRepository
-import com.example.walkingpark.presentation.adapter.home.getCalendarFromItem
+import com.example.walkingpark.ui.adapter.home.*
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.*
-import io.reactivex.Observable
+import io.reactivex.Flowable
+import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
@@ -35,6 +31,9 @@ import java.util.stream.Collectors
 import javax.inject.Inject
 import kotlin.math.abs
 
+
+const val MINUS = 0
+const val PLUS = 1
 
 /*
     TODO 현재는 UI 관련 비즈니스 로직을 작성하지 않았으므로 사용하지 않음.
@@ -53,14 +52,29 @@ class HomeViewModel @Inject constructor(
 
     val userLiveHolderStation = MutableLiveData<StationResponse.Response.Body.Items?>()
     val userLiveHolderAir = MutableLiveData<List<AirResponse.Response.Body.Items>?>()
-    val userLiveHolderWeather = MutableLiveData<List<WeatherDTO?>>()
+    val userLiveHolderWeather = MutableLiveData<List<SimplePanel5?>>()
 
-    val userSimplePanelAir = MutableLiveData<SimpleAir>()
-    val userSimplePanelWeather = MutableLiveData<SimpleWeather>()
+    val simplePanel1 = MutableLiveData<SimplePanel1>()
+    val simplePanel2 = MutableLiveData<SimplePanel2>()
+    val simplePanel3 = MutableLiveData<SimplePanel3>()
+    val simplePanel4 = MutableLiveData<SimplePanel4>()
+    val simplePanel5 = MutableLiveData<SimplePanel5>()
 
-    var isAirLoaded = MutableLiveData<Int>()
-    var isStationLoaded = MutableLiveData<Int>()
-    var isWeatherLoaded = MutableLiveData<Int>()
+
+    // Api 재시도 횟수 기록. 성공 시 초기화
+    private var weatherRetryCount = 0
+    private var stationRetryCount = 0
+    private var airRetryCount = 0
+
+    var isAirLoaded = MutableLiveData<Int>().apply {
+        this.postValue(Common.RESPONSE_INIT)
+    }
+    var isStationLoaded = MutableLiveData<Int>().apply {
+        this.postValue(Common.RESPONSE_INIT)
+    }
+    var isWeatherLoaded = MutableLiveData<Int>().apply {
+        this.postValue(Common.RESPONSE_INIT)
+    }
 
     val userResponseCheck = MediatorLiveData<ResponseCheck>()
         .apply {
@@ -136,7 +150,6 @@ class HomeViewModel @Inject constructor(
         }.collect(Collectors.toList())[0]
     }
 
-    // TODO PM25(초미세먼지) 관련 값을 항상 NULL 로 받아오는 문제 발견. -> 다른곳에는 문제 없음
     fun startAirApi(stationName: String): Disposable {
         return airRepository.startAirApi(stationName)
             .retryWhen { error ->
@@ -158,7 +171,7 @@ class HomeViewModel @Inject constructor(
                         "received Air Data",
                         "${receive.pm10Grade} ${receive.pm25Grade} ${receive.dataTime} ${receive.pm10Value} ${receive.pm25Value}"
                     )
-                    userSimplePanelAir.postValue(parsingSimpleAir(stationName, receive))
+                    simplePanel4.postValue(parsingSimpleAir(stationName, receive))
                 },
                 onError = {
                     it.printStackTrace()
@@ -171,8 +184,7 @@ class HomeViewModel @Inject constructor(
 
     // TODO 통신 실패 시, 현재 시간을 기준으로 검색시간을 변경하여 재시도 하도록
     // TODO ResultCode 에 따른 에러핸들링 필요.
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun startWeatherApi(entity: LocationEntity): Disposable {
+    fun startWeatherApi(entity: LocationEntity, calendar: Calendar, calc: Int): Disposable {
 
 /*        .retry { count, error ->
             Timestamp(Calendar.getInstance().apply {
@@ -183,10 +195,10 @@ class HomeViewModel @Inject constructor(
 
         // 날씨 Api 의 결과는 총 800개가 넘으므로, 이를 약 250개씩 4페이지에 걸쳐 분할하여 받음.
         return Single.zip(
-            weatherRepository.startWeatherApi(entity, 1),
-            weatherRepository.startWeatherApi(entity, 2),
-            weatherRepository.startWeatherApi(entity, 3),
-            weatherRepository.startWeatherApi(entity, 4),
+            weatherRepository.startWeatherApi(entity, 1, calendar),
+            weatherRepository.startWeatherApi(entity, 2, calendar),
+            weatherRepository.startWeatherApi(entity, 3, calendar),
+            weatherRepository.startWeatherApi(entity, 4, calendar),
         ) { emit1, emit2, emit3, emit4 ->
             // 응답결과 -> Map 자료구조 변환
             weatherMapToList(
@@ -199,74 +211,62 @@ class HomeViewModel @Inject constructor(
                             emit4
                         )
                     )
-                )
-            )
-        }.subscribeBy(
-            onSuccess = {
-                isWeatherLoaded.postValue(Common.RESPONSE_SUCCESS)
-
-                val prevDate = Calendar.getInstance().apply { set(1990, 1, 1) }
-                insertSeperatorAndUpdateWeatherLiveData(it.toMutableList(), prevDate)
-
-                userSimplePanelWeather.postValue(parsingSimpleWeather(it[0]))
-                Log.e("asdfasdfasdfasd", "${it[0].windSpeed}    asfdafsad")
-                Log.e("WeatherResponse", "Success")
-            },
-            onError = {
-                isWeatherLoaded.postValue(Common.RESPONSE_FAILURE)
-                it.printStackTrace()
-                Log.e("WeatherResponse", "Failure")
-            }
-        )
-    }
-
-    // Seperator Flag 로 사용할 null 데이터 삽입을 수행하는 메서드.
-    // ConcurrentException 으로 인하여 Reactive 사용.
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun insertSeperatorAndUpdateWeatherLiveData(
-        tmp: MutableList<WeatherDTO?>,
-        prevDate: Calendar,
-    ) {
-        var count = 0   // 원본 배열의 변경사항이 Rx Observable 간 위치값 이슈를 해결하기 위한 index 가충치 변수
-        val observable = Observable.fromIterable(tmp)
-            .map { s -> Indexed(tmp.indexOf(s), s) }
-            .observeOn(Schedulers.io())
+                ), Calendar.getInstance().apply {
+                    set(Calendar.YEAR, 1990)
+                })
+        }
+            .subscribeOn(Schedulers.io())
             .subscribeBy(
-                onNext = {
-                    val dateTime = getCalendarFromItem(it.item)
-                    if (prevDate.get(Calendar.YEAR) != 1990) {
+                onSuccess = {
+                    if (!it.isNullOrEmpty()) {
+                        Log.e("WeatherResponse", "Success")
 
-                        if (
-                            prevDate.get(Calendar.YEAR) != dateTime.get(Calendar.YEAR) ||
-                            prevDate.get(Calendar.MONTH) != dateTime.get(Calendar.MONTH) ||
-                            prevDate.get(Calendar.DAY_OF_MONTH) != dateTime.get(Calendar.DAY_OF_MONTH)
-                        ) {
-                            tmp.add(
-                                it.index + count++,
-                                null
-                            )
+                        weatherRetryCount = 0
+                        isWeatherLoaded.postValue(Common.RESPONSE_SUCCESS)
+                        val prevDate = Calendar.getInstance().apply { set(1990, 1, 1) }
+                        // insertSeperatorAndUpdateWeatherLiveData(it.toMutableList(), prevDate)
+                        userLiveHolderWeather.postValue(it)
+                        it[0]?.let { latestItem ->
+                            simplePanel3.postValue(parsingSimpleWeather(latestItem))
+
                         }
                     }
-                    prevDate.set(
-                        dateTime.get(Calendar.YEAR),
-                        dateTime.get(Calendar.MONTH),
-                        dateTime.get(Calendar.DAY_OF_MONTH)
-                    )
+                    // 통신은 성공하였으나, 결과값 없음 -> 실패로 간주 -> 다시시도
+                    else {
+                        Log.e("WeatherResponse", "Failure")
+                        weatherRetryCount++
+                        isWeatherLoaded.postValue(Common.RESPONSE_FAILURE)
+                        retryWeather(entity, calendar, calc)
+                    }
                 },
-                onComplete = {
-                    userLiveHolderWeather.postValue(tmp)
-                },
-                onError = {}
+                // 실패하여 이전 1시간을 기준으로 다시 실행. -> 재귀원리
+                onError = {
+                    Log.e("WeatherResponse", "Failure")
+
+                    weatherRetryCount++
+                    isWeatherLoaded.postValue(Common.RESPONSE_FAILURE)
+                    retryWeather(entity, calendar, calc)
+                }
             )
 
     }
 
+
+    // 검색해야 하는 날짜가 현재 시각보다 커질경우, 날짜 연산, Api 통신에 오류가 발생하므로
+    // 이를 방지.
+    private fun retryWeather(entity: LocationEntity, calendar: Calendar, calc: Int) {
+        calendar.add(Calendar.HOUR_OF_DAY, if (calc == PLUS) 1 else -1)
+        if (Calendar.getInstance().before(calendar))
+            startWeatherApi(entity, getCalendarTodayMin(), MINUS)
+        else
+            startWeatherApi(entity, calendar, PLUS)
+    }
 
     // SimplePanel 에서 사용할 객체 변환
     private fun parsingSimpleAir(
         stationName: String,
         latestResponse: AirResponse.Response.Body.Items
-    ) = SimpleAir(
+    ) = SimplePanel4(
         stationName = stationName,
         dust = latestResponse.pm10Value ?: Common.NO_DATA,
         smallDust = latestResponse.pm25Value ?: Common.NO_DATA,
@@ -315,9 +315,9 @@ class HomeViewModel @Inject constructor(
         }
     )
 
-    private fun parsingSimpleWeather(data: WeatherDTO) =
+    private fun parsingSimpleWeather(data: SimplePanel5) =
 
-        SimpleWeather(
+        SimplePanel3(
             date = data.date ?: Common.NO_DATA,
             time = data.time ?: Common.NO_DATA,
             windValue = data.windSpeed.run {
@@ -352,11 +352,11 @@ class HomeViewModel @Inject constructor(
             rainChanceIcon = data.rainType.run {
                 try {
                     when (this.toInt()) {
-                        0 -> R.drawable.ic_weather_rain     // 없음
-                        1 -> R.drawable.ic_weather_rain     // 비
-                        2 -> R.drawable.ic_weather_rain     // 비/눈
-                        3 -> R.drawable.ic_weather_rain     // 눈
-                        4 -> R.drawable.ic_weather_rain     // 소나기
+                        NONE -> R.drawable.ic_weather_rain     // 없음
+                        RAIN -> R.drawable.ic_weather_rain     // 비
+                        RAIN_SNOW -> R.drawable.ic_weather_rain     // 비/눈
+                        SNOW -> R.drawable.ic_weather_rain     // 눈
+                        SHOWER -> R.drawable.ic_weather_rain     // 소나기
                         else -> R.drawable.ic_weather_rain
                     }
                 } catch (e: NumberFormatException) {
@@ -388,6 +388,7 @@ class HomeViewModel @Inject constructor(
                 outer.value.groupBy {
                     it.fcstTime
                 }.mapValues { inner ->
+
                     inner.value.associate {
                         it.category to it.fcstValue
                     }
@@ -397,29 +398,69 @@ class HomeViewModel @Inject constructor(
     }
 
     // 위에서 통합한 3-Level map 객체를 recyclerView 에서 사용하기 위한 List<WeatherDTO> 변환
-    private fun weatherMapToList(map: Map<String, Map<String, Map<String, String>>>): List<WeatherDTO> {
-        return emptyList<WeatherDTO>().toMutableList().apply {
+    private fun weatherMapToList(map: Map<String, Map<String, Map<String, String>>>, prevDate: Calendar): List<SimplePanel5?> {
+        return emptyList<SimplePanel5?>().toMutableList().apply {
+
             map.forEach { outer ->
                 outer.value.forEach {
-                    this.add(
-                        WeatherDTO(
-                            date = outer.key,
-                            time = it.key,
-                            temperature = it.value[WEATHER.TEMPERATURE.code] ?: Common.NO_DATA,
-                            temperatureMax = it.value[WEATHER.TEMPERATURE_HIGH.code]
-                                ?: Common.NO_DATA,
-                            temperatureMin = it.value[WEATHER.TEMPERATURE_LOW.code]
-                                ?: Common.NO_DATA,
-                            humidity = it.value[WEATHER.HUMIDITY.code] ?: Common.NO_DATA,
-                            rainChance = it.value[WEATHER.RAIN_CHANCE.code] ?: Common.NO_DATA,
-                            rainType = it.value[WEATHER.RAIN_TYPE.code] ?: Common.NO_DATA,
-                            snow = it.value[WEATHER.SNOW.code] ?: Common.NO_DATA,
-                            windSpeed = it.value[WEATHER.WIND_SPEED.code] ?: Common.NO_DATA,
-                            windEW = it.value[WEATHER.WIND_SPEED_EW.code] ?: Common.NO_DATA,
-                            windNS = it.value[WEATHER.WIND_SPEED_NS.code] ?: Common.NO_DATA,
-                            sky = it.value[WEATHER.SKY.code] ?: Common.NO_DATA,
-                        )
-                    )
+                    getCalendarFromYYYYMMDDHHmm(outer.key + it.key).let { target ->
+                        getCalendarTodayCurrentHour().let { current ->
+
+
+                            it.value[WEATHER.TEMPERATURE_HIGH.code]?.let {  max ->
+                                it.value[WEATHER.TEMPERATURE_LOW.code]?.let { min ->
+                                    
+                                }
+                            }
+
+                            // 현재 시각을 기준으로 이전시간 데이터는 걸러내기.
+                            if (abs(current.timeInMillis - target.timeInMillis) < 100
+                                || current.before(target)
+                            ) {
+                                if (prevDate.get(Calendar.YEAR) != 1990) {
+                                    if (
+                                        prevDate.get(Calendar.YEAR) != target.get(Calendar.YEAR) ||
+                                        prevDate.get(Calendar.MONTH) != target.get(Calendar.MONTH) ||
+                                        prevDate.get(Calendar.DAY_OF_MONTH) != target.get(Calendar.DAY_OF_MONTH)
+                                    ) {
+                                        this.add(null)
+                                    }
+                                }
+
+                                this.add(
+                                    SimplePanel5(
+                                        date = outer.key,
+                                        time = it.key,
+                                        temperature = it.value[WEATHER.TEMPERATURE.code]
+                                            ?: Common.NO_DATA,
+//                                    temperatureMax = it.value[WEATHER.TEMPERATURE_HIGH.code]
+//                                        ?: Common.NO_DATA,
+//                                    temperatureMin = it.value[WEATHER.TEMPERATURE_LOW.code]
+//                                        ?: Common.NO_DATA,
+                                        humidity = it.value[WEATHER.HUMIDITY.code]
+                                            ?: Common.NO_DATA,
+                                        rainChance = it.value[WEATHER.RAIN_CHANCE.code]
+                                            ?: Common.NO_DATA,
+                                        rainType = it.value[WEATHER.RAIN_TYPE.code]
+                                            ?: Common.NO_DATA,
+                                        snow = it.value[WEATHER.SNOW.code] ?: Common.NO_DATA,
+                                        windSpeed = it.value[WEATHER.WIND_SPEED.code]
+                                            ?: Common.NO_DATA,
+                                        windEW = it.value[WEATHER.WIND_SPEED_EW.code]
+                                            ?: Common.NO_DATA,
+                                        windNS = it.value[WEATHER.WIND_SPEED_NS.code]
+                                            ?: Common.NO_DATA,
+                                        sky = it.value[WEATHER.SKY.code] ?: Common.NO_DATA,
+                                    )
+                                )
+                                prevDate.set(
+                                    target.get(Calendar.YEAR),
+                                    target.get(Calendar.MONTH),
+                                    target.get(Calendar.DAY_OF_MONTH)
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -430,11 +471,7 @@ class HomeViewModel @Inject constructor(
         air: MutableLiveData<Int>?,
         weather: MutableLiveData<Int>?
     ): ResponseCheck {
-        return ResponseCheck(
-            air = Common.RESPONSE_FAILURE,
-            station = Common.RESPONSE_FAILURE,
-            weather = Common.RESPONSE_FAILURE
-        ).apply {
+        return ResponseCheck().apply {
             station?.value?.let {
                 this.station = it
             }
@@ -446,13 +483,60 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
-
-// -------------------------------------------------------------------------------------------------
-// ----------------------------------------- DataBinding -------------------------------------------
-// -------------------------------------------------------------------------------------------------
 }
 
-class Indexed(var index: Int, var item: WeatherDTO)
+fun returnAmPmAfterCheck(hoursOfDay: Int, hour: Int) =
+    "${if (hoursOfDay < 12) "오전 " else "오후"} ${if (hour == 0) 12 else hour}시"
+
+
+// TODO Calendar 객체는 Month 가 0 부터 시작 (0~11) 이를 감안하여 처리해야 한다.
+fun getCalendarFromYYYYMMDDHHmm(item: String): Calendar =
+
+    Calendar.getInstance().apply {
+        set(
+            item.substring(0, 4).toInt(),
+            item.substring(4, 6).toInt() - 1,
+            item.substring(6, 8).toInt(),
+            item.substring(8, 10).toInt(),
+            0,
+            0
+        )
+    }
+
+
+// TODO Calendar 객체는 Month 가 0 부터 시작 (0~11) 이를 감안하여 처리해야 한다.
+fun getCalendarFromItem(item: SimplePanel5): Calendar =
+    (item.date + item.time).run {
+        Calendar.getInstance().apply {
+            set(
+                this@run.substring(0, 4).toInt(),
+                this@run.substring(4, 6).toInt() - 1,
+                this@run.substring(6, 8).toInt(),
+                this@run.substring(8, 10).toInt(),
+                this@run.substring(10).toInt(),
+                0
+            )
+        }
+    }
+
+// Calendar 의 차이에 따른 날짜의 갯수를 구해야 하므로, 해당 날짜의 최소시작을 리턴
+fun getCalendarTodayMin(): Calendar = Calendar.getInstance().apply {
+    set(
+        this.get(Calendar.YEAR),
+        this.get(Calendar.MONTH),
+        this.get(Calendar.DAY_OF_MONTH),
+        0,
+        0,
+        0
+    )
+}
+
+fun getCalendarTodayCurrentHour(): Calendar = Calendar.getInstance().apply {
+    set(Calendar.MINUTE, 0)
+    set(Calendar.SECOND, 0)
+}
+
+
 
 
 

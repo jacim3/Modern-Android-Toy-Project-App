@@ -1,7 +1,6 @@
-package com.example.walkingpark.presentation.viewmodels
+package com.example.walkingpark.ui.viewmodels
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.walkingpark.data.model.entity.LocationEntity

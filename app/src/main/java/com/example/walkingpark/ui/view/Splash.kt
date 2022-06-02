@@ -1,4 +1,4 @@
-package com.example.walkingpark.presentation.view
+package com.example.walkingpark.ui.view
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,7 +6,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import com.example.walkingpark.presentation.MainActivity
+import com.example.walkingpark.ui.MainActivity
 import com.example.walkingpark.R
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*

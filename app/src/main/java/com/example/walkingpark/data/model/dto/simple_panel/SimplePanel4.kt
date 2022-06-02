@@ -1,6 +1,6 @@
-package com.example.walkingpark.data.model.dto
+package com.example.walkingpark.data.model.dto.simple_panel
 
-data class SimpleAir(
+data class SimplePanel4(
     val dustStatus: String,
     val smallDustStatus: String,
     val dust: String,

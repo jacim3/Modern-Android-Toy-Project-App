@@ -1,22 +1,16 @@
-package com.example.walkingpark.presentation
+package com.example.walkingpark.ui
 
-import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.widget.SeekBar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import com.example.walkingpark.R
 import com.example.walkingpark.databinding.FragmentMapsBinding
-import com.example.walkingpark.presentation.service.LocationService
-import com.example.walkingpark.presentation.view.LoadingIndicator
-import com.example.walkingpark.presentation.viewmodels.MainViewModel
-import com.example.walkingpark.presentation.viewmodels.MapsViewModel
+import com.example.walkingpark.ui.view.LoadingIndicator
+import com.example.walkingpark.ui.viewmodels.MainViewModel
+import com.example.walkingpark.ui.viewmodels.MapsViewModel
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng

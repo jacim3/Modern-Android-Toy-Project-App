@@ -1,4 +1,4 @@
-package com.example.walkingpark.presentation.receiver
+package com.example.walkingpark.ui.receiver
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -6,7 +6,7 @@ import android.content.Intent
 import android.os.Build
 import androidx.lifecycle.MutableLiveData
 import com.example.walkingpark.constants.Common
-import com.example.walkingpark.presentation.service.LocationService
+import com.example.walkingpark.ui.service.LocationService
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

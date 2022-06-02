@@ -1,11 +1,11 @@
-package com.example.walkingpark.data.model.dto
+package com.example.walkingpark.data.model.dto.simple_panel
 
-data class WeatherDTO(
+data class SimplePanel5(
     val date: String,
     val time: String,
     val temperature: String,
-    val temperatureMax: String,
-    val temperatureMin: String,
+/*    val temperatureMax: String,
+    val temperatureMin: String,*/
     val humidity: String,
     val rainChance: String,
     val rainType: String,

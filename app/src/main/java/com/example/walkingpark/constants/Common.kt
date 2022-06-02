@@ -39,15 +39,13 @@ object Common {
 
     const val LOADING_INDICATOR_DISMISS_TIME = 500
 
-    private const val REST_API_DATE_UNIT_FORMAT =  "yyyyMMdd"
-    private const val REST_API_TIME_UNIT_FORMAT =  "HHmm"
-
     @SuppressLint("SimpleDateFormat")
-    val dateFormat = SimpleDateFormat(REST_API_DATE_UNIT_FORMAT)
+    val dateFormat = SimpleDateFormat("yyyyMMdd")
     @SuppressLint("SimpleDateFormat")
-    val timeFormat = SimpleDateFormat(REST_API_TIME_UNIT_FORMAT)
+    val timeFormat = SimpleDateFormat("HH00")
 
     // RestApi 응답 관련
+    const val RESPONSE_INIT = -1
     const val RESPONSE_SUCCESS = 0
     const val RESPONSE_FAILURE = 1
     const val RESPONSE_PROCEEDING = 2

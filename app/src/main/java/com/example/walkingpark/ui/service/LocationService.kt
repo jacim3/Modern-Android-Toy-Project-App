@@ -1,4 +1,4 @@
-package com.example.walkingpark.presentation.service
+package com.example.walkingpark.ui.service
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -16,7 +16,7 @@ import com.example.walkingpark.R
 import com.example.walkingpark.constants.Common
 import com.example.walkingpark.constants.Settings
 import com.example.walkingpark.data.model.entity.LocationObject
-import com.example.walkingpark.presentation.MainActivity
+import com.example.walkingpark.ui.MainActivity
 import com.google.android.gms.location.*
 import com.google.android.gms.tasks.CancellationToken
 import com.google.android.gms.tasks.CancellationTokenSource

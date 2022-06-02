@@ -7,7 +7,7 @@
 
         <variable
             name="homeViewModel"
-            type="com.example.walkingpark.presentation.viewmodels.HomeViewModel" />
+            type="com.example.walkingpark.ui.viewmodels.HomeViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -22,7 +22,7 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                tools:context=".presentation.HomeFragment">
+                tools:context=".ui.HomeFragment">
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/textViewAddress"
@@ -48,7 +48,7 @@
                         android:orientation="vertical">
 
                         <androidx.appcompat.widget.AppCompatImageView
-                            android:id="@+id/imageViewIconWeather"
+                            android:id="@+id/imageViewWeatherMainIcon"
                             android:layout_width="100dp"
                             android:layout_height="100dp"
                             android:layout_gravity="center"
@@ -57,7 +57,7 @@
                             android:src="@drawable/ic_launcher_background" />
 
                         <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/textViewStatusWeather"
+                            android:id="@+id/textViewWeatherMainText"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center"
@@ -73,7 +73,7 @@
                         android:layout_weight="1">
 
                         <androidx.appcompat.widget.AppCompatTextView
-                            android:id="@+id/textViewStatusTemperature"
+                            android:id="@+id/textViewWeatherMainTemperature"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="100dp"
@@ -92,10 +92,10 @@
                             android:text="°"
                             android:textSize="40sp"
                             android:textStyle="bold"
-                            app:layout_constraintBottom_toBottomOf="@+id/textViewStatusTemperature"
+                            app:layout_constraintBottom_toBottomOf="@+id/textViewWeatherMainTemperature"
                             app:layout_constraintEnd_toStartOf="@+id/linearLayoutCompat"
-                            app:layout_constraintStart_toEndOf="@+id/textViewStatusTemperature"
-                            app:layout_constraintTop_toTopOf="@+id/textViewStatusTemperature" />
+                            app:layout_constraintStart_toEndOf="@+id/textViewWeatherMainTemperature"
+                            app:layout_constraintTop_toTopOf="@+id/textViewWeatherMainTemperature" />
 
                         <androidx.appcompat.widget.LinearLayoutCompat
                             android:id="@+id/linearLayoutCompat"
@@ -168,7 +168,7 @@
                             android:gravity="center"
                             android:text="어제보다 6도 낮아요"
                             android:textSize="16sp"
-                            app:layout_constraintTop_toBottomOf="@+id/textViewStatusTemperature" />
+                            app:layout_constraintTop_toBottomOf="@+id/textViewWeatherMainTemperature" />
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/textViewFeelingTemperature"
@@ -207,14 +207,14 @@
                             android:layout_height="@dimen/home_simple_panel_icon_size"
                             android:paddingStart="@dimen/home_simple_panel_icon_padding"
                             android:paddingEnd="@dimen/home_simple_panel_icon_padding"
-                            app:bindingSrc="@{homeViewModel.userSimplePanelAir.icon}" />
+                            app:bindingSrc="@{homeViewModel.simplePanel4.icon}" />
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/textViewAirStatus"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center"
-                            android:text="@{homeViewModel.userSimplePanelAir.dustStatus}" />
+                            android:text="@{homeViewModel.simplePanel4.dustStatus}" />
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="match_parent"
@@ -247,7 +247,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center"
-                            android:text="@{homeViewModel.userSimplePanelWeather.windValue}" />
+                            android:text="@{homeViewModel.simplePanel3.windValue}" />
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="match_parent"
@@ -273,14 +273,14 @@
                             android:layout_height="@dimen/home_simple_panel_icon_size"
                             android:paddingStart="@dimen/home_simple_panel_icon_padding"
                             android:paddingEnd="@dimen/home_simple_panel_icon_padding"
-                            app:bindingSrc="@{homeViewModel.userSimplePanelWeather.humidityIcon}" />
+                            app:bindingSrc="@{homeViewModel.simplePanel3.humidityIcon}" />
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/textViewStatusHumidity"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center"
-                            android:text="@{homeViewModel.userSimplePanelWeather.humidityValue}" />
+                            android:text="@{homeViewModel.simplePanel3.humidityValue}" />
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="match_parent"
@@ -308,14 +308,14 @@
                             android:layout_height="@dimen/home_simple_panel_icon_size"
                             android:paddingStart="@dimen/home_simple_panel_icon_padding"
                             android:paddingEnd="@dimen/home_simple_panel_icon_padding"
-                            app:bindingSrc="@{homeViewModel.userSimplePanelWeather.rainChanceIcon}" />
+                            app:bindingSrc="@{homeViewModel.simplePanel3.rainChanceIcon}" />
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:id="@+id/textViewStatusRainChance"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center"
-                            android:text="@{homeViewModel.userSimplePanelWeather.rainChanceValue}" />
+                            android:text="@{homeViewModel.simplePanel3.rainChanceValue}" />
 
                         <androidx.appcompat.widget.AppCompatTextView
                             android:layout_width="match_parent"
