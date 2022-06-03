@@ -15,6 +15,7 @@ import com.example.walkingpark.ui.viewmodels.getCalendarFromItem
 import com.example.walkingpark.ui.viewmodels.returnAmPmAfterCheck
 import java.util.*
 
+
 class HumidityAdapter :
     RecyclerView.Adapter<HumidityAdapter.HumidityViewHolder>() {
 
@@ -32,7 +33,6 @@ class HumidityAdapter :
         val textViewValue: AppCompatTextView = itemView.findViewById(R.id.textViewHumidityValue)
         val container: ConstraintLayout = itemView.findViewById(R.id.humidityItem)
         val seperator: LinearLayoutCompat = itemView.findViewById(R.id.humiditySeperator)
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HumidityViewHolder {
@@ -47,8 +47,7 @@ class HumidityAdapter :
         val item = data[position]
 
         if (item != null) {
-            holder.container.visibility = View.VISIBLE
-            holder.seperator.visibility = View.GONE
+            switchView(ITEM, holder)
 
             val dateTime = getCalendarFromItem(item)
 
@@ -59,11 +58,20 @@ class HumidityAdapter :
                     dateTime.get(Calendar.HOUR)
                 )
             holder.textViewValue.text = item.humidity + "%"
+
+        } else {
+            switchView(SEPERATOR, holder)
+        }
+    }
+
+    private fun switchView(code: Int, holder: HumidityViewHolder) =
+        if (code == ITEM) {
+            holder.container.visibility = View.VISIBLE
+            holder.seperator.visibility = View.GONE
         } else {
             holder.container.visibility = View.GONE
             holder.seperator.visibility = View.VISIBLE
         }
-    }
 
     override fun getItemCount(): Int {
         return data.size

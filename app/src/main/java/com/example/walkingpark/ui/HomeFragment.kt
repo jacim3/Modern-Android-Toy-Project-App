@@ -18,7 +18,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.walkingpark.constants.Common
 import com.example.walkingpark.data.model.dto.simple_panel.SimplePanelDTO
 import com.example.walkingpark.databinding.FragmentHomeBinding
-import com.example.walkingpark.ui.adapter.ItemDecorator
 import com.example.walkingpark.ui.adapter.home.*
 import com.example.walkingpark.ui.view.LoadingIndicator
 import com.example.walkingpark.ui.viewmodels.*
@@ -169,17 +168,6 @@ class HomeFragment : Fragment() {
                 this.layoutManager = humidityLayoutManager
                 adapter = humidityAdapterAdapter
                 LinearSnapHelper().attachToRecyclerView(this)
-                decorator?.let { decorator->
-                    this.removeItemDecoration(decorator)
-                }
-
-                homeViewModel.simplePanelWeather.value?.let {
-                    decorator = ItemDecorator(it)
-                }
-
-                decorator?.let { decorator ->
-                    this.addItemDecoration(decorator)
-                }
             }
 
             it.recyclerViewWind.apply {
@@ -202,6 +190,7 @@ class HomeFragment : Fragment() {
                 binding.textViewWeatherLabel.text = setLabel(0, today)
                 binding.textViewWindLabel.text = setLabel(0, today)
                 binding.textViewHumidityLabel.text = setLabel(0, today)
+
 
                 setLabelChangeEventFromRecyclerView(
                     binding.recyclerViewWeather,
@@ -238,7 +227,6 @@ class HomeFragment : Fragment() {
         today: Calendar
     ) {
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
 

@@ -20,9 +20,6 @@ import kotlin.math.ceil
 class WindAdapter : RecyclerView.Adapter<WindAdapter.WindViewHolder>() {
 
     var data = emptyList<SimplePanelDTO?>()
-    private var prevDate: Calendar = Calendar.getInstance().apply {
-        set(1990, 1, 1)
-    }
 
     class WindViewHolder constructor(itemView: View) :
         RecyclerView.ViewHolder(itemView) {
@@ -41,44 +38,20 @@ class WindAdapter : RecyclerView.Adapter<WindAdapter.WindViewHolder>() {
         )
     }
 
+    // 북남 (북:+, 남:-) / 동서 (동:+, 서:-)
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: WindViewHolder, position: Int) {
         val item = data[position]
 
         if (item != null) {
-            holder.container.visibility = View.VISIBLE
-            holder.seperator.visibility = View.GONE
-            val date = item.date
-            val time = item.time
+
+            switchView(ITEM, holder)
             val dateTime = getCalendarFromItem(item)
+            val value = checkValue(item.windSpeed)
 
-            holder.seperator.visibility = View.GONE     // RecyclerView 의 특성장 기존 View 를 재사용하므로,
-            // Seperator 초기화 필요.
-            val value = item.windSpeed.run {
-                try {
-                    ceil(this.toFloat()).toInt()
-                } catch (e: NumberFormatException) {
-                    0
-                }
-            }
-            // 북남 (북:+, 남:-)
-            // 바람 세기 : 0.3 이하는 고요 -> 수치 버림, 나머지는 올림 수행. by 보퍼트 풍력 기준.
-            val ns = item.windNS.run {
-                try {
-                    ceil(this.toFloat())
-                } catch (e: NumberFormatException) {
-                    0f
-                }
-            }
-
-            // 동서 (동:+, 서:-)
-            // 바람 세기 : 0.3 이하는 고요 -> 수치 버림, 나머지는 올림 수행. by 보퍼트 풍력 기준.
-            val ew = item.windEW.run {
-                try {
-                    ceil(this.toFloat())
-                } catch (e: NumberFormatException) {
-                    0f
-                }
+            calculateWindDirection(checkValue(item.windNS), checkValue(item.windEW), holder).let {
+                holder.imageViewIcon.rotation = it[0] as Float
+                holder.textViewDirection.text = "${it[1]}°"
             }
 
             holder.textViewTime.text = if (position == 0) " 지금 " else returnAmPmAfterCheck(
@@ -86,49 +59,72 @@ class WindAdapter : RecyclerView.Adapter<WindAdapter.WindViewHolder>() {
                 dateTime.get(Calendar.HOUR)
             )
 
-            when {
-                // 북 : N
-                ns > 0f && ew == 0f -> setViewItems(holder, value, WindDirection.N)
+            holder.textViewValue.text = "${value}m/s"
 
-                // 북동 : NE
-                ns > 0f && ew > 0f -> setViewItems(holder, value, WindDirection.NE)
+        } else {
+            switchView(SEPERATOR, holder)
+        }
+    }
 
-                // 동 : E
-                ns == 0f && ew > 0f -> setViewItems(holder, value, WindDirection.E)
-
-                // 남동 : SE
-                ns < 0f && ew > 0f -> setViewItems(holder, value, WindDirection.SE)
-
-                // 남 : S
-                ns < 0f && ew == 0f -> setViewItems(holder, value, WindDirection.S)
-
-                // 남서 : SW
-                ns < 0f && ew < 0f -> setViewItems(holder, value, WindDirection.SW)
-
-                // 서 : W
-                ns == 0f && ew < 0f -> setViewItems(holder, value, WindDirection.W)
-
-                // 북서 : NW
-                ns > 0f && ew < 0f -> setViewItems(holder, value, WindDirection.NW)
+    private fun checkValue(value: String) =
+        value.run {
+            try {
+                ceil(this.toFloat()).toInt()
+            } catch (e: NumberFormatException) {
+                0
             }
-            prevDate.set(
-                dateTime.get(Calendar.YEAR),
-                dateTime.get(Calendar.MONTH),
-                dateTime.get(Calendar.DAY_OF_MONTH)
-            )
+        }
+
+    private fun switchView(code: Int, holder: WindViewHolder) =
+        if (code == ITEM) {
+            holder.container.visibility = View.VISIBLE
+            holder.seperator.visibility = View.GONE
         } else {
             holder.container.visibility = View.GONE
             holder.seperator.visibility = View.VISIBLE
         }
 
+    private fun calculateWindDirection(
+        ns: Int,
+        ew: Int,
+        holder: WindViewHolder
+    ): Array<out Any> {
+
+        return when {
+            // 북 : N
+            ns > 0 && ew == 0 -> setViewItems(holder, WindDirection.N)
+
+            // 북동 : NE
+            ns > 0 && ew > 0 -> setViewItems(holder, WindDirection.NE)
+
+            // 동 : E
+            ns == 0 && ew > 0 -> setViewItems(holder, WindDirection.E)
+
+            // 남동 : SE
+            ns < 0 && ew > 0 -> setViewItems(holder, WindDirection.SE)
+
+            // 남 : S
+            ns < 0 && ew == 0 -> setViewItems(holder, WindDirection.S)
+
+            // 남서 : SW
+            ns < 0 && ew < 0 -> setViewItems(holder, WindDirection.SW)
+
+            // 서 : W
+            ns == 0 && ew < 0 -> setViewItems(holder, WindDirection.W)
+
+            // 북서 : NW :
+            ns > 0 && ew < 0 -> setViewItems(holder, WindDirection.NW)
+
+            else -> {
+               setViewItems(holder, WindDirection.NE)
+            }
+        }
     }
 
     @SuppressLint("SetTextI18n")
-    private fun setViewItems(holder: WindViewHolder, value: Int, direction: WindDirection) {
-        holder.imageViewIcon.rotation = direction.DEGREE
-        holder.textViewDirection.text = direction.text
-        holder.textViewValue.text = "${value}m/s"
-    }
+    private fun setViewItems(holder: WindViewHolder, direction: WindDirection) =
+        arrayOf(direction.DEGREE, direction.text)
+
 
     override fun getItemCount(): Int {
         return data.size
@@ -139,3 +135,4 @@ class WindAdapter : RecyclerView.Adapter<WindAdapter.WindViewHolder>() {
         notifyDataSetChanged()
     }
 }
+

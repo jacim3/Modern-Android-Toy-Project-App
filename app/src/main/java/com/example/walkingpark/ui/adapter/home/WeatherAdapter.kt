@@ -54,11 +54,10 @@ class WeatherAdapter() : RecyclerView.Adapter<WeatherAdapter.WeatherViewHolder>(
         val item = data[position]
 
         if (item != null) {
-            holder.container.visibility = View.VISIBLE
-            holder.seperator.visibility = View.GONE
+            switchView(ITEM, holder)
+
             val dateTime = getCalendarFromItem(item)
             holder.imageViewIcon.setImageResource(checkTimeForSetWeatherMenu(item))
-
 
             holder.textViewTime.text =
                 if (position == 0) " 지금 " else returnAmPmAfterCheck(
@@ -70,11 +69,19 @@ class WeatherAdapter() : RecyclerView.Adapter<WeatherAdapter.WeatherViewHolder>(
 
             // prevDate.set(dateTime.year, dateTime.monthValue, dateTime.dayOfMonth)
         } else {
-            holder.container.visibility = View.GONE
-            holder.seperator.visibility = View.VISIBLE
+            switchView(SEPERATOR, holder)
         }
     }
 
+
+    private fun switchView(code: Int, holder: WeatherViewHolder) =
+        if (code == ITEM) {
+            holder.container.visibility = View.VISIBLE
+            holder.seperator.visibility = View.GONE
+        } else {
+            holder.container.visibility = View.GONE
+            holder.seperator.visibility = View.VISIBLE
+        }
 
     override fun getItemCount(): Int {
         return data.size
@@ -85,46 +92,6 @@ class WeatherAdapter() : RecyclerView.Adapter<WeatherAdapter.WeatherViewHolder>(
         notifyDataSetChanged()
     }
 }
-
-val WEATHER_ICONS = arrayOf(
-    arrayOf(
-        0,
-        R.drawable.ic_weather_am_clear,
-        0,
-        R.drawable.ic_weather_am_cloudy,
-        R.drawable.ic_weather_am_overcast
-    ),
-    arrayOf(
-        0,
-        R.drawable.ic_weather_pm_clear,
-        0,
-        R.drawable.ic_weather_pm_cloudy,
-        R.drawable.ic_weather_pm_overcast
-    )
-)
-
-val RAIN_ICONS = arrayOf(
-    arrayOf(
-        0,
-        R.drawable.ic_weather_am_rain,
-        R.drawable.ic_weather_snow_rain,
-        R.drawable.ic_weather_snow,
-        R.drawable.ic_weather_am_shower
-    ),
-    arrayOf(
-        0,
-        R.drawable.ic_weather_pm_rain,
-        R.drawable.ic_weather_snow_rain,
-        R.drawable.ic_weather_snow,
-        R.drawable.ic_weather_pm_shower
-    )
-)
-
-const val NIGHT_START = 20
-const val NIGHT_END = 5
-const val AM = 0
-const val PM = 1
-
 
 fun checkTimeForSetWeatherMenu(item: SimplePanelDTO): Int {
 
