@@ -9,25 +9,18 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.walkingpark.R
-import com.example.walkingpark.constants.Common
-import com.example.walkingpark.data.model.dto.simple_panel.SimplePanel5
+import com.example.walkingpark.constants.RAIN
+import com.example.walkingpark.constants.SKY
+import com.example.walkingpark.data.model.dto.simple_panel.SimplePanelDTO
 import com.example.walkingpark.ui.viewmodels.getCalendarFromItem
 import com.example.walkingpark.ui.viewmodels.returnAmPmAfterCheck
+import java.lang.NumberFormatException
 import java.util.*
 
-const val CLEAR = 1
-const val CLOUDY = 3
-const val OVER_CAST = 4
-
-const val NONE = 0
-const val RAIN = 1
-const val RAIN_SNOW = 2
-const val SNOW = 3
-const val SHOWER = 4
 
 class WeatherAdapter() : RecyclerView.Adapter<WeatherAdapter.WeatherViewHolder>() {
 
-    var data = emptyList<SimplePanel5?>()
+    var data = emptyList<SimplePanelDTO?>()
     private var prevDate: Calendar = Calendar.getInstance().apply {
         set(1990, 1, 1)
     }
@@ -63,80 +56,9 @@ class WeatherAdapter() : RecyclerView.Adapter<WeatherAdapter.WeatherViewHolder>(
         if (item != null) {
             holder.container.visibility = View.VISIBLE
             holder.seperator.visibility = View.GONE
-
-            // 오전
-            val statusSky = item.sky
-            val rainType = item.rainType
-
-            val weatherSun = R.drawable.ic_weather_sun
-            val weatherCloud = R.drawable.ic_weather_cloud
-            val weatherCloudPlus = R.drawable.ic_weather_fog
-            val weatherMoon = R.drawable.ic_weather_moon
-            val weatherRain = R.drawable.ic_weather_rain
-            // 오후
-            
-            
             val dateTime = getCalendarFromItem(item)
+            holder.imageViewIcon.setImageResource(checkTimeForSetWeatherMenu(item))
 
-            // TODO 배열로 담아서 메서드로 처리할것 !
-            // 1. 날씨 체크
-            if (statusSky != Common.NO_DATA) {
-                when (statusSky.toInt()) {
-                    // 맑음
-                    CLEAR -> {
-                        if (rainType != Common.NO_DATA) {
-                            when (rainType.toInt()) {
-                                NONE -> {}
-                                RAIN -> {}
-                                RAIN_SNOW -> {}
-                                SNOW -> {}
-                                SHOWER -> {}
-                            }
-                        } else {
-                            holder.imageViewIcon.setImageResource(weatherSun)
-                        }
-                    }
-                    CLOUDY -> {
-                        if (rainType != Common.NO_DATA) {
-                            when (rainType.toInt()) {
-                                NONE -> {}
-                                RAIN -> {}
-                                RAIN_SNOW -> {}
-                                SNOW -> {}
-                                SHOWER -> {}
-                            }
-                        } else {
-                            holder.imageViewIcon.setImageResource(weatherSun)
-                        }
-                    }
-                    OVER_CAST -> {
-                        if (rainType != Common.NO_DATA) {
-                            when (rainType.toInt()) {
-                                NONE -> {}
-                                RAIN -> {}
-                                RAIN_SNOW -> {}
-                                SNOW -> {}
-                                SHOWER -> {}
-                            }
-                        } else {
-                            holder.imageViewIcon.setImageResource(weatherSun)
-                        }
-                    }
-                    else -> {
-
-                    }
-                }
-            }
-            // NUll -> 정보 없음.
-            else {
-
-            }
-            // 2. 시간 체크
-            // HOUR_OF_DAY : 24시간
-            // HOUR : 12시간
-            if (5 >= dateTime.get(Calendar.HOUR_OF_DAY) || dateTime.get(Calendar.HOUR_OF_DAY) >= 20) {
-                holder.imageViewIcon.setImageResource(weatherMoon)
-            }
 
             holder.textViewTime.text =
                 if (position == 0) " 지금 " else returnAmPmAfterCheck(
@@ -158,12 +80,95 @@ class WeatherAdapter() : RecyclerView.Adapter<WeatherAdapter.WeatherViewHolder>(
         return data.size
     }
 
-    fun setAdapterData(data: List<SimplePanel5?>) {
+    fun setAdapterData(data: List<SimplePanelDTO?>) {
         this.data = data
         notifyDataSetChanged()
     }
 }
 
-fun getTimeStamp() {
+val WEATHER_ICONS = arrayOf(
+    arrayOf(
+        0,
+        R.drawable.ic_weather_am_clear,
+        0,
+        R.drawable.ic_weather_am_cloudy,
+        R.drawable.ic_weather_am_overcast
+    ),
+    arrayOf(
+        0,
+        R.drawable.ic_weather_pm_clear,
+        0,
+        R.drawable.ic_weather_pm_cloudy,
+        R.drawable.ic_weather_pm_overcast
+    )
+)
 
+val RAIN_ICONS = arrayOf(
+    arrayOf(
+        0,
+        R.drawable.ic_weather_am_rain,
+        R.drawable.ic_weather_snow_rain,
+        R.drawable.ic_weather_snow,
+        R.drawable.ic_weather_am_shower
+    ),
+    arrayOf(
+        0,
+        R.drawable.ic_weather_pm_rain,
+        R.drawable.ic_weather_snow_rain,
+        R.drawable.ic_weather_snow,
+        R.drawable.ic_weather_pm_shower
+    )
+)
+
+const val NIGHT_START = 20
+const val NIGHT_END = 5
+const val AM = 0
+const val PM = 1
+
+
+fun checkTimeForSetWeatherMenu(item: SimplePanelDTO): Int {
+
+    val rainType = item.rainType.run {
+        try {
+            this.toInt()
+        } catch (e: NumberFormatException) {
+            0
+        }
+    }
+    val sky = item.sky.run {
+        try {
+            this.toInt()
+        } catch (e: NumberFormatException) {
+            1
+        }
+    }
+    val dateTime = getCalendarFromItem(item)
+
+    // 오후.
+    return if (NIGHT_END >= dateTime.get(Calendar.HOUR_OF_DAY) || dateTime.get(Calendar.HOUR_OF_DAY) >= NIGHT_START) {
+        setWeatherIcon(PM, rainType, sky)
+    }
+    // 오전.
+    else {
+        setWeatherIcon(AM, rainType, sky)
+    }
 }
+
+fun setWeatherIcon(AmPm: Int, rainType: Int, sky: Int) =
+
+    when (rainType) {
+        RAIN.RAINY.index, RAIN.RAIN_SNOW.index, RAIN.SNOW.index, RAIN.SHOWER.index -> {
+            RAIN_ICONS[AmPm][rainType]
+        }
+        else -> {
+            when (sky) {
+                SKY.CLEAR.index, SKY.CLOUDY.index, SKY.OVERCAST.index -> WEATHER_ICONS[AmPm][sky]
+                else -> {
+                    0
+                }
+            }
+        }
+    }
+
+
+

@@ -1,12 +1,11 @@
 package com.example.walkingpark.data.model.dto.simple_panel
 
-data class SimplePanel3 (
-    val windIcon:Int,
-    val windValue:String,
-    val humidityIcon:Int,
-    val humidityValue:String,
-    val rainChanceIcon:Int,
-    val rainChanceValue:String,
-    val date:String,
-    val time:String
-    )
+data class SimplePanel3(
+    val dustStatus: String,
+    val smallDustStatus: String,
+    val dust: String,
+    val smallDust: String,
+    val dateTime: String,
+    val stationName: String,
+    val icon: Int
+)

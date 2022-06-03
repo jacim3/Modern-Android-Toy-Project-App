@@ -1,6 +1,7 @@
 package com.example.walkingpark.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,12 +11,14 @@ import androidx.databinding.BindingAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.walkingpark.constants.Common
-import com.example.walkingpark.data.model.dto.simple_panel.SimplePanel5
+import com.example.walkingpark.data.model.dto.simple_panel.SimplePanelDTO
 import com.example.walkingpark.databinding.FragmentHomeBinding
+import com.example.walkingpark.ui.adapter.ItemDecorator
 import com.example.walkingpark.ui.adapter.home.*
 import com.example.walkingpark.ui.view.LoadingIndicator
 import com.example.walkingpark.ui.viewmodels.*
@@ -27,7 +30,7 @@ val week = arrayOf("일", "월", "화", "수", "목", "금", "토")
 val label = arrayOf("오늘", "내일", "모레", "글피")     // 레이블 텍스트
 
 @AndroidEntryPoint
-class HomeFragment : Fragment(), GetScrollItemListener {
+class HomeFragment : Fragment() {
     /*
         기존 뷰모델 생성법 : private val searchViewModel: SearchViewModel by viewModels()
         프래그먼트- 액티비티간 뷰모델 공유 : private val searchViewModel: SearchViewModel by activityViewModels()
@@ -68,7 +71,7 @@ class HomeFragment : Fragment(), GetScrollItemListener {
                     this.postValue(Common.RESPONSE_PROCEEDING)
                     Calendar.getInstance().apply {
                     }
-                    homeViewModel.startWeatherApi(it,   getCalendarTodayMin(), PLUS)
+                    homeViewModel.startWeatherApi(it, getCalendarTodayMin(), PLUS)
                 }
             }
 
@@ -147,8 +150,10 @@ class HomeFragment : Fragment(), GetScrollItemListener {
 
     private fun setAdapters() {
         weatherAdapterAdapter = WeatherAdapter()
-        humidityAdapterAdapter = HumidityAdapter(this)
+        humidityAdapterAdapter = HumidityAdapter()
         windAdapterAdapter = WindAdapter()
+
+        var decorator: RecyclerView.ItemDecoration? = null
 
         binding?.let {
             it.recyclerViewWeather.apply {
@@ -164,6 +169,17 @@ class HomeFragment : Fragment(), GetScrollItemListener {
                 this.layoutManager = humidityLayoutManager
                 adapter = humidityAdapterAdapter
                 LinearSnapHelper().attachToRecyclerView(this)
+                decorator?.let { decorator->
+                    this.removeItemDecoration(decorator)
+                }
+
+                homeViewModel.simplePanelWeather.value?.let {
+                    decorator = ItemDecorator(it)
+                }
+
+                decorator?.let { decorator ->
+                    this.addItemDecoration(decorator)
+                }
             }
 
             it.recyclerViewWind.apply {
@@ -209,12 +225,16 @@ class HomeFragment : Fragment(), GetScrollItemListener {
         }
         homeViewModel.userLiveHolderAir.observe(viewLifecycleOwner) {
         }
+
+        homeViewModel.simpleMinMaxTemperature.observe(viewLifecycleOwner) {
+            Log.e("MinMaxObserver", it.toString())
+        }
     }
 
     private fun setLabelChangeEventFromRecyclerView(
         recyclerView: RecyclerView,
         textView: AppCompatTextView,
-        data: List<SimplePanel5?>,
+        data: List<SimplePanelDTO?>,
         today: Calendar
     ) {
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -222,28 +242,23 @@ class HomeFragment : Fragment(), GetScrollItemListener {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
 
-                val firstPosition =
-                    (recyclerView.layoutManager as LinearLayoutManager).findFirstCompletelyVisibleItemPosition()
-
-                data[firstPosition]?.let {
-
-                    val selTime = getCalendarFromItem(it)
-
-                    Calendar.DAY_OF_WEEK
-                    val nextLabel = setLabel(
-                        findDiff(
-                            selTime,
-                            today
-                        ).run {
-                            when {
-                                this < 0 -> 0
-                                this > label.size - 1 -> label.size - 1
-                                else -> this
-                            }
-                        },
-                        selTime
-                    )
-                    if (textView.text != nextLabel) textView.text = nextLabel
+                ((recyclerView.layoutManager as LinearLayoutManager).findFirstCompletelyVisibleItemPosition()).let { firstPosition ->
+                    data[firstPosition]?.let {
+                        val nextLabel = setLabel(
+                            findDiff(
+                                getCalendarFromItem(it),
+                                today
+                            ).run {
+                                when {
+                                    this < 0 -> 0
+                                    this > label.size - 1 -> label.size - 1
+                                    else -> this
+                                }
+                            },
+                            getCalendarFromItem(it)
+                        )
+                        if (textView.text != nextLabel) textView.text = nextLabel
+                    }
                 }
             }
         })
@@ -268,17 +283,15 @@ class HomeFragment : Fragment(), GetScrollItemListener {
         }
 
         @JvmStatic
-        @BindingAdapter("bindingHashMap")
-        fun loadText(textView: AppCompatTextView, text:String){
-            textView.text = text
+        @BindingAdapter("bindingHashMap", "check")
+        fun loadText(
+            textView: AppCompatTextView,
+            item: MutableLiveData<HashMap<String, HashMap<String, String>>>,
+            check: Int
+        ) {
+            item.value?.get(Common.DateFormat.format(Date()))?.let {
+                textView.text = it[if (check == 1) "max" else "min"]
+            }
         }
     }
-
-    override fun getItem(position: Int, item: String?) {
-        // Log.e("getAdapter", "$position $item")
-    }
-}
-
-interface GetScrollItemListener {
-    fun getItem(position: Int, item: String?)
 }

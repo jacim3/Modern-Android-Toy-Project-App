@@ -8,4 +8,6 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="circle_indicator_dot_color">#000000</color>
+    <color name="ic_weather_icon_color_normal">#212121</color>
+    <color name="ic_weather_icon_color_overcast">#BF000000</color>
 </resources>

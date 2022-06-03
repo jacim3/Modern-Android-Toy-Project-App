@@ -1,6 +1,6 @@
 package com.example.walkingpark.data.model.dto.simple_panel
 
-data class SimplePanel5(
+data class SimplePanelDTO(
     val date: String,
     val time: String,
     val temperature: String,

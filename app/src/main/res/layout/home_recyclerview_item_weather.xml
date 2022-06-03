@@ -12,7 +12,7 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-    android:visibility="gone"
+        android:visibility="gone"
         android:gravity="center">
 
         <androidx.appcompat.widget.AppCompatTextView
@@ -29,28 +29,26 @@
         android:layout_width="wrap_content"
         android:layout_height="140dp"
         android:layout_margin="16dp"
+        android:gravity="center"
         android:orientation="vertical">
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/textViewWeatherTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:text="지금"/>
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/imageViewWeatherIcon"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="@dimen/detail_panel_list_item_size"
+            android:layout_height="@dimen/detail_panel_list_item_size"
             android:layout_marginTop="8dp"
-            android:layout_gravity="center"
-            android:src="@drawable/ic_launcher_background"/>
+            android:layout_gravity="center"/>
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/textViewWeatherTemperature"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
             android:layout_marginTop="32dp"
             android:text="19"/>
 
@@ -58,7 +56,6 @@
             android:id="@+id/textViewWeatherRainChance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
             android:layout_marginTop="8dp"
             android:text="19"/>
 

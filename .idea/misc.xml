@@ -3,20 +3,37 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.1555" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/circleindicator_dot.xml" value="0.1515" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/dotted_line_vertical.xml" value="0.245" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/home_sub_panel_dotted_seperator.xml" value="0.245" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic__379208.xml" value="0.16666666666666666" />
+        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_air_status_bad.xml" value="0.1555" />
+        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_air_status_good.xml" value="0.1555" />
+        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_air_status_normal.xml" value="0.1555" />
+        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_air_status_very_bad.xml" value="0.1555" />
+        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_baseline_arrow_down.xml" value="0.1555" />
+        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_baseline_arrow_up.xml" value="0.1555" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_battery_100_svgrepo_com.xml" value="0.188" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_battery_full_svgrepo_com.xml" value="0.1" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_battery_svgrepo_com__1_.xml" value="0.12" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_beaker_svgrepo_com.xml" value="0.186" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_cropped_1379208_1654061104187.xml" value="0.1515" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_launcher_background.xml" value="0.192" />
+        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_pm_rain.xml" value="0.1555" />
+        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_sky_none.xml" value="0.2185" />
+        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_sky_rain.xml" value="0.2185" />
+        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_sky_snow.xml" value="0.2185" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_water_bottle_svgrepo_com.xml" value="0.203" />
-        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_weather_cloud.xml" value="0.207" />
-        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_weather_fog.xml" value="0.239" />
-        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_weather_humidity.xml" value="0.233" />
+        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_weather_am_clear.xml" value="0.1555" />
+        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_weather_am_cloudy.xml" value="0.1555" />
+        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_weather_am_overcast.xml" value="0.1555" />
+        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_weather_am_rain.xml" value="0.1555" />
+        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_weather_am_shower.xml" value="0.1555" />
+        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_weather_cloud.xml" value="0.14666666666666667" />
+        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_weather_cloudy.xml" value="0.1555" />
+        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_weather_fog.xml" value="0.14666666666666667" />
+        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_weather_humidity.xml" value="0.22" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_weather_humidity_0.xml" value="0.1085" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_weather_humidity_1.xml" value="0.1085" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_weather_humidity_2.xml" value="0.1085" />
@@ -26,23 +43,32 @@
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_weather_humidity_6.xml" value="0.1085" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_weather_humidity_7.xml" value="0.1085" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_weather_moon.xml" value="0.127" />
+        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_weather_overcast.xml" value="0.1555" />
+        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_weather_pm_clear.xml" value="0.1555" />
+        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_weather_pm_cloudy.xml" value="0.1555" />
+        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_weather_pm_overcast.xml" value="0.1555" />
+        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_weather_pm_rain.xml" value="0.1555" />
+        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_weather_pm_shower.xml" value="0.1555" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_weather_rain.xml" value="0.233" />
+        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_weather_snow.xml" value="0.1555" />
+        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_weather_snow_rain.xml" value="0.1555" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_weather_sun.xml" value="0.1075" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_weather_wind_arrow.xml" value="0.1085" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_weather_wind_ne.xml" value="0.1" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_weather_wind_up.xml" value="0.169" />
+        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_wind.xml" value="0.2185" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ui_loading_indicator_background.xml" value="0.1475" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/layout/activity_main.xml" value="0.22" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/layout/activity_permisison.xml" value="0.128125" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/layout/addon_loading_indicator.xml" value="0.22291666666666668" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/layout/content_main.xml" value="0.35520833333333335" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/layout/fragment_first.xml" value="0.35520833333333335" />
-        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/layout/fragment_home.xml" value="0.18281718281718282" />
+        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/layout/fragment_home.xml" value="0.22" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/layout/fragment_maps.xml" value="0.22" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/layout/fragment_parkmaps.xml" value="0.22" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/layout/fragment_second.xml" value="0.35520833333333335" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/layout/fragment_settings.xml" value="0.22" />
-        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/layout/home_recyclerview_item_humidity.xml" value="0.3333333333333333" />
+        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/layout/home_recyclerview_item_humidity.xml" value="0.4466666666666667" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/layout/home_recyclerview_item_seperator.xml" value="0.290625" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/layout/home_recyclerview_item_weather.xml" value="0.3333333333333333" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/layout/home_recyclerview_item_wind.xml" value="0.3333333333333333" />

@@ -10,7 +10,7 @@ import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.walkingpark.R
 import com.example.walkingpark.constants.WindDirection
-import com.example.walkingpark.data.model.dto.simple_panel.SimplePanel5
+import com.example.walkingpark.data.model.dto.simple_panel.SimplePanelDTO
 import com.example.walkingpark.ui.viewmodels.getCalendarFromItem
 import com.example.walkingpark.ui.viewmodels.returnAmPmAfterCheck
 import java.lang.NumberFormatException
@@ -19,7 +19,7 @@ import kotlin.math.ceil
 
 class WindAdapter : RecyclerView.Adapter<WindAdapter.WindViewHolder>() {
 
-    var data = emptyList<SimplePanel5?>()
+    var data = emptyList<SimplePanelDTO?>()
     private var prevDate: Calendar = Calendar.getInstance().apply {
         set(1990, 1, 1)
     }
@@ -134,7 +134,7 @@ class WindAdapter : RecyclerView.Adapter<WindAdapter.WindViewHolder>() {
         return data.size
     }
 
-    fun setAdapterData(data: List<SimplePanel5?>) {
+    fun setAdapterData(data: List<SimplePanelDTO?>) {
         this.data = data
         notifyDataSetChanged()
     }

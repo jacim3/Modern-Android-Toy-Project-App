@@ -13,7 +13,12 @@ import java.sql.Timestamp
 class ExampleUnitTest {
     @Test
     fun addition_isCorrect() {
-        assertEquals(4, Timestamp.valueOf("202204020100"))
+
+
+        assertEquals(4, 2+2)
+
     }
+
+
 
 }

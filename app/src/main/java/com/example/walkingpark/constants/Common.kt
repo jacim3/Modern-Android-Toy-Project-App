@@ -40,9 +40,9 @@ object Common {
     const val LOADING_INDICATOR_DISMISS_TIME = 500
 
     @SuppressLint("SimpleDateFormat")
-    val dateFormat = SimpleDateFormat("yyyyMMdd")
+    val DateFormat = SimpleDateFormat("yyyyMMdd")
     @SuppressLint("SimpleDateFormat")
-    val timeFormat = SimpleDateFormat("HH00")
+    val TimeFormat = SimpleDateFormat("HH00")
 
     // RestApi 응답 관련
     const val RESPONSE_INIT = -1

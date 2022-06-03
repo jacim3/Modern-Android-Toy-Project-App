@@ -80,8 +80,8 @@ class WeatherApiRepository @Inject constructor(
     @SuppressLint("SimpleDateFormat")
     private fun getTime(cal: Calendar): Map<String, String> {
         return mapOf(
-            "date" to Common.dateFormat.format(cal.time),
-            "time" to Common.timeFormat.format(cal.time)
+            "date" to Common.DateFormat.format(cal.time),
+            "time" to Common.TimeFormat.format(cal.time)
         )
     }
 
