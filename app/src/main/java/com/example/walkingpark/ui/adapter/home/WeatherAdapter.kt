@@ -1,12 +1,14 @@
 package com.example.walkingpark.ui.adapter.home
 
 import android.annotation.SuppressLint
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.LinearLayoutCompat
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.example.walkingpark.R
 import com.example.walkingpark.constants.RAIN
@@ -14,26 +16,29 @@ import com.example.walkingpark.constants.SKY
 import com.example.walkingpark.data.model.dto.simple_panel.SimplePanelDTO
 import com.example.walkingpark.ui.viewmodels.getCalendarFromItem
 import com.example.walkingpark.ui.viewmodels.returnAmPmAfterCheck
-import java.lang.NumberFormatException
+import com.google.android.material.internal.ViewUtils.dpToPx
 import java.util.*
 
 
 class WeatherAdapter() : RecyclerView.Adapter<WeatherAdapter.WeatherViewHolder>() {
 
     var data = emptyList<SimplePanelDTO?>()
-    private var prevDate: Calendar = Calendar.getInstance().apply {
-        set(1990, 1, 1)
-    }
 
     class WeatherViewHolder constructor(itemView: View) :
         RecyclerView.ViewHolder(itemView) {
+
         val imageViewIcon: AppCompatImageView = itemView.findViewById(R.id.imageViewWeatherIcon)
         val textViewTime: AppCompatTextView = itemView.findViewById(R.id.textViewWeatherTime)
+
+        private val innerView: View = itemView.findViewById(R.id.includeGraph)
         val textViewTemperature: AppCompatTextView =
-            itemView.findViewById(R.id.textViewWeatherTemperature)
+            innerView.findViewById(R.id.textViewValue)
+        val viewMover: ConstraintLayout = innerView.findViewById(R.id.viewMover)
+        val dotPointer: AppCompatImageView = innerView.findViewById(R.id.imageViewDot)
+
         val textViewRainChance: AppCompatTextView =
             itemView.findViewById(R.id.textViewWeatherRainChance)
-        val container: LinearLayoutCompat = itemView.findViewById(R.id.weatherItem)
+        val container: ConstraintLayout = itemView.findViewById(R.id.weatherItem)
         val seperator: LinearLayoutCompat = itemView.findViewById(R.id.weatherSeperator)
     }
 
@@ -53,8 +58,11 @@ class WeatherAdapter() : RecyclerView.Adapter<WeatherAdapter.WeatherViewHolder>(
 
         val item = data[position]
 
-        if (item != null) {
+        item?.let {
             switchView(ITEM, holder)
+
+            if (position == 0) holder.dotPointer.setImageResource(R.drawable.home_adapter_point_dot_big)
+            else holder.dotPointer.setImageResource(R.drawable.home_adapter_point_dot)
 
             val dateTime = getCalendarFromItem(item)
             holder.imageViewIcon.setImageResource(checkTimeForSetWeatherMenu(item))
@@ -66,13 +74,27 @@ class WeatherAdapter() : RecyclerView.Adapter<WeatherAdapter.WeatherViewHolder>(
                 )
             holder.textViewTemperature.text = item.temperature + "°"
             holder.textViewRainChance.text = item.rainChance + " %"
-
-            // prevDate.set(dateTime.year, dateTime.monthValue, dateTime.dayOfMonth)
-        } else {
-            switchView(SEPERATOR, holder)
-        }
+            (holder.viewMover.layoutParams as ConstraintLayout.LayoutParams).let {
+                it.matchConstraintPercentHeight =
+                    (checkValueWeather(item.temperature)).run {
+                        handleGraphValue(this)
+                    }.run {
+                        if (this > 1f) 1f else this
+                    }
+                holder.viewMover.layoutParams = it
+            }
+        } ?: switchView(SEPERATOR, holder)
     }
 
+    private fun handleGraphValue(value: Int) =
+        when (value) {
+            in 0..10 -> value * 0.5f / 100
+            in 11..19 -> value * 1.0f / 100
+            in 20..30 -> value * 2f / 100
+            else -> {
+                value * 2.5f / 100
+            }
+        }
 
     private fun switchView(code: Int, holder: WeatherViewHolder) =
         if (code == ITEM) {
@@ -83,7 +105,8 @@ class WeatherAdapter() : RecyclerView.Adapter<WeatherAdapter.WeatherViewHolder>(
             holder.seperator.visibility = View.VISIBLE
         }
 
-    override fun getItemCount(): Int {
+    override fun getItemCount()
+            : Int {
         return data.size
     }
 
@@ -93,24 +116,20 @@ class WeatherAdapter() : RecyclerView.Adapter<WeatherAdapter.WeatherViewHolder>(
     }
 }
 
-fun checkTimeForSetWeatherMenu(item: SimplePanelDTO): Int {
-
-    val rainType = item.rainType.run {
+private fun checkValueWeather(value: String) =
+    value.run {
         try {
             this.toInt()
         } catch (e: NumberFormatException) {
             0
         }
     }
-    val sky = item.sky.run {
-        try {
-            this.toInt()
-        } catch (e: NumberFormatException) {
-            1
-        }
-    }
-    val dateTime = getCalendarFromItem(item)
 
+fun checkTimeForSetWeatherMenu(item: SimplePanelDTO): Int {
+
+    val rainType = checkValueWeather(item.rainType)
+    val sky = checkValueWeather(item.sky)
+    val dateTime = getCalendarFromItem(item)
     // 오후.
     return if (NIGHT_END >= dateTime.get(Calendar.HOUR_OF_DAY) || dateTime.get(Calendar.HOUR_OF_DAY) >= NIGHT_START) {
         setWeatherIcon(PM, rainType, sky)

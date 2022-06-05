@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import com.example.walkingpark.R
 import com.example.walkingpark.constants.*
 import com.example.walkingpark.data.model.ResponseCheck
+import com.example.walkingpark.data.model.dto.detail_panel.DustBinding
 import com.example.walkingpark.data.model.dto.response.AirResponse
 import com.example.walkingpark.data.model.dto.response.StationResponse
 import com.example.walkingpark.data.model.dto.response.WeatherResponse
@@ -28,6 +29,7 @@ import java.lang.StringBuilder
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.stream.Collectors
+import java.util.stream.Stream
 import javax.inject.Inject
 import kotlin.collections.HashMap
 import kotlin.math.abs
@@ -60,6 +62,9 @@ class HomeViewModel @Inject constructor(
     val simplePanelAir = MutableLiveData<SimplePanel3>()
     val simpleMinMaxTemperature =
         MutableLiveData<HashMap<String, HashMap<String, String>>>()
+
+    val detailPanelDust = MutableLiveData<List<DustBinding>>()
+    val isDustPanelAnimationStart = MutableLiveData<Boolean>().apply { this.postValue(false) }
 
     // Api 재시도 횟수 기록. 성공 시 초기화
     private var weatherRetryCount = 0
@@ -185,7 +190,11 @@ class HomeViewModel @Inject constructor(
                         "received Air Data",
                         "${receive.pm10Grade} ${receive.pm25Grade} ${receive.dataTime} ${receive.pm10Value} ${receive.pm25Value}"
                     )
-                    simplePanelAir.postValue(parsingSimpleAir(stationName, receive))
+
+                    parsingSimpleAir(stationName, receive).let {
+                        simplePanelAir.postValue(it)
+                        detailPanelDust.postValue(getDetailDustData(it))
+                    }
                 },
                 onError = {
                     it.printStackTrace()
@@ -194,6 +203,74 @@ class HomeViewModel @Inject constructor(
                 }
             )
 
+    private fun getDetailDustData(it: SimplePanel3): List<DustBinding> {
+        return listOf(
+            checkFineDust(it.dust).run {
+                DustBinding(
+                    value = it.dust,
+                    label = DustIndicator.values()[this].label,
+                    stationName = it.stationName,
+                    icon = DustIndicator.values()[this].icon,
+                    container = DustIndicator.values()[this].container,
+                    pointer = DustIndicator.values()[this].pointer,
+                    title = "미세먼지",
+                    color = DustIndicator.values()[this].color
+                )
+            },
+            checkFineDustUltra(it.smallDust).run {
+                DustBinding(
+                    value = it.smallDust,
+                    label = DustIndicator.values()[this].label,
+                    stationName = it.stationName,
+                    icon = DustIndicator.values()[this].icon,
+                    container = DustIndicator.values()[this].container,
+                    pointer = DustIndicator.values()[this].pointer,
+                    title = "초미세먼지",
+                    color = DustIndicator.values()[this].color
+                )
+            }
+        )
+    }
+
+    private fun getDetailTransitionX() {
+
+    }
+
+    private fun checkFineDust(value: String): Int {
+        return value.run {
+            try {
+                this.toInt()
+            } catch (e: NumberFormatException) {
+                0
+            }
+        }.run {
+            when (this) {
+                in 0..15 -> 0
+                in 16..30 -> 1
+                in 31..80 -> 2
+                in 81..150 -> 3
+                else -> 4
+            }
+        }
+    }
+
+    private fun checkFineDustUltra(value: String): Int {
+        return value.run {
+            try {
+                this.toInt()
+            } catch (e: NumberFormatException) {
+                0
+            }
+        }.run {
+            when (this) {
+                in 0..7 -> 0
+                in 8..15 -> 1
+                in 16..35 -> 2
+                in 36..75 -> 3
+                else -> 0
+            }
+        }
+    }
 
     // TODO 통신 실패 시, 현재 시간을 기준으로 검색시간을 변경하여 재시도 하도록
     // TODO ResultCode 에 따른 에러핸들링 필요.
@@ -442,7 +519,7 @@ class HomeViewModel @Inject constructor(
     ): List<SimplePanelDTO?> {
         return emptyList<SimplePanelDTO?>().toMutableList()
             .apply {
-                map.forEach { outer ->
+                map.map { outer ->
                     outer.value.forEach { inner ->
                         getCalendarFromYYYYMMDDHHmm(outer.key + inner.key).let { target ->
                             getCalendarTodayCurrentHour().let { current ->

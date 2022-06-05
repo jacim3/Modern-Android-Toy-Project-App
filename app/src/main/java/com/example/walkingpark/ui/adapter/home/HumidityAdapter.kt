@@ -30,7 +30,13 @@ class HumidityAdapter :
         RecyclerView.ViewHolder(itemView) {
         val imageViewIcon: AppCompatImageView = itemView.findViewById(R.id.imageViewHumidityIcon)
         val textViewTime: AppCompatTextView = itemView.findViewById(R.id.textViewHumidityTime)
-        val textViewValue: AppCompatTextView = itemView.findViewById(R.id.textViewHumidityValue)
+
+        private val innerView: View = itemView.findViewById(R.id.includeGraph)
+        val textViewValue: AppCompatTextView =
+            innerView.findViewById(R.id.textViewValue)
+        val viewMover: ConstraintLayout = innerView.findViewById(R.id.viewMover)
+        val dotPointer: AppCompatImageView = innerView.findViewById(R.id.imageViewDot)
+
         val container: ConstraintLayout = itemView.findViewById(R.id.humidityItem)
         val seperator: LinearLayoutCompat = itemView.findViewById(R.id.humiditySeperator)
     }
@@ -46,11 +52,13 @@ class HumidityAdapter :
     override fun onBindViewHolder(holder: HumidityViewHolder, position: Int) {
         val item = data[position]
 
-        if (item != null) {
+        item?.let {
             switchView(ITEM, holder)
 
-            val dateTime = getCalendarFromItem(item)
+            if (position == 0) holder.dotPointer.setImageResource(R.drawable.home_adapter_point_dot_big)
+            else holder.dotPointer.setImageResource(R.drawable.home_adapter_point_dot)
 
+            val dateTime = getCalendarFromItem(item)
             holder.imageViewIcon.setImageResource(getCalculatedHumidityIcon(item.humidity))
             holder.textViewTime.text =
                 if (position == 0) " 지금 " else returnAmPmAfterCheck(
@@ -59,9 +67,19 @@ class HumidityAdapter :
                 )
             holder.textViewValue.text = item.humidity + "%"
 
-        } else {
-            switchView(SEPERATOR, holder)
-        }
+            (holder.viewMover.layoutParams as ConstraintLayout.LayoutParams).let {
+                it.matchConstraintPercentHeight =
+                    item.humidity.run {
+                        try {
+                            this.toFloat()/100f
+                        } catch (e: java.lang.NumberFormatException) {
+                            0f
+                        }
+                    }
+                holder.viewMover.layoutParams = it
+            }
+
+        } ?: switchView(SEPERATOR, holder)
     }
 
     private fun switchView(code: Int, holder: HumidityViewHolder) =

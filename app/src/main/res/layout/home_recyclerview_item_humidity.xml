@@ -26,7 +26,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/humidityItem"
         android:layout_width="wrap_content"
-        android:layout_height="120dp"
+        android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:gravity="center"
         android:orientation="vertical">
@@ -44,17 +44,27 @@
             android:id="@+id/imageViewHumidityIcon"
             android:layout_width="@dimen/detail_panel_list_item_size"
             android:layout_height="@dimen/detail_panel_list_item_size"
-            android:layout_marginTop="8dp"
             android:layout_gravity="center"
             android:rotation="270"
+            android:layout_marginTop="@dimen/home_detail_list_item_margin"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textViewHumidityTime" />
 
-        <androidx.appcompat.widget.AppCompatTextView
+<!--        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/textViewHumidityValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageViewHumidityIcon" />-->
+
+        <include
+            android:id="@+id/includeGraph"
+            layout="@layout/home_recyclerview_item_graph"
+            android:layout_width="wrap_content"
+            android:layout_height="60dp"
+            android:layout_marginTop="@dimen/home_detail_list_item_margin"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/imageViewHumidityIcon" />

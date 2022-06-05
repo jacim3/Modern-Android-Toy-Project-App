@@ -2,5 +2,8 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="home_simple_panel_icon_size">80dp</dimen>
     <dimen name="home_simple_panel_icon_padding">16dp</dimen>
+    <dimen name="home_detail_list_item_margin">8dp</dimen>
     <dimen name="detail_panel_list_item_size">36dp</dimen>
+    <dimen name="home_dust_detail_panel_divider_height">2dp</dimen>
+    <dimen name="home_dust_detail_panel_divider_width_percent">0.19</dimen>
 </resources>

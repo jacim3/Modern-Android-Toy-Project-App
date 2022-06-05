@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.example.walkingpark.ui.viewmodels.HomeViewModel" />
+
+        <variable
+            name="index"
+            type="Integer" />
+    </data>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textSize="15sp"
+            android:text="@{viewModel.detailPanelDust.get(index).title}"/>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/container"
+            android:layout_width="match_parent"
+            android:layout_height="100dp">
+
+            <!--            <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/indicatorMover"
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            app:layout_constraintBottom_toBottomOf="@+id/fineDust1"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="@+id/fineDust1"
+                            app:layout_constraintWidth_percent="0.2"
+                            />-->
+
+            <View
+                android:id="@+id/fineDust5"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/home_dust_detail_panel_divider_height"
+                android:background="@color/home_dust_detail_panel_divider_color_5"
+                app:layout_constraintBottom_toBottomOf="@+id/fineDust4"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/fineDust4"
+                app:layout_constraintWidth_percent="0.195" />
+
+            <View
+                android:id="@+id/fineDust4"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/home_dust_detail_panel_divider_height"
+                android:background="@color/home_dust_detail_panel_divider_color_4"
+                app:layout_constraintBottom_toBottomOf="@+id/fineDust3"
+                app:layout_constraintEnd_toStartOf="@+id/fineDust5"
+                app:layout_constraintStart_toEndOf="@+id/fineDust3"
+                app:layout_constraintWidth_percent="0.195" />
+
+            <View
+                android:id="@+id/fineDust3"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/home_dust_detail_panel_divider_height"
+                android:background="@color/home_dust_detail_panel_divider_color_3"
+                app:layout_constraintBottom_toBottomOf="@+id/fineDust2"
+                app:layout_constraintEnd_toStartOf="@+id/fineDust4"
+                app:layout_constraintStart_toEndOf="@+id/fineDust2"
+                app:layout_constraintWidth_percent="0.195" />
+
+            <View
+                android:id="@+id/fineDust2"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/home_dust_detail_panel_divider_height"
+                android:background="@color/home_dust_detail_panel_divider_color_2"
+                app:layout_constraintBottom_toBottomOf="@+id/fineDust1"
+                app:layout_constraintEnd_toStartOf="@+id/fineDust3"
+                app:layout_constraintStart_toEndOf="@+id/fineDust1"
+                app:layout_constraintWidth_percent="0.195" />
+
+            <View
+                android:id="@+id/fineDust1"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/home_dust_detail_panel_divider_height"
+                android:layout_marginBottom="4dp"
+                android:background="@color/home_dust_detail_panel_divider_color_1"
+                app:layout_constraintBottom_toTopOf="@+id/fineDustText1"
+                app:layout_constraintEnd_toStartOf="@+id/fineDust2"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintWidth_percent="0.195" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/fineDustText1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="최고"
+                android:textColor="@color/home_dust_detail_panel_divider_color_1"
+                android:textSize="11sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/fineDust1"
+                app:layout_constraintStart_toStartOf="@+id/fineDust1" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/fineDustText2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="좋음"
+                android:textColor="@color/home_dust_detail_panel_divider_color_2"
+                android:textSize="11sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/fineDust2"
+                app:layout_constraintStart_toStartOf="@+id/fineDust2" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/fineDustText5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="매우나쁨"
+                android:textColor="@color/home_dust_detail_panel_divider_color_5"
+                android:textSize="11sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/fineDust5"
+                app:layout_constraintStart_toStartOf="@+id/fineDust5" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/fineDustText3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="보통"
+                android:textColor="@color/home_dust_detail_panel_divider_color_3"
+                android:textSize="11sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/fineDust3"
+                app:layout_constraintStart_toStartOf="@+id/fineDust3" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/fineDustText4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="나쁨"
+                android:textColor="@color/home_dust_detail_panel_divider_color_4"
+                android:textSize="11sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/fineDust4"
+                app:layout_constraintStart_toStartOf="@+id/fineDust4" />
+
+
+            <!--            <include
+                            android:id="@+id/IndicatorContainerOuter"
+                            layout="@layout/home_finedust_panel_indicator"
+                            app:layout_constraintHorizontal_bias="0.2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:layout_constraintBottom_toTopOf="@+id/imageViewIndicatorPointer"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent" />-->
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/IndicatorContainerOuter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toTopOf="@+id/fineDustText1"
+                app:layout_constraintEnd_toStartOf="@+id/fineDust1"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/indicatorInnerContainer"
+                    bindingBackground="@{viewModel.detailPanelDust.get(index).container}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/imageViewDustIcon"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_gravity="center"
+                        app:bindingSrc="@{viewModel.detailPanelDust.get(index).icon}" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/textViewDustStatus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="4dp"
+                        android:text="@{viewModel.detailPanelDust.get(index).label}"
+                        android:textColor="@color/white"
+                        android:textStyle="bold" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/textViewDustValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="@{viewModel.detailPanelDust.get(index).value}"
+                        android:textColor="@color/white"
+                        android:textStyle="bold" />
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/viewIndicatorConnectLine"
+                    android:layout_width="3dp"
+                    android:layout_height="10dp"
+                    android:layout_gravity="center|bottom"
+                    app:bindingSrc="@{viewModel.detailPanelDust.get(index).color}" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/imageViewIndicatorPointer"
+                    bindingSrc="@{viewModel.detailPanelDust.get(index).pointer}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.appcompat.widget.LinearLayoutCompat>
+</layout>
+

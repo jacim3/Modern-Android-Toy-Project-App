@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.appcompat.widget.LinearLayoutCompat
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="horizontal">
@@ -8,7 +9,7 @@
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/weatherSeperator"
         android:layout_width="match_parent"
-        android:layout_height="140dp"
+        android:layout_height="200dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
@@ -24,10 +25,10 @@
     </androidx.appcompat.widget.LinearLayoutCompat>
 
 
-    <androidx.appcompat.widget.LinearLayoutCompat
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/weatherItem"
         android:layout_width="wrap_content"
-        android:layout_height="140dp"
+        android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:gravity="center"
         android:orientation="vertical">
@@ -36,30 +37,44 @@
             android:id="@+id/textViewWeatherTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="지금"/>
+            android:text="지금"
+            app:layout_constraintBottom_toTopOf="@+id/imageViewWeatherIcon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/imageViewWeatherIcon"
             android:layout_width="@dimen/detail_panel_list_item_size"
             android:layout_height="@dimen/detail_panel_list_item_size"
-            android:layout_marginTop="8dp"
-            android:layout_gravity="center"/>
+            android:layout_marginTop="@dimen/home_detail_list_item_margin"
+            android:layout_gravity="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewWeatherTime" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/textViewWeatherTemperature"
+        <include
+            layout="@layout/home_recyclerview_item_graph"
+            android:id="@+id/includeGraph"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:text="19"/>
+            android:layout_height="60dp"
+            android:layout_marginTop="@dimen/home_detail_list_item_margin"
+            app:layout_constraintBottom_toTopOf="@+id/textViewWeatherRainChance"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageViewWeatherIcon" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/textViewWeatherRainChance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="19"/>
+            android:layout_marginTop="@dimen/home_detail_list_item_margin"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/includeGraph" />
 
-    </androidx.appcompat.widget.LinearLayoutCompat>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
 

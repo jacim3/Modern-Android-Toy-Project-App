@@ -1,5 +1,7 @@
 package com.example.walkingpark.constants
 
+import com.example.walkingpark.R
+
 enum class Enums() {}
 
 /**
@@ -89,4 +91,42 @@ enum class WindDirection(val DEGREE: Float, val text: String) {
     SW(225f, "남서"),
     W(270f, "서"),
     NW(315f, "북서"),
+}
+
+enum class DustIndicator(val container: Int, val color:Int, val pointer: Int, val icon: Int, val label: String) {
+    VERY_GOOD(
+        R.drawable.home_dust_detail_panel_indicator_container_1,
+        R.color.home_dust_detail_panel_divider_color_1,
+        R.drawable.home_dust_detail_panel_indicator_dot_1,
+        R.drawable.ic_dust_very_good,
+        "매우좋음"
+    ),
+    GOOD(
+        R.drawable.home_dust_detail_panel_indicator_container_2,
+        R.color.home_dust_detail_panel_divider_color_2,
+        R.drawable.home_dust_detail_panel_indicator_dot_2,
+        R.drawable.ic_dust_good,
+        "좋음"
+    ),
+    NORMAL(
+        R.drawable.home_dust_detail_panel_indicator_container_3,
+        R.color.home_dust_detail_panel_divider_color_3,
+        R.drawable.home_dust_detail_panel_indicator_dot_3,
+        R.drawable.ic_dust_normal,
+        "보통"
+    ),
+    BAD(
+        R.drawable.home_dust_detail_panel_indicator_container_4,
+        R.color.home_dust_detail_panel_divider_color_4,
+        R.drawable.home_dust_detail_panel_indicator_dot_4,
+        R.drawable.ic_dust_bad,
+        "나쁨"
+    ),
+    VERY_BAD(
+        R.drawable.home_dust_detail_panel_indicator_container_5,
+        R.color.home_dust_detail_panel_divider_color_5,
+        R.drawable.home_dust_detail_panel_indicator_dot_5,
+        R.drawable.ic_dust_very_bad,
+        "매우나쁨"
+    ),
 }

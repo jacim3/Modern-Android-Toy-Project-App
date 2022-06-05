@@ -10,4 +10,9 @@
     <color name="circle_indicator_dot_color">#000000</color>
     <color name="ic_weather_icon_color_normal">#212121</color>
     <color name="ic_weather_icon_color_overcast">#BF000000</color>
+    <color name="home_dust_detail_panel_divider_color_1">#3F51B5</color>
+    <color name="home_dust_detail_panel_divider_color_2">#2196F3</color>
+    <color name="home_dust_detail_panel_divider_color_3">#009688</color>
+    <color name="home_dust_detail_panel_divider_color_4">#FF9800</color>
+    <color name="home_dust_detail_panel_divider_color_5">#FF5722</color>
 </resources>

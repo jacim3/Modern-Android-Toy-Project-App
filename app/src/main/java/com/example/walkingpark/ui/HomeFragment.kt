@@ -1,12 +1,19 @@
 package com.example.walkingpark.ui
 
+import android.content.res.Resources
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.TranslateAnimation
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.appcompat.widget.LinearLayoutCompat
+import androidx.core.widget.NestedScrollView
 import androidx.databinding.BindingAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -27,6 +34,8 @@ import java.util.*
 const val diff = 24 * 60 * 60 * 1000       // calendar 간 날짜계산을 위해 필요
 val week = arrayOf("일", "월", "화", "수", "목", "금", "토")
 val label = arrayOf("오늘", "내일", "모레", "글피")     // 레이블 텍스트
+val START = 0
+val END = 1
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
@@ -100,7 +109,12 @@ class HomeFragment : Fragment() {
                 it.weather == Common.RESPONSE_SUCCESS
             ) {
                 loadingIndicator.dismissIndicator()
+            }
+        }
 
+        homeViewModel.isDustPanelAnimationStart.observe(viewLifecycleOwner) { check ->
+            if (check == true) {
+                setDustAnimationWithCalculatePosition()
             }
         }
 
@@ -119,6 +133,66 @@ class HomeFragment : Fragment() {
             }
         }
         setAdapters()
+        setScrollEvent()
+    }
+
+    private fun setDustAnimationWithCalculatePosition() {
+        binding?.let {
+
+            homeViewModel.detailPanelDust.value?.also { data ->
+                // 이하 디바이스의 최대 width, 뷰 정보, 위치등을 읽어옴.
+                val l1 = it.includeDustPanel.fineDust1
+                val l2 = it.includeDustPanel.fineDust2
+                val l3 = it.includeDustPanel.fineDust3
+                val l4 = it.includeDustPanel.fineDust4
+                val l5 = it.includeDustPanel.fineDust5
+
+                val halfWidth = it.includeDustPanel.indicatorInnerContainer.run {
+                    it.includeDustPanel.indicatorInnerContainer.width.toFloat() / 2
+                }
+                val maxWidth = Resources.getSystem().displayMetrics.widthPixels.toFloat()
+
+                // 픽셀단위 영역 구하기
+                val range = arrayOf(
+                    arrayOf(l1.x + l1.x, l2.x - l1.x),
+                    arrayOf(l2.x + l1.x, l3.x - l1.x),
+                    arrayOf(l3.x + l1.x, l4.x - l1.x),
+                    arrayOf(l4.x + l1.x, l5.x - l1.x),
+                    arrayOf(
+                        l5.x + l1.x,
+                        maxWidth - l1.x
+                    ),
+                )
+
+                Handler(Looper.getMainLooper()).post {
+                    it.includeDustPanel.let { panel ->
+                        panel.IndicatorContainerOuter.startAnimation(
+                            getDustAnimationWithData(
+                                0,
+                                data[0].value.toInt(),
+                                range,
+                                halfWidth,
+                                maxWidth
+                            )
+                        )
+                    }
+                }
+
+                Handler(Looper.getMainLooper()).post {
+                    it.includeUltraDustPanel.let { panel ->
+                        panel.IndicatorContainerOuter.startAnimation(
+                            getDustAnimationWithData(
+                                1,
+                                data[1].value.toInt(),
+                                range,
+                                halfWidth,
+                                maxWidth
+                            )
+                        )
+                    }
+                }
+            }
+        }
     }
 
     private fun setContainerVisibility(code: Int) {
@@ -146,6 +220,86 @@ class HomeFragment : Fragment() {
             }
         }
     }
+
+
+    private fun dustCheck(
+        value: Int,
+        range: Array<Array<Float>>,
+        indicatorHalfWidth: Float,
+        maxWidth: Float
+    ) =
+        when (value) {
+            in 0..15 -> dustValueToPosition(value, range[0], 0 to 15).run {
+                if (this < indicatorHalfWidth) indicatorHalfWidth else this
+            }
+            in 16..30 -> dustValueToPosition(value, range[1], 16 to 30)
+            in 31..80 -> dustValueToPosition(value, range[2], 31 to 80)
+            in 81..150 -> dustValueToPosition(value, range[3], 81 to 150)
+            else -> {
+                dustValueToPosition(value, range[4], 150 to 200).run {
+                    if (this > maxWidth - indicatorHalfWidth) maxWidth - indicatorHalfWidth else this
+                }
+            }
+        }
+
+
+    private fun ultraDustCheck(
+        value: Int,
+        range: Array<Array<Float>>,
+        indicatorHalfWidth: Float,
+        maxWidth: Float
+    ) =
+        when (value) {
+            in 0..7 -> dustValueToPosition(value, range[0], 0 to 7).run {
+                if (this < indicatorHalfWidth) indicatorHalfWidth else this
+            }
+            in 8..15 -> dustValueToPosition(value, range[1], 8 to 15)
+            in 16..35 -> dustValueToPosition(value, range[2], 16 to 35)
+            in 36..75 -> dustValueToPosition(value, range[3], 36 to 75)
+            else -> {
+                dustValueToPosition(value, range[4], 76 to 100).run {
+                    if (this > maxWidth - indicatorHalfWidth) maxWidth - indicatorHalfWidth else this
+                }
+            }
+        }
+
+    private fun dustValueToPosition(
+        value: Int,
+        area: Array<Float>,
+        range: Pair<Int, Int>
+    ) = (range.second - range.first).run {
+        area[START] + ((value - range.first) * (area[END] - area[START]) / this)
+    }
+
+    private fun setScrollEvent() {
+        binding?.let {
+            it.nestedScrollView.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+
+                if ((it.includeUltraDustPanel.container.y - it.includeUltraDustPanel.container.height) <= scrollY && homeViewModel.isDustPanelAnimationStart.value == false) {
+                    homeViewModel.isDustPanelAnimationStart.postValue(true)
+                }
+            })
+        }
+    }
+
+    private fun getDustAnimationWithData(
+        code: Int,
+        value: Int,
+        range: Array<Array<Float>>,
+        halfWidth: Float,
+        maxWidth: Float
+    ) = TranslateAnimation(
+            0f,
+            if (code == 0) dustCheck(value, range, halfWidth, maxWidth)
+            else ultraDustCheck(value, range, halfWidth, maxWidth),
+            0f,
+            0f
+        ).apply {
+            duration = 2000
+            interpolator = AccelerateDecelerateInterpolator()
+            fillAfter = true
+        }
+
 
     private fun setAdapters() {
         weatherAdapterAdapter = WeatherAdapter()
@@ -264,12 +418,22 @@ class HomeFragment : Fragment() {
     }
 
     companion object {
+
+        // 이미지 바인딩
         @JvmStatic
         @BindingAdapter("bindingSrc")
         fun loadImage(imageView: AppCompatImageView, resId: Int) {
             imageView.setImageResource(resId)
         }
 
+        @JvmStatic
+        @BindingAdapter("bindingBackground")
+        fun loadBackground(container: LinearLayoutCompat, resId: Int) {
+            container.setBackgroundResource(resId)
+        }
+
+        // 하루 최저 / 최고온도 바인딩
+        // check : 0 - 최저온도, 1 - 최고온도
         @JvmStatic
         @BindingAdapter("bindingHashMap", "check")
         fun loadText(
@@ -280,6 +444,14 @@ class HomeFragment : Fragment() {
             item.value?.get(Common.DateFormat.format(Date()))?.let {
                 textView.text = it[if (check == 1) "max" else "min"]
             }
+        }
+
+        // 미세먼지 컨데이너 색 설정
+        // check : 0 - 미세먼지, 1 - 초미세먼지
+        @JvmStatic
+        @BindingAdapter("bindingDustSetColor", "category")
+        fun setColor(view: AppCompatImageView, value: String, label: String) {
+            Log.e("asdfasdfdas", view.javaClass.name)
         }
     }
 }

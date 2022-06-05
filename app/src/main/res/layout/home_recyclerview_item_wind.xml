@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.appcompat.widget.LinearLayoutCompat
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="horizontal">
@@ -23,10 +24,10 @@
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
-    <androidx.appcompat.widget.LinearLayoutCompat
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/windItem"
         android:layout_width="wrap_content"
-        android:layout_height="140dp"
+        android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:gravity="center"
         android:orientation="vertical">
@@ -35,30 +36,52 @@
             android:id="@+id/textViewWindTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="지금"/>
+            android:text="지금"
+            app:layout_constraintBottom_toTopOf="@+id/imageViewWindIcon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/imageViewWindIcon"
             android:layout_width="@dimen/detail_panel_list_item_size"
             android:layout_height="@dimen/detail_panel_list_item_size"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="@dimen/home_detail_list_item_margin"
             android:layout_gravity="center"
-            android:src="@drawable/ic_wind_direction_arrow"/>
+            android:src="@drawable/ic_wind_direction_arrow"
+            app:layout_constraintBottom_toTopOf="@+id/textViewWindDirection"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewWindTime" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/textViewWindDirection"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:text="19"/>
+            android:layout_marginTop="@dimen/home_detail_list_item_margin"
+            android:text="북동"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageViewWindIcon" />
 
-        <androidx.appcompat.widget.AppCompatTextView
+<!--        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/textViewWindValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="19"/>
+            android:text="19"/>-->
 
-    </androidx.appcompat.widget.LinearLayoutCompat>
+        <include
+            android:id="@+id/includeGraph"
+            layout="@layout/home_recyclerview_item_graph"
+            android:layout_width="wrap_content"
+            android:layout_height="60dp"
+            android:layout_marginTop="@dimen/home_detail_list_item_margin"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewWindDirection" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.appcompat.widget.LinearLayoutCompat>
