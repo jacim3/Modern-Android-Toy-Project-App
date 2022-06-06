@@ -68,7 +68,7 @@ class WeatherAdapter() : RecyclerView.Adapter<WeatherAdapter.WeatherViewHolder>(
             holder.imageViewIcon.setImageResource(checkTimeForSetWeatherMenu(item))
 
             holder.textViewTime.text =
-                if (position == 0) " 지금 " else returnAmPmAfterCheck(
+                if (position == 0) "  지금  " else returnAmPmAfterCheck(
                     dateTime.get(Calendar.HOUR_OF_DAY),
                     dateTime.get(Calendar.HOUR)
                 )

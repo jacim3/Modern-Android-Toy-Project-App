@@ -19,6 +19,7 @@
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/home_dust_detail_panel_indicator_dot_3.xml" value="0.2005" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/home_dust_detail_panel_indicator_dot_4.xml" value="0.2005" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/home_dust_detail_panel_indicator_dot_5.xml" value="0.2005" />
+        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/home_simple_panel_weather_item_container.xml" value="0.2325" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/home_sub_panel_dotted_seperator.xml" value="0.245" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic__379208.xml" value="0.16666666666666666" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_air_status_bad.xml" value="0.1555" />
@@ -75,13 +76,14 @@
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_weather_wind_ne.xml" value="0.1" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_weather_wind_up.xml" value="0.169" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_wind.xml" value="0.2185" />
+        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ic_wind_direction_arrow.xml" value="0.216" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/drawable/ui_loading_indicator_background.xml" value="0.1475" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/layout/activity_main.xml" value="0.22" />
-        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/layout/activity_permisison.xml" value="0.128125" />
+        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/layout/activity_permisison.xml" value="0.22" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/layout/addon_loading_indicator.xml" value="0.22291666666666668" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/layout/content_main.xml" value="0.35520833333333335" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/layout/fragment_first.xml" value="0.35520833333333335" />
-        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/layout/fragment_home.xml" value="0.22" />
+        <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/layout/fragment_home.xml" value="0.3333333333333333" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/layout/fragment_maps.xml" value="0.22" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/layout/fragment_parkmaps.xml" value="0.22" />
         <entry key="..\:/Users/kjk89/AndroidStudioProjects/WalkingPark/app/src/main/res/layout/fragment_second.xml" value="0.35520833333333335" />

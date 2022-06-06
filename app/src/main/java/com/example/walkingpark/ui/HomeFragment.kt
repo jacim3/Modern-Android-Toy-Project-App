@@ -26,7 +26,6 @@ import com.example.walkingpark.constants.Common
 import com.example.walkingpark.data.model.dto.simple_panel.SimplePanelDTO
 import com.example.walkingpark.databinding.FragmentHomeBinding
 import com.example.walkingpark.ui.adapter.home.*
-import com.example.walkingpark.ui.view.LoadingIndicator
 import com.example.walkingpark.ui.viewmodels.*
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
@@ -48,7 +47,6 @@ class HomeFragment : Fragment() {
     private val mainViewModel: MainViewModel by activityViewModels()
 
     private var binding: FragmentHomeBinding? = null
-    private lateinit var loadingIndicator: LoadingIndicator
     private lateinit var humidityAdapterAdapter: HumidityAdapter
     private lateinit var weatherAdapterAdapter: WeatherAdapter
     private lateinit var windAdapterAdapter: WindAdapter
@@ -66,10 +64,7 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        loadingIndicator = LoadingIndicator(requireContext(), "RestApi 통신중...")
-        loadingIndicator.startLoadingIndicator()
-
-        // 사용자 위치업데이트 관찰 수행시 수행.
+        // 사용자 GPS 정보 획득 시 수행.
         mainViewModel.userLocation.observe(viewLifecycleOwner) {
             homeViewModel.isWeatherLoaded.apply {
                 if (this.value != Common.RESPONSE_PROCEEDING &&
@@ -93,11 +88,11 @@ class HomeFragment : Fragment() {
             }
         }
 
-        homeViewModel.userResponseCheck.observe(viewLifecycleOwner) {
+        homeViewModel.userResponseCheck.observe(viewLifecycleOwner) { check ->
 
-            if (it.station == Common.RESPONSE_SUCCESS &&
-                it.air != Common.RESPONSE_PROCEEDING &&
-                it.air != Common.RESPONSE_SUCCESS
+            if (check.station == Common.RESPONSE_SUCCESS &&
+                check.air != Common.RESPONSE_PROCEEDING &&
+                check.air != Common.RESPONSE_SUCCESS
             ) {
                 homeViewModel.userLiveHolderStation.value?.stationName?.let { name ->
                     homeViewModel.isAirLoaded.postValue(Common.RESPONSE_PROCEEDING)
@@ -105,10 +100,13 @@ class HomeFragment : Fragment() {
                 }
             }
 
-            if (it.air == Common.RESPONSE_SUCCESS &&
-                it.weather == Common.RESPONSE_SUCCESS
+            if (check.air == Common.RESPONSE_SUCCESS &&
+                check.weather == Common.RESPONSE_SUCCESS
             ) {
-                loadingIndicator.dismissIndicator()
+                binding?.let {
+                    it.loadingIndicator.visibility = View.INVISIBLE
+                    it.mainContents.visibility = View.VISIBLE
+                }
             }
         }
 
@@ -117,7 +115,12 @@ class HomeFragment : Fragment() {
                 setDustAnimationWithCalculatePosition()
             }
         }
+        setButtonTabEvent()
+        setAdapters()
+        setScrollEvent()
+    }
 
+    private fun setButtonTabEvent() {
         binding?.let {
 
             it.buttonTabWeather.setOnClickListener {
@@ -132,27 +135,52 @@ class HomeFragment : Fragment() {
                 setContainerVisibility(2)
             }
         }
-        setAdapters()
-        setScrollEvent()
     }
 
+    private fun setContainerVisibility(code: Int) {
+        when (code) {
+            0 -> {
+                binding?.apply {
+                    weatherPanelContainer.visibility = View.VISIBLE
+                    windPanelContainer.visibility = View.GONE
+                    humidityPanelContainer.visibility = View.GONE
+                }
+            }
+            1 -> {
+                binding?.apply {
+                    weatherPanelContainer.visibility = View.GONE
+                    windPanelContainer.visibility = View.VISIBLE
+                    humidityPanelContainer.visibility = View.GONE
+                }
+            }
+            2 -> {
+                binding?.apply {
+                    weatherPanelContainer.visibility = View.GONE
+                    windPanelContainer.visibility = View.GONE
+                    humidityPanelContainer.visibility = View.VISIBLE
+                }
+            }
+        }
+    }
+
+    // 미세먼지 값 -> 디바이스의 width 및 각 Widget 의 위치를 고려한 Position 변환 및
     private fun setDustAnimationWithCalculatePosition() {
         binding?.let {
 
             homeViewModel.detailPanelDust.value?.also { data ->
                 // 이하 디바이스의 최대 width, 뷰 정보, 위치등을 읽어옴.
-                val l1 = it.includeDustPanel.fineDust1
-                val l2 = it.includeDustPanel.fineDust2
-                val l3 = it.includeDustPanel.fineDust3
-                val l4 = it.includeDustPanel.fineDust4
-                val l5 = it.includeDustPanel.fineDust5
+                val l1 = it.includeDustPanel.fineDust1      // 범위 - 매우좋음
+                val l2 = it.includeDustPanel.fineDust2      // 범위 - 좋음
+                val l3 = it.includeDustPanel.fineDust3      // 범위 - 보통
+                val l4 = it.includeDustPanel.fineDust4      // 범위 - 나쁨
+                val l5 = it.includeDustPanel.fineDust5      // 범위 - 매우나쁨
 
                 val halfWidth = it.includeDustPanel.indicatorInnerContainer.run {
                     it.includeDustPanel.indicatorInnerContainer.width.toFloat() / 2
                 }
                 val maxWidth = Resources.getSystem().displayMetrics.widthPixels.toFloat()
 
-                // 픽셀단위 영역 구하기
+                // 각 영역의 범위
                 val range = arrayOf(
                     arrayOf(l1.x + l1.x, l2.x - l1.x),
                     arrayOf(l2.x + l1.x, l3.x - l1.x),
@@ -195,73 +223,45 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun setContainerVisibility(code: Int) {
-        when (code) {
-            0 -> {
-                binding?.apply {
-                    weatherPanelContainer.visibility = View.VISIBLE
-                    windPanelContainer.visibility = View.GONE
-                    humidityPanelContainer.visibility = View.GONE
-                }
-            }
-            1 -> {
-                binding?.apply {
-                    weatherPanelContainer.visibility = View.GONE
-                    windPanelContainer.visibility = View.VISIBLE
-                    humidityPanelContainer.visibility = View.GONE
-                }
-            }
-            2 -> {
-                binding?.apply {
-                    weatherPanelContainer.visibility = View.GONE
-                    windPanelContainer.visibility = View.GONE
-                    humidityPanelContainer.visibility = View.VISIBLE
-                }
-            }
-        }
-    }
-
-
+    // 미세먼지 값 -> Position (Pixel) 변환
     private fun dustCheck(
         value: Int,
         range: Array<Array<Float>>,
         indicatorHalfWidth: Float,
         maxWidth: Float
-    ) =
-        when (value) {
-            in 0..15 -> dustValueToPosition(value, range[0], 0 to 15).run {
-                if (this < indicatorHalfWidth) indicatorHalfWidth else this
-            }
-            in 16..30 -> dustValueToPosition(value, range[1], 16 to 30)
-            in 31..80 -> dustValueToPosition(value, range[2], 31 to 80)
-            in 81..150 -> dustValueToPosition(value, range[3], 81 to 150)
-            else -> {
-                dustValueToPosition(value, range[4], 150 to 200).run {
-                    if (this > maxWidth - indicatorHalfWidth) maxWidth - indicatorHalfWidth else this
-                }
+    ) = when (value) {
+        in 0..15 -> dustValueToPosition(value, range[0], 0 to 15).run {
+            if (this < indicatorHalfWidth) indicatorHalfWidth else this
+        }
+        in 16..30 -> dustValueToPosition(value, range[1], 16 to 30)
+        in 31..80 -> dustValueToPosition(value, range[2], 31 to 80)
+        in 81..150 -> dustValueToPosition(value, range[3], 81 to 150)
+        else -> {
+            dustValueToPosition(value, range[4], 150 to 200).run {
+                if (this > maxWidth - indicatorHalfWidth) maxWidth - indicatorHalfWidth else this
             }
         }
+    }
 
-
+    // 초미세먼지 값 -> Position (Pixel) 변환
     private fun ultraDustCheck(
         value: Int,
         range: Array<Array<Float>>,
         indicatorHalfWidth: Float,
         maxWidth: Float
-    ) =
-        when (value) {
-            in 0..7 -> dustValueToPosition(value, range[0], 0 to 7).run {
-                if (this < indicatorHalfWidth) indicatorHalfWidth else this
-            }
-            in 8..15 -> dustValueToPosition(value, range[1], 8 to 15)
-            in 16..35 -> dustValueToPosition(value, range[2], 16 to 35)
-            in 36..75 -> dustValueToPosition(value, range[3], 36 to 75)
-            else -> {
-                dustValueToPosition(value, range[4], 76 to 100).run {
-                    if (this > maxWidth - indicatorHalfWidth) maxWidth - indicatorHalfWidth else this
-                }
+    ) = when (value) {
+        in 0..7 -> dustValueToPosition(value, range[0], 0 to 7).run {
+            if (this < indicatorHalfWidth) indicatorHalfWidth else this
+        }
+        in 8..15 -> dustValueToPosition(value, range[1], 8 to 15)
+        in 16..35 -> dustValueToPosition(value, range[2], 16 to 35)
+        in 36..75 -> dustValueToPosition(value, range[3], 36 to 75)
+        else -> {
+            dustValueToPosition(value, range[4], 76 to 100).run {
+                if (this > maxWidth - indicatorHalfWidth) maxWidth - indicatorHalfWidth else this
             }
         }
+    }
 
     private fun dustValueToPosition(
         value: Int,
@@ -282,6 +282,7 @@ class HomeFragment : Fragment() {
         }
     }
 
+    // 리턴받은 Position (Value 에 의하여 변환) 값을 Animation 객체 생성 및 리턴.
     private fun getDustAnimationWithData(
         code: Int,
         value: Int,
@@ -289,24 +290,22 @@ class HomeFragment : Fragment() {
         halfWidth: Float,
         maxWidth: Float
     ) = TranslateAnimation(
-            0f,
-            if (code == 0) dustCheck(value, range, halfWidth, maxWidth)
-            else ultraDustCheck(value, range, halfWidth, maxWidth),
-            0f,
-            0f
-        ).apply {
-            duration = 2000
-            interpolator = AccelerateDecelerateInterpolator()
-            fillAfter = true
-        }
+        0f,
+        if (code == 0) dustCheck(value, range, halfWidth, maxWidth)
+        else ultraDustCheck(value, range, halfWidth, maxWidth),
+        0f,
+        0f
+    ).apply {
+        duration = 2000
+        interpolator = AccelerateDecelerateInterpolator()
+        fillAfter = true
+    }
 
-
+    // 리사이클러뷰 초기화 및 어댑터 등록.
     private fun setAdapters() {
         weatherAdapterAdapter = WeatherAdapter()
         humidityAdapterAdapter = HumidityAdapter()
         windAdapterAdapter = WindAdapter()
-
-        var decorator: RecyclerView.ItemDecoration? = null
 
         binding?.let {
             it.recyclerViewWeather.apply {
@@ -366,14 +365,10 @@ class HomeFragment : Fragment() {
                 )
             }
         }
-        homeViewModel.userLiveHolderAir.observe(viewLifecycleOwner) {
-        }
-
-        homeViewModel.simpleMinMaxTemperature.observe(viewLifecycleOwner) {
-            Log.e("MinMaxObserver", it.toString())
-        }
     }
 
+
+    // RecyclerView 스크롤 이벤트에 따라 날짜 Label 변경 이벤트
     private fun setLabelChangeEventFromRecyclerView(
         recyclerView: RecyclerView,
         textView: AppCompatTextView,
@@ -387,7 +382,7 @@ class HomeFragment : Fragment() {
                 ((recyclerView.layoutManager as LinearLayoutManager).findFirstCompletelyVisibleItemPosition()).let { firstPosition ->
                     data[firstPosition]?.let {
                         val nextLabel = setLabel(
-                            findDiff(
+                            findDiffDay(
                                 getCalendarFromItem(it),
                                 today
                             ).run {
@@ -406,10 +401,12 @@ class HomeFragment : Fragment() {
         })
     }
 
+    // 차이 일수를 label 텍스트로 변환
     private fun setLabel(index: Int, time: Calendar) =
         "${label[index]}{${week[time.get(Calendar.DAY_OF_WEEK) - 1]})"
 
-    private fun findDiff(selDay: Calendar, today: Calendar) =
+    // 두 Calendar 객체를 통하여 차이 구하여 리턴 : Int
+    private fun findDiffDay(selDay: Calendar, today: Calendar) =
         ((selDay.timeInMillis - today.timeInMillis) / diff).toInt()
 
     override fun onDestroyView() {
@@ -434,16 +431,23 @@ class HomeFragment : Fragment() {
 
         // 하루 최저 / 최고온도 바인딩
         // check : 0 - 최저온도, 1 - 최고온도
+        // day : 오눌 - 0, 내일 - 1, 모레 - 2
         @JvmStatic
-        @BindingAdapter("bindingHashMap", "check")
+        @BindingAdapter("bindingHashMap", "minMax", "baseDate")
         fun loadText(
             textView: AppCompatTextView,
             item: MutableLiveData<HashMap<String, HashMap<String, String>>>,
-            check: Int
+            minMax: String,
+            baseDate: String
         ) {
-            item.value?.get(Common.DateFormat.format(Date()))?.let {
-                textView.text = it[if (check == 1) "max" else "min"]
-            }
+            item.value?.get(
+                Common.DateFormat.format(
+                    Calendar.getInstance().apply {
+                        this.add(Calendar.DAY_OF_MONTH, baseDate.toInt())
+                    }.time
+                )
+            )?.let { textView.text = it[if (minMax == "최대온도") "max" else "min"] }
+            ?: let { textView.text = "정보 없음" }
         }
 
         // 미세먼지 컨데이너 색 설정

@@ -7,6 +7,13 @@
     <string name="next">Next</string>
     <string name="previous">Previous</string>
 
+    <string name="temperature_max">최대온도</string>
+    <string name="temperature_min">최저온도</string>
+
+    <string name="date_today">0</string>
+    <string name="date_tomorrow">1</string>
+    <string name="date_after_tomorrow">2</string>
+
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
 
@@ -15,5 +22,11 @@
     <string name="tab_button_3">세팅</string>
     <string name="home_detail_panel_label_fine_dust">미세먼지</string>
     <string name="home_detail_panel_label_fine_dust_ultra">초미세먼지</string>
-    <string name="aaaaa">0.2</string>
+
+    <string name="home_temperature_label_tomorrow">내일</string>
+    <string name="home_temperature_label_after_tomorrow">모레</string>
+
+    <string name="home_dust_label_fine_dust">미세먼지</string>
+    <string name="home_dust_label_fine_dust_ultra">초미세먼지</string>
+
 </resources>

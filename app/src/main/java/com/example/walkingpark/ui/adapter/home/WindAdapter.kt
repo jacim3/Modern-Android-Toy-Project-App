@@ -68,7 +68,7 @@ class WindAdapter : RecyclerView.Adapter<WindAdapter.WindViewHolder>() {
                 holder.textViewDirection.text = "${it[1]}°"
             }
 
-            holder.textViewTime.text = if (position == 0) " 지금 " else returnAmPmAfterCheck(
+            holder.textViewTime.text = if (position == 0) "  지금  " else returnAmPmAfterCheck(
                 dateTime.get(Calendar.HOUR_OF_DAY),
                 dateTime.get(Calendar.HOUR)
             )
