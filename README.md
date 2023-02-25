@@ -2,8 +2,9 @@
 
 - 기상청 API 및 RXKotlin 을 적용하여, 모던 안드로이드 트렌드를 반영한 스터디용 어플리케이션입니다.
 
+
 ## 다음의 기술이 적용되었습니다.
-### AndroidX 라이브러리 
+### AndroidX 
 - RxKotlin
 - Dagger-hilt
 - LiveData
@@ -11,7 +12,7 @@
 - Google Maps Api
 - Geocoding Api
 
-### Third Party 라이브러리
+### Third Party 
 - Retrofit2 
     
 
